@@ -2,3 +2,4 @@ browser_session/
 chrome_debug.log
 __pycache__/
 .claude/
+run_daily.log

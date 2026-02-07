@@ -7,6 +7,7 @@ NOTE: Chrome must be fully closed before running this script.
 """
 
 import json
+import re
 import subprocess
 import sys
 import time
@@ -21,6 +22,13 @@ DATA_DIR = BASE_DIR / "data"
 ALLIANCE_URL = "https://v3.stfc.pro/alliances/3974286889"
 CHROME_PATH = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
 DEBUG_PORT = 9222
+
+LEADERBOARD_PAGES = [
+    ("players_killed",    "https://v3.stfc.pro/players-killed",    "Players Killed"),
+    ("resources_mined",   "https://v3.stfc.pro/resources-mined",   "Resources Mined"),
+    ("hostiles_killed",   "https://v3.stfc.pro/hostiles-killed",   "Hostiles Killed"),
+    ("resources_raided",  "https://v3.stfc.pro/resources-raided",  "Resources Raided"),
+]
 
 
 def ensure_dirs():
@@ -45,7 +53,6 @@ def launch_chrome():
     proc = subprocess.Popen(cmd, shell=True, stderr=log_handle, stdout=log_handle)
 
     # Wait for Chrome to write the DevTools URL to the log
-    import re
     ws_url = None
     for i in range(30):
         time.sleep(1)
@@ -68,6 +75,54 @@ def launch_chrome():
     # Give Chrome a moment to fully initialize after the port is open
     time.sleep(3)
     return proc, ws_url
+
+
+def select_combobox(page, current_text, option_text):
+    """Click a combobox button and select an option from its dropdown."""
+    btn = page.locator(f"button[role='combobox']:has-text('{current_text}')").first
+    btn.click()
+    time.sleep(1)
+    page.locator(f"[role='option']:has-text('{option_text}')").first.click()
+    time.sleep(2)
+
+
+def scrape_leaderboard(page, url, stat_label):
+    """Navigate to a leaderboard page, apply Server 716 + NCC filters,
+    and return a dict mapping player name -> stat value."""
+    print(f"\nScraping {stat_label} from {url}...")
+    page.goto(url, wait_until="domcontentloaded", timeout=60_000)
+    time.sleep(5)
+
+    # Select Server 716
+    select_combobox(page, "All Servers", "716")
+
+    # Alliance filter appears after server selection
+    time.sleep(2)
+    select_combobox(page, "All Alliances", "[NCC]")
+    time.sleep(3)
+
+    # Extract all rows (table: Rank, Player, Alliance, Server, Level, StatValue, empty)
+    rows = page.evaluate("""() => {
+        const rows = [];
+        document.querySelectorAll('table tbody tr').forEach(tr => {
+            const cells = [];
+            tr.querySelectorAll('td').forEach(td => {
+                cells.push((td.innerText || '').trim());
+            });
+            if (cells.length >= 6) rows.push(cells);
+        });
+        return rows;
+    }""")
+
+    result = {}
+    for row in rows:
+        # row: [rank, name, alliance, server, level, stat_value, ...]
+        name = row[1]
+        value = row[5]
+        result[name] = value
+
+    print(f"  Got {len(result)} members for {stat_label}")
+    return result
 
 
 def pull_data(playwright, ws_endpoint):
@@ -198,6 +253,21 @@ def pull_data(playwright, ws_endpoint):
             member[field] = row[i] if i < len(row) else ""
         member_list.append(member)
 
+    # Scrape leaderboard pages for additional stats
+    leaderboard_data = {}
+    for key, url, label in LEADERBOARD_PAGES:
+        try:
+            leaderboard_data[key] = scrape_leaderboard(page, url, label)
+        except Exception as e:
+            print(f"  WARNING: Failed to scrape {label}: {e}")
+            leaderboard_data[key] = {}
+
+    # Merge leaderboard stats into member records
+    for member in member_list:
+        name = member["name"]
+        for key, _, _ in LEADERBOARD_PAGES:
+            member[key] = leaderboard_data.get(key, {}).get(name, "0")
+
     # Save with timestamp
     timestamp = datetime.now().strftime("%Y-%m-%d_%H%M%S")
     filename = DATA_DIR / f"alliance_{timestamp}.json"
@@ -218,8 +288,61 @@ def pull_data(playwright, ws_endpoint):
     with open(latest, "w", encoding="utf-8") as f:
         json.dump(record, f, indent=2, ensure_ascii=False)
 
+    # Update history.json with today's snapshot
+    update_history(record)
+
     print("Done!")
     browser.close()
+
+
+TRACKED_FIELDS = [
+    "level", "power", "helps", "rss_contrib", "iso_contrib",
+    "players_killed", "hostiles_killed", "resources_mined", "resources_raided",
+]
+
+
+def update_history(record):
+    """Append or update today's entry in history.json."""
+    history_file = DATA_DIR / "history.json"
+
+    # Load existing history
+    history = []
+    if history_file.exists():
+        try:
+            with open(history_file, "r", encoding="utf-8") as f:
+                history = json.load(f)
+        except (json.JSONDecodeError, ValueError):
+            history = []
+
+    today = datetime.now().strftime("%Y-%m-%d")
+
+    # Build compact member snapshot (name -> tracked numeric fields only)
+    members_snapshot = {}
+    for m in record.get("members", []):
+        members_snapshot[m["name"]] = {
+            field: m.get(field, "0") for field in TRACKED_FIELDS
+        }
+
+    entry = {
+        "date": today,
+        "summary": record.get("summary", {}),
+        "members": members_snapshot,
+    }
+
+    # Replace today's entry if it already exists, otherwise append
+    replaced = False
+    for i, e in enumerate(history):
+        if e.get("date") == today:
+            history[i] = entry
+            replaced = True
+            break
+    if not replaced:
+        history.append(entry)
+
+    with open(history_file, "w", encoding="utf-8") as f:
+        json.dump(history, f, indent=2, ensure_ascii=False)
+
+    print(f"History updated ({len(history)} days tracked)")
 
 
 def main():

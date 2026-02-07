@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NCC Alliance Tracker</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #0a0e17;
+    color: #c8d6e5;
+    min-height: 100vh;
+    line-height: 1.5;
+  }
+
+  .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+
+  /* Header */
+  header {
+    text-align: center;
+    padding: 30px 0 20px;
+    border-bottom: 1px solid #1a2332;
+    margin-bottom: 24px;
+  }
+  header h1 {
+    font-size: 1.8rem;
+    color: #e2e8f0;
+    letter-spacing: 1px;
+  }
+  header h1 span { color: #4dabf7; }
+  .updated {
+    font-size: 0.85rem;
+    color: #636e7b;
+    margin-top: 6px;
+  }
+
+  /* Summary Cards */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  .card {
+    background: #111827;
+    border: 1px solid #1e2d3d;
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+  }
+  .card .label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #636e7b;
+    margin-bottom: 4px;
+  }
+  .card .value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #4dabf7;
+  }
+  .card .delta {
+    font-size: 0.8rem;
+    margin-top: 2px;
+    min-height: 1.2em;
+  }
+
+  /* Period Selector */
+  .period-bar {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 20px;
+  }
+  .period-btn {
+    background: #111827;
+    border: 1px solid #1e2d3d;
+    color: #8899aa;
+    padding: 6px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .period-btn:hover { border-color: #4dabf7; color: #c8d6e5; }
+  .period-btn.active {
+    background: #4dabf7;
+    color: #0a0e17;
+    border-color: #4dabf7;
+    font-weight: 600;
+  }
+
+  /* Table */
+  .table-wrap {
+    overflow-x: auto;
+    border: 1px solid #1e2d3d;
+    border-radius: 10px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 1000px;
+  }
+  th, td {
+    padding: 10px 14px;
+    text-align: left;
+    white-space: nowrap;
+  }
+  th { white-space: normal; }
+  th {
+    background: #111827;
+    color: #8899aa;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    cursor: pointer;
+    user-select: none;
+    position: sticky;
+    top: 0;
+  }
+  th:hover { color: #4dabf7; }
+  th .arrow { margin-left: 4px; font-size: 0.7rem; }
+  tr { border-bottom: 1px solid #1a2332; }
+  tr:last-child { border-bottom: none; }
+  tr:hover td { background: #111827; }
+  td { font-size: 0.9rem; }
+
+  /* Delta display in table cells */
+  .cell-val { display: block; }
+  .cell-delta {
+    display: block;
+    font-size: 0.75rem;
+    line-height: 1.2;
+    margin-top: 1px;
+  }
+
+  /* Delta colors */
+  .delta-pos { color: #34d399; }
+  .delta-neg { color: #f87171; }
+  .delta-zero { color: #3a4250; }
+  .delta-new { color: #fbbf24; font-style: italic; }
+
+  /* Rank badges */
+  .rank {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.78rem;
+    font-weight: 600;
+  }
+  .rank-admiral    { background: #7c3aed22; color: #a78bfa; border: 1px solid #7c3aed44; }
+  .rank-commodore  { background: #dc262622; color: #f87171; border: 1px solid #dc262644; }
+  .rank-premier    { background: #d9770622; color: #fb923c; border: 1px solid #d9770644; }
+  .rank-operative  { background: #0d946822; color: #34d399; border: 1px solid #0d946844; }
+  .rank-agent      { background: #1d4ed822; color: #60a5fa; border: 1px solid #1d4ed844; }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    padding: 24px 0;
+    margin-top: 28px;
+    border-top: 1px solid #1a2332;
+    font-size: 0.8rem;
+    color: #4a5568;
+  }
+  footer a { color: #4dabf7; text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  /* Loading */
+  .loading {
+    text-align: center;
+    padding: 60px 0;
+    color: #636e7b;
+    font-size: 1.1rem;
+  }
+  .error { color: #f87171; }
+
+  @media (max-width: 600px) {
+    .container { padding: 12px; }
+    header h1 { font-size: 1.3rem; }
+    .card .value { font-size: 1.2rem; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>&#x1F680; <span>NCC</span> Alliance Tracker</h1>
+    <div class="updated" id="updated">Loading...</div>
+  </header>
+
+  <div id="content">
+    <div class="loading">Loading alliance data...</div>
+  </div>
+
+  <footer>
+    Data sourced from <a href="https://stfc.pro" target="_blank" rel="noopener">stfc.pro</a>
+  </footer>
+</div>
+
+<script>
+(function() {
+  const $ = id => document.getElementById(id);
+
+  // Parse abbreviated numbers: "190.58M", "198.96K", "42", "109.84Q"
+  function parseAbbr(str) {
+    if (!str) return 0;
+    str = String(str).trim().replace(/,/g, '');
+    const m = str.match(/^([\d.]+)\s*([KMBQT]?)$/i);
+    if (!m) return 0;
+    const num = parseFloat(m[1]);
+    const suffix = m[2].toUpperCase();
+    if (suffix === 'K') return num * 1e3;
+    if (suffix === 'M') return num * 1e6;
+    if (suffix === 'B') return num * 1e9;
+    if (suffix === 'T') return num * 1e12;
+    if (suffix === 'Q') return num * 1e15;
+    return num;
+  }
+
+  // Format a number with abbreviation
+  function formatNum(n) {
+    if (n === 0) return '0';
+    const abs = Math.abs(n);
+    const sign = n < 0 ? '-' : '+';
+    let val, suf;
+    if (abs >= 1e15)      { val = abs / 1e15; suf = 'Q'; }
+    else if (abs >= 1e12) { val = abs / 1e12; suf = 'T'; }
+    else if (abs >= 1e9)  { val = abs / 1e9;  suf = 'B'; }
+    else if (abs >= 1e6)  { val = abs / 1e6;  suf = 'M'; }
+    else if (abs >= 1e3)  { val = abs / 1e3;  suf = 'K'; }
+    else                  { val = abs;         suf = '';  }
+    // Use up to 2 decimal places, trim trailing zeros
+    const formatted = val.toFixed(2).replace(/\.?0+$/, '');
+    return sign + formatted + suf;
+  }
+
+  function parseDate(str) {
+    if (!str) return 0;
+    const d = new Date(str);
+    return isNaN(d) ? 0 : d.getTime();
+  }
+
+  function formatTime(iso) {
+    const d = new Date(iso);
+    return d.toLocaleDateString('en-US', {
+      year: 'numeric', month: 'short', day: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    });
+  }
+
+  const RANK_ORDER = { admiral: 0, commodore: 1, premier: 2, operative: 3, agent: 4 };
+  function rankSort(r) { return RANK_ORDER[(r || '').toLowerCase()] ?? 99; }
+  function rankClass(r) { return 'rank rank-' + (r || 'agent').toLowerCase(); }
+
+  function esc(s) {
+    const el = document.createElement('span');
+    el.textContent = s || '';
+    return el.innerHTML;
+  }
+
+  // Numeric fields that support deltas
+  const NUMERIC_KEYS = new Set([
+    'level', 'power', 'helps', 'rss_contrib', 'iso_contrib',
+    'players_killed', 'hostiles_killed', 'resources_mined', 'resources_raided',
+  ]);
+
+  let data = null;
+  let history = [];
+  let sortCol = 'power';
+  let sortAsc = false;
+  let period = null; // null = all time (no deltas), 1/7/30 = days
+
+  const COLUMNS = [
+    { key: 'name',             label: 'Name',              sort: (a,b) => a.name.localeCompare(b.name) },
+    { key: 'rank',             label: 'Rank',              sort: (a,b) => rankSort(a.rank) - rankSort(b.rank) },
+    { key: 'level',            label: 'Level',             sort: (a,b) => parseAbbr(a.level) - parseAbbr(b.level) },
+    { key: 'power',            label: 'Power',             sort: (a,b) => parseAbbr(a.power) - parseAbbr(b.power) },
+    { key: 'helps',            label: 'Helps',             sort: (a,b) => parseAbbr(a.helps) - parseAbbr(b.helps) },
+    { key: 'rss_contrib',      label: 'RSS<br>Contrib',    sort: (a,b) => parseAbbr(a.rss_contrib) - parseAbbr(b.rss_contrib) },
+    { key: 'iso_contrib',      label: 'ISO<br>Contrib',    sort: (a,b) => parseAbbr(a.iso_contrib) - parseAbbr(b.iso_contrib) },
+    { key: 'players_killed',   label: 'PVP<br>Kills',      sort: (a,b) => parseAbbr(a.players_killed) - parseAbbr(b.players_killed) },
+    { key: 'hostiles_killed',  label: 'Hostile<br>Kills',   sort: (a,b) => parseAbbr(a.hostiles_killed) - parseAbbr(b.hostiles_killed) },
+    { key: 'resources_mined',  label: 'RSS<br>Mined',      sort: (a,b) => parseAbbr(a.resources_mined) - parseAbbr(b.resources_mined) },
+    { key: 'resources_raided', label: 'RSS<br>Raided',     sort: (a,b) => parseAbbr(a.resources_raided) - parseAbbr(b.resources_raided) },
+    { key: 'join_date',        label: 'Joined',            sort: (a,b) => parseDate(a.join_date) - parseDate(b.join_date) },
+  ];
+
+  // Find the history snapshot closest to N days ago
+  function getSnapshotDaysAgo(days) {
+    if (!history.length) return null;
+    const target = new Date();
+    target.setDate(target.getDate() - days);
+    const targetStr = target.toISOString().slice(0, 10);
+
+    // Find the entry on or just before the target date
+    let best = null;
+    for (const entry of history) {
+      if (entry.date <= targetStr) {
+        best = entry;
+      }
+    }
+    // If no entry before target, use the oldest available
+    if (!best) best = history[0];
+    return best;
+  }
+
+  // Get the delta for a member's field vs a past snapshot
+  function getDelta(memberName, field, pastSnapshot) {
+    if (!pastSnapshot || !pastSnapshot.members) return null;
+    const past = pastSnapshot.members[memberName];
+    if (!past) return 'new'; // member wasn't in the alliance then
+    return past[field] || '0';
+  }
+
+  // Render a delta badge
+  function deltaHtml(currentStr, pastStr) {
+    if (pastStr === 'new') {
+      return '<span class="cell-delta delta-new">new</span>';
+    }
+    if (pastStr === null) return '';
+
+    const current = parseAbbr(currentStr);
+    const past = parseAbbr(pastStr);
+    const diff = current - past;
+
+    if (diff === 0) {
+      return '<span class="cell-delta delta-zero">-</span>';
+    }
+    const cls = diff > 0 ? 'delta-pos' : 'delta-neg';
+    return `<span class="cell-delta ${cls}">${formatNum(diff)}</span>`;
+  }
+
+  function render() {
+    if (!data) return;
+
+    const s = data.summary || {};
+    const members = [...(data.members || [])];
+
+    // Get past snapshot for deltas
+    const pastSnap = period ? getSnapshotDaysAgo(period) : null;
+
+    // Sort
+    const colDef = COLUMNS.find(c => c.key === sortCol);
+    if (colDef) {
+      members.sort((a, b) => {
+        const v = colDef.sort(a, b);
+        return sortAsc ? v : -v;
+      });
+    }
+
+    let html = '';
+
+    // Summary Cards
+    html += '<div class="cards">';
+    const cards = [
+      ['Total Power',   s.total_power  || '—', 'power'],
+      ['Members',       s.member_count || '—', null],
+      ['League',        s.league       || '—', null],
+      ['Avg Level',     s.avg_level    || '—', null],
+      ['Total Helps',   s.total_helps  || '—', 'helps'],
+      ['RSS Contrib',   s.total_rss    || '—', 'rss_contrib'],
+      ['ISO Contrib',   s.total_iso    || '—', 'iso_contrib'],
+    ];
+    for (const [label, value, field] of cards) {
+      let cardDelta = '';
+      if (period && pastSnap && pastSnap.summary && field) {
+        // Compute alliance-level delta from summary
+        const pastSummary = pastSnap.summary;
+        const summaryKeyMap = {
+          power: 'total_power', helps: 'total_helps',
+          rss_contrib: 'total_rss', iso_contrib: 'total_iso',
+        };
+        const pastKey = summaryKeyMap[field];
+        if (pastKey && pastSummary[pastKey]) {
+          cardDelta = deltaHtml(value, pastSummary[pastKey]);
+        }
+      }
+      html += `<div class="card"><div class="label">${label}</div><div class="value">${esc(value)}</div><div class="delta">${cardDelta}</div></div>`;
+    }
+    html += '</div>';
+
+    // Period selector
+    html += '<div class="period-bar">';
+    const periods = [
+      [null, 'All Time'],
+      [1, '1 Day'],
+      [7, '7 Days'],
+      [30, '30 Days'],
+    ];
+    for (const [p, label] of periods) {
+      const active = period === p ? ' active' : '';
+      html += `<button class="period-btn${active}" data-period="${p}">${label}</button>`;
+    }
+    html += '</div>';
+
+    // History info
+    if (history.length > 0) {
+      const oldest = history[0].date;
+      const newest = history[history.length - 1].date;
+      const days = history.length;
+      html += `<div style="text-align:center; font-size:0.78rem; color:#4a5568; margin-bottom:16px;">Tracking ${days} day${days > 1 ? 's' : ''} of history (${oldest} to ${newest})</div>`;
+    }
+
+    // Table
+    html += '<div class="table-wrap"><table><thead><tr>';
+    for (const col of COLUMNS) {
+      const arrow = sortCol === col.key ? (sortAsc ? '&#9650;' : '&#9660;') : '';
+      html += `<th data-col="${col.key}">${col.label}<span class="arrow">${arrow}</span></th>`;
+    }
+    html += '</tr></thead><tbody>';
+    for (const m of members) {
+      html += '<tr>';
+      for (const col of COLUMNS) {
+        const val = m[col.key] || '';
+        if (col.key === 'rank') {
+          html += `<td><span class="${rankClass(val)}">${esc(val)}</span></td>`;
+        } else if (period && NUMERIC_KEYS.has(col.key)) {
+          const pastVal = getDelta(m.name, col.key, pastSnap);
+          html += `<td><span class="cell-val">${esc(val)}</span>${deltaHtml(val, pastVal)}</td>`;
+        } else {
+          html += `<td>${esc(val)}</td>`;
+        }
+      }
+      html += '</tr>';
+    }
+    html += '</tbody></table></div>';
+
+    $('content').innerHTML = html;
+
+    // Attach sort handlers
+    document.querySelectorAll('th[data-col]').forEach(th => {
+      th.addEventListener('click', () => {
+        const col = th.dataset.col;
+        if (sortCol === col) { sortAsc = !sortAsc; }
+        else { sortCol = col; sortAsc = col === 'name' || col === 'join_date'; }
+        render();
+      });
+    });
+
+    // Attach period handlers
+    document.querySelectorAll('.period-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const p = btn.dataset.period;
+        period = p === 'null' ? null : parseInt(p);
+        render();
+      });
+    });
+  }
+
+  // Load data and history in parallel
+  const dataPromise = fetch('data/latest.json?t=' + Date.now())
+    .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
+
+  const historyPromise = fetch('data/history.json?t=' + Date.now())
+    .then(r => { if (!r.ok) return []; return r.json(); })
+    .catch(() => []);
+
+  Promise.all([dataPromise, historyPromise])
+    .then(([d, h]) => {
+      data = d;
+      history = h.sort((a, b) => a.date.localeCompare(b.date));
+      $('updated').textContent = 'Last updated: ' + formatTime(d.pulled_at);
+      render();
+    })
+    .catch(err => {
+      $('updated').textContent = '';
+      $('content').innerHTML = `<div class="loading error">Failed to load data: ${esc(err.message)}<br>Make sure data/latest.json exists.</div>`;
+    });
+})();
+</script>
+</body>
+</html>
