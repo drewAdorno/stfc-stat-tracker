@@ -1,0 +1,355 @@
+{
+  "pulled_at": "2026-02-07T08:44:14.498120",
+  "alliance_url": "https://v3.stfc.pro/alliances/3974286889",
+  "summary": {
+    "total_power": "190.58M",
+    "member_count": "34",
+    "league": "Adept League",
+    "total_helps": "198.96K",
+    "total_rss": "250.57K",
+    "total_iso": "210.59M",
+    "avg_level": "22"
+  },
+  "members": [
+    {
+      "name": "LuckyPete",
+      "rank": "Admiral",
+      "level": "46",
+      "power": "49.11M",
+      "helps": "17.28K",
+      "rss_contrib": "103.69K",
+      "iso_contrib": "178.40M",
+      "join_date": "Dec 22, 2025"
+    },
+    {
+      "name": "Dяew",
+      "rank": "Commodore",
+      "level": "25",
+      "power": "2.16M",
+      "helps": "30.80K",
+      "rss_contrib": "2.64K",
+      "iso_contrib": "4.72M",
+      "join_date": "Dec 22, 2025"
+    },
+    {
+      "name": "SalsaSpock",
+      "rank": "Commodore",
+      "level": "49",
+      "power": "66.08M",
+      "helps": "13.24K",
+      "rss_contrib": "85.33K",
+      "iso_contrib": "0",
+      "join_date": "Dec 25, 2025"
+    },
+    {
+      "name": "AZTreeFella",
+      "rank": "Premier",
+      "level": "39",
+      "power": "19.25M",
+      "helps": "43.89K",
+      "rss_contrib": "0",
+      "iso_contrib": "0",
+      "join_date": "Dec 24, 2025"
+    },
+    {
+      "name": "colewchambers",
+      "rank": "Operative",
+      "level": "38",
+      "power": "7.14M",
+      "helps": "19.02K",
+      "rss_contrib": "52.30K",
+      "iso_contrib": "0",
+      "join_date": "Jan 22, 2026"
+    },
+    {
+      "name": "Nalarha",
+      "rank": "Operative",
+      "level": "20",
+      "power": "853.00K",
+      "helps": "5.83K",
+      "rss_contrib": "0",
+      "iso_contrib": "0",
+      "join_date": "Feb 2, 2026"
+    },
+    {
+      "name": "AdmiralStorie",
+      "rank": "Operative",
+      "level": "42",
+      "power": "25.07M",
+      "helps": "4.15K",
+      "rss_contrib": "1.68K",
+      "iso_contrib": "27.47M",
+      "join_date": "Jan 24, 2026"
+    },
+    {
+      "name": "Muckenstein",
+      "rank": "Operative",
+      "level": "33",
+      "power": "5.81M",
+      "helps": "3.87K",
+      "rss_contrib": "42",
+      "iso_contrib": "0",
+      "join_date": "Jan 30, 2026"
+    },
+    {
+      "name": "Toaster8675309",
+      "rank": "Operative",
+      "level": "19",
+      "power": "243.65K",
+      "helps": "3.73K",
+      "rss_contrib": "0",
+      "iso_contrib": "0",
+      "join_date": "Dec 24, 2025"
+    },
+    {
+      "name": "Markonetorpedo",
+      "rank": "Operative",
+      "level": "25",
+      "power": "2.17M",
+      "helps": "2.60K",
+      "rss_contrib": "0",
+      "iso_contrib": "0",
+      "join_date": "Dec 22, 2025"
+    },
+    {
+      "name": "GobblemyGnobble",
+      "rank": "Operative",
+      "level": "24",
+      "power": "1.57M",
+      "helps": "2.33K",
+      "rss_contrib": "108",
+      "iso_contrib": "0",
+      "join_date": "Dec 26, 2025"
+    },
+    {
+      "name": "GrandWeiner",
+      "rank": "Agent",
+      "level": "29",
+      "power": "3.74M",
+      "helps": "15.01K",
+      "rss_contrib": "618",
+      "iso_contrib": "0",
+      "join_date": "Feb 5, 2026"
+    },
+    {
+      "name": "PhraggleRawk",
+      "rank": "Agent",
+      "level": "22",
+      "power": "633.52K",
+      "helps": "5.19K",
+      "rss_contrib": "210",
+      "iso_contrib": "0",
+      "join_date": "Feb 1, 2026"
+    },
+    {
+      "name": "gloomiedoom",
+      "rank": "Agent",
+      "level": "20",
+      "power": "585.86K",
+      "helps": "4.80K",
+      "rss_contrib": "0",
+      "iso_contrib": "0",
+      "join_date": "Dec 24, 2025"
+    },
+    {
+      "name": "xSnowBallx",
+      "rank": "Agent",
+      "level": "22",
+      "power": "1.42M",
+      "helps": "2.55K",
+      "rss_contrib": "156",
+      "iso_contrib": "0",
+      "join_date": "Jan 6, 2026"
+    },
+    {
+      "name": "LadyLain",
+      "rank": "Agent",
+      "level": "22",
+      "power": "700.66K",
+      "helps": "2.34K",
+      "rss_contrib": "132",
+      "iso_contrib": "0",
+      "join_date": "Jan 4, 2026"
+    },
+    {
+      "name": "glakuns",
+      "rank": "Agent",
+      "level": "19",
+      "power": "425.24K",
+      "helps": "2.27K",
+      "rss_contrib": "0",
+      "iso_contrib": "0",
+      "join_date": "Feb 7, 2026"
+    },
+    {
+      "name": "Twister1967",
+      "rank": "Agent",
+      "level": "20",
+      "power": "471.90K",
+      "helps": "2.26K",
+      "rss_contrib": "78",
+      "iso_contrib": "0",
+      "join_date": "Jan 29, 2026"
+    },
+    {
+      "name": "Smoothie81",
+      "rank": "Agent",
+      "level": "15",
+      "power": "173.06K",
+      "helps": "2.18K",
+      "rss_contrib": "0",
+      "iso_contrib": "0",
+      "join_date": "Jan 31, 2026"
+    },
+    {
+      "name": "thexquizit",
+      "rank": "Agent",
+      "level": "19",
+      "power": "311.52K",
+      "helps": "2.13K",
+      "rss_contrib": "24",
+      "iso_contrib": "0",
+      "join_date": "Feb 7, 2026"
+    },
+    {
+      "name": "TrialsAndTribbles",
+      "rank": "Agent",
+      "level": "18",
+      "power": "428.21K",
+      "helps": "2.00K",
+      "rss_contrib": "36",
+      "iso_contrib": "0",
+      "join_date": "Feb 6, 2026"
+    },
+    {
+      "name": "Bacon0Violence",
+      "rank": "Agent",
+      "level": "19",
+      "power": "474.06K",
+      "helps": "1.79K",
+      "rss_contrib": "0",
+      "iso_contrib": "0",
+      "join_date": "Feb 4, 2026"
+    },
+    {
+      "name": "OfficerJoseppi",
+      "rank": "Agent",
+      "level": "14",
+      "power": "143.29K",
+      "helps": "1.75K",
+      "rss_contrib": "0",
+      "iso_contrib": "0",
+      "join_date": "Jan 27, 2026"
+    },
+    {
+      "name": "HadrianMarlow3",
+      "rank": "Agent",
+      "level": "14",
+      "power": "142.20K",
+      "helps": "1.75K",
+      "rss_contrib": "474",
+      "iso_contrib": "0",
+      "join_date": "Feb 1, 2026"
+    },
+    {
+      "name": "Belswin",
+      "rank": "Agent",
+      "level": "13",
+      "power": "97.13K",
+      "helps": "1.36K",
+      "rss_contrib": "0",
+      "iso_contrib": "0",
+      "join_date": "Feb 1, 2026"
+    },
+    {
+      "name": "KnightofBAAWA",
+      "rank": "Agent",
+      "level": "19",
+      "power": "503.92K",
+      "helps": "828",
+      "rss_contrib": "24",
+      "iso_contrib": "0",
+      "join_date": "Feb 6, 2026"
+    },
+    {
+      "name": "AnimaPerduta",
+      "rank": "Agent",
+      "level": "12",
+      "power": "59.48K",
+      "helps": "797",
+      "rss_contrib": "900",
+      "iso_contrib": "0",
+      "join_date": "Feb 4, 2026"
+    },
+    {
+      "name": "CmdQuackers",
+      "rank": "Agent",
+      "level": "16",
+      "power": "181.47K",
+      "helps": "704",
+      "rss_contrib": "2.07K",
+      "iso_contrib": "0",
+      "join_date": "Feb 7, 2026"
+    },
+    {
+      "name": "Officer Gar8434310",
+      "rank": "Agent",
+      "level": "12",
+      "power": "59.99K",
+      "helps": "675",
+      "rss_contrib": "60",
+      "iso_contrib": "0",
+      "join_date": "Feb 3, 2026"
+    },
+    {
+      "name": "DLanick",
+      "rank": "Agent",
+      "level": "15",
+      "power": "106.26K",
+      "helps": "575",
+      "rss_contrib": "0",
+      "iso_contrib": "0",
+      "join_date": "Feb 4, 2026"
+    },
+    {
+      "name": "GarvinFade",
+      "rank": "Agent",
+      "level": "15",
+      "power": "143.13K",
+      "helps": "541",
+      "rss_contrib": "0",
+      "iso_contrib": "0",
+      "join_date": "Feb 4, 2026"
+    },
+    {
+      "name": "FoundPoem122",
+      "rank": "Agent",
+      "level": "13",
+      "power": "63.58K",
+      "helps": "376",
+      "rss_contrib": "0",
+      "iso_contrib": "0",
+      "join_date": "Feb 4, 2026"
+    },
+    {
+      "name": "Thatsoalykat",
+      "rank": "Agent",
+      "level": "11",
+      "power": "30.94K",
+      "helps": "237",
+      "rss_contrib": "0",
+      "iso_contrib": "0",
+      "join_date": "Jan 27, 2026"
+    },
+    {
+      "name": "BluNoClues",
+      "rank": "Agent",
+      "level": "9",
+      "power": "27.77K",
+      "helps": "98",
+      "rss_contrib": "0",
+      "iso_contrib": "0",
+      "join_date": "Jan 29, 2026"
+    }
+  ]
+}
