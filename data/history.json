@@ -2,19 +2,19 @@
   {
     "date": "2026-02-07",
     "summary": {
-      "total_power": "190.58M",
+      "total_power": "191.18M",
       "member_count": "34",
       "league": "Adept League",
-      "total_helps": "198.96K",
-      "total_rss": "250.57K",
+      "total_helps": "200.31K",
+      "total_rss": "250.60K",
       "total_iso": "210.59M",
       "avg_level": "22"
     },
     "members": {
       "LuckyPete": {
         "level": "46",
-        "power": "49.11M",
-        "helps": "17.28K",
+        "power": "48.67M",
+        "helps": "17.33K",
         "rss_contrib": "103.69K",
         "iso_contrib": "178.40M",
         "players_killed": "177",
@@ -25,7 +25,7 @@
       "Dяew": {
         "level": "25",
         "power": "2.20M",
-        "helps": "30.80K",
+        "helps": "30.93K",
         "rss_contrib": "2.64K",
         "iso_contrib": "4.72M",
         "players_killed": "75",
@@ -36,7 +36,7 @@
       "SalsaSpock": {
         "level": "49",
         "power": "66.19M",
-        "helps": "13.24K",
+        "helps": "13.27K",
         "rss_contrib": "85.33K",
         "iso_contrib": "0",
         "players_killed": "14",
@@ -69,7 +69,7 @@
       "Nalarha": {
         "level": "20",
         "power": "853.00K",
-        "helps": "5.83K",
+        "helps": "5.87K",
         "rss_contrib": "0",
         "iso_contrib": "0",
         "players_killed": "14",
@@ -79,8 +79,8 @@
       },
       "AdmiralStorie": {
         "level": "42",
-        "power": "25.07M",
-        "helps": "4.15K",
+        "power": "26.10M",
+        "helps": "4.28K",
         "rss_contrib": "1.68K",
         "iso_contrib": "27.47M",
         "players_killed": "8",
@@ -91,7 +91,7 @@
       "Muckenstein": {
         "level": "33",
         "power": "5.89M",
-        "helps": "3.87K",
+        "helps": "3.94K",
         "rss_contrib": "42",
         "iso_contrib": "0",
         "players_killed": "12",
@@ -113,7 +113,7 @@
       "Markonetorpedo": {
         "level": "25",
         "power": "2.17M",
-        "helps": "2.60K",
+        "helps": "2.62K",
         "rss_contrib": "0",
         "iso_contrib": "0",
         "players_killed": "42",
@@ -134,8 +134,8 @@
       },
       "GrandWeiner": {
         "level": "29",
-        "power": "3.74M",
-        "helps": "15.01K",
+        "power": "3.75M",
+        "helps": "15.06K",
         "rss_contrib": "618",
         "iso_contrib": "0",
         "players_killed": "26",
@@ -145,8 +145,8 @@
       },
       "PhraggleRawk": {
         "level": "22",
-        "power": "633.52K",
-        "helps": "5.19K",
+        "power": "636.72K",
+        "helps": "5.24K",
         "rss_contrib": "210",
         "iso_contrib": "0",
         "players_killed": "7",
@@ -156,8 +156,8 @@
       },
       "gloomiedoom": {
         "level": "20",
-        "power": "588.00K",
-        "helps": "4.80K",
+        "power": "594.28K",
+        "helps": "4.94K",
         "rss_contrib": "0",
         "iso_contrib": "0",
         "players_killed": "71",
@@ -176,6 +176,28 @@
         "resources_mined": "814.92K",
         "resources_raided": "2.70K"
       },
+      "Twister1967": {
+        "level": "20",
+        "power": "472.19K",
+        "helps": "2.35K",
+        "rss_contrib": "78",
+        "iso_contrib": "0",
+        "players_killed": "3",
+        "hostiles_killed": "1.97K",
+        "resources_mined": "595.87K",
+        "resources_raided": "271"
+      },
+      "glakuns": {
+        "level": "19",
+        "power": "426.94K",
+        "helps": "2.34K",
+        "rss_contrib": "0",
+        "iso_contrib": "0",
+        "players_killed": "1",
+        "hostiles_killed": "1.24K",
+        "resources_mined": "974.02K",
+        "resources_raided": "600"
+      },
       "LadyLain": {
         "level": "22",
         "power": "700.66K",
@@ -187,32 +209,10 @@
         "resources_mined": "2.26M",
         "resources_raided": "4.41K"
       },
-      "glakuns": {
-        "level": "19",
-        "power": "426.94K",
-        "helps": "2.27K",
-        "rss_contrib": "0",
-        "iso_contrib": "0",
-        "players_killed": "1",
-        "hostiles_killed": "1.24K",
-        "resources_mined": "974.02K",
-        "resources_raided": "600"
-      },
-      "Twister1967": {
-        "level": "20",
-        "power": "472.15K",
-        "helps": "2.26K",
-        "rss_contrib": "78",
-        "iso_contrib": "0",
-        "players_killed": "3",
-        "hostiles_killed": "1.97K",
-        "resources_mined": "595.87K",
-        "resources_raided": "271"
-      },
       "Smoothie81": {
-        "level": "15",
-        "power": "173.69K",
-        "helps": "2.18K",
+        "level": "16",
+        "power": "175.02K",
+        "helps": "2.25K",
         "rss_contrib": "0",
         "iso_contrib": "0",
         "players_killed": "13",
@@ -222,8 +222,8 @@
       },
       "thexquizit": {
         "level": "19",
-        "power": "311.52K",
-        "helps": "2.13K",
+        "power": "312.52K",
+        "helps": "2.17K",
         "rss_contrib": "24",
         "iso_contrib": "0",
         "players_killed": "13",
@@ -233,14 +233,25 @@
       },
       "TrialsAndTribbles": {
         "level": "18",
-        "power": "428.21K",
-        "helps": "2.00K",
+        "power": "428.81K",
+        "helps": "2.02K",
         "rss_contrib": "36",
         "iso_contrib": "0",
         "players_killed": "3",
         "hostiles_killed": "5.49K",
         "resources_mined": "2.41M",
         "resources_raided": "821"
+      },
+      "HadrianMarlow3": {
+        "level": "14",
+        "power": "142.78K",
+        "helps": "1.81K",
+        "rss_contrib": "474",
+        "iso_contrib": "0",
+        "players_killed": "125",
+        "hostiles_killed": "1.13K",
+        "resources_mined": "275.13K",
+        "resources_raided": "6.11K"
       },
       "Bacon0Violence": {
         "level": "19",
@@ -256,24 +267,13 @@
       "OfficerJoseppi": {
         "level": "14",
         "power": "143.29K",
-        "helps": "1.75K",
+        "helps": "1.78K",
         "rss_contrib": "0",
         "iso_contrib": "0",
         "players_killed": "6",
         "hostiles_killed": "596",
         "resources_mined": "309.08K",
         "resources_raided": "696"
-      },
-      "HadrianMarlow3": {
-        "level": "14",
-        "power": "142.78K",
-        "helps": "1.75K",
-        "rss_contrib": "474",
-        "iso_contrib": "0",
-        "players_killed": "125",
-        "hostiles_killed": "1.13K",
-        "resources_mined": "275.13K",
-        "resources_raided": "6.11K"
       },
       "Belswin": {
         "level": "13",
@@ -289,7 +289,7 @@
       "KnightofBAAWA": {
         "level": "19",
         "power": "503.92K",
-        "helps": "828",
+        "helps": "891",
         "rss_contrib": "24",
         "iso_contrib": "0",
         "players_killed": "7",
@@ -299,8 +299,8 @@
       },
       "AnimaPerduta": {
         "level": "12",
-        "power": "61.24K",
-        "helps": "797",
+        "power": "61.41K",
+        "helps": "849",
         "rss_contrib": "900",
         "iso_contrib": "0",
         "players_killed": "2",
@@ -310,8 +310,8 @@
       },
       "CmdQuackers": {
         "level": "16",
-        "power": "181.47K",
-        "helps": "704",
+        "power": "183.55K",
+        "helps": "746",
         "rss_contrib": "2.07K",
         "iso_contrib": "0",
         "players_killed": "3",
@@ -322,13 +322,24 @@
       "Officer Gar8434310": {
         "level": "12",
         "power": "59.99K",
-        "helps": "675",
+        "helps": "684",
         "rss_contrib": "60",
         "iso_contrib": "0",
         "players_killed": "0",
         "hostiles_killed": "3.64K",
         "resources_mined": "25.60K",
         "resources_raided": "0"
+      },
+      "GarvinFade": {
+        "level": "15",
+        "power": "168.43K",
+        "helps": "635",
+        "rss_contrib": "36",
+        "iso_contrib": "0",
+        "players_killed": "3",
+        "hostiles_killed": "577",
+        "resources_mined": "52.26K",
+        "resources_raided": "1.38K"
       },
       "DLanick": {
         "level": "15",
@@ -340,17 +351,6 @@
         "hostiles_killed": "165",
         "resources_mined": "58.16K",
         "resources_raided": "0"
-      },
-      "GarvinFade": {
-        "level": "15",
-        "power": "144.53K",
-        "helps": "541",
-        "rss_contrib": "0",
-        "iso_contrib": "0",
-        "players_killed": "3",
-        "hostiles_killed": "577",
-        "resources_mined": "52.26K",
-        "resources_raided": "1.38K"
       },
       "FoundPoem122": {
         "level": "13",
