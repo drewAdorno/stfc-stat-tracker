@@ -18,29 +18,29 @@
         "rss_contrib": "103.69K",
         "iso_contrib": "178.40M",
         "players_killed": "177",
-        "hostiles_killed": "41.78K",
-        "resources_mined": "53.76M",
+        "hostiles_killed": "41.83K",
+        "resources_mined": "53.91M",
         "resources_raided": "68.62B"
       },
       "Dяew": {
         "level": "25",
-        "power": "2.16M",
+        "power": "2.20M",
         "helps": "30.80K",
         "rss_contrib": "2.64K",
         "iso_contrib": "4.72M",
         "players_killed": "75",
-        "hostiles_killed": "32.52K",
-        "resources_mined": "9.64M",
+        "hostiles_killed": "32.93K",
+        "resources_mined": "9.69M",
         "resources_raided": "38.72M"
       },
       "SalsaSpock": {
         "level": "49",
-        "power": "66.08M",
+        "power": "66.19M",
         "helps": "13.24K",
         "rss_contrib": "85.33K",
         "iso_contrib": "0",
-        "players_killed": "11",
-        "hostiles_killed": "4.48K",
+        "players_killed": "14",
+        "hostiles_killed": "4.49K",
         "resources_mined": "4.18M",
         "resources_raided": "1.72M"
       },
@@ -50,7 +50,7 @@
         "helps": "43.89K",
         "rss_contrib": "0",
         "iso_contrib": "0",
-        "players_killed": "21",
+        "players_killed": "22",
         "hostiles_killed": "12.50K",
         "resources_mined": "10.04M",
         "resources_raided": "54.67K"
@@ -73,7 +73,7 @@
         "rss_contrib": "0",
         "iso_contrib": "0",
         "players_killed": "14",
-        "hostiles_killed": "3.66K",
+        "hostiles_killed": "3.67K",
         "resources_mined": "1.05M",
         "resources_raided": "7.42K"
       },
@@ -84,19 +84,19 @@
         "rss_contrib": "1.68K",
         "iso_contrib": "27.47M",
         "players_killed": "8",
-        "hostiles_killed": "10.30K",
-        "resources_mined": "19.26M",
+        "hostiles_killed": "10.39K",
+        "resources_mined": "20.45M",
         "resources_raided": "152.10K"
       },
       "Muckenstein": {
         "level": "33",
-        "power": "5.81M",
+        "power": "5.89M",
         "helps": "3.87K",
         "rss_contrib": "42",
         "iso_contrib": "0",
         "players_killed": "12",
-        "hostiles_killed": "7.83K",
-        "resources_mined": "3.74M",
+        "hostiles_killed": "7.87K",
+        "resources_mined": "3.84M",
         "resources_raided": "9.27K"
       },
       "Toaster8675309": {
@@ -117,7 +117,7 @@
         "rss_contrib": "0",
         "iso_contrib": "0",
         "players_killed": "42",
-        "hostiles_killed": "2.39K",
+        "hostiles_killed": "2.43K",
         "resources_mined": "1.39M",
         "resources_raided": "10.00K"
       },
@@ -139,8 +139,8 @@
         "rss_contrib": "618",
         "iso_contrib": "0",
         "players_killed": "26",
-        "hostiles_killed": "25.31K",
-        "resources_mined": "3.71M",
+        "hostiles_killed": "25.41K",
+        "resources_mined": "3.73M",
         "resources_raided": "5.86M"
       },
       "PhraggleRawk": {
@@ -150,19 +150,19 @@
         "rss_contrib": "210",
         "iso_contrib": "0",
         "players_killed": "7",
-        "hostiles_killed": "1.46K",
+        "hostiles_killed": "1.49K",
         "resources_mined": "1.03M",
         "resources_raided": "0"
       },
       "gloomiedoom": {
         "level": "20",
-        "power": "585.86K",
+        "power": "588.00K",
         "helps": "4.80K",
         "rss_contrib": "0",
         "iso_contrib": "0",
         "players_killed": "71",
-        "hostiles_killed": "5.72K",
-        "resources_mined": "3.06M",
+        "hostiles_killed": "5.87K",
+        "resources_mined": "3.19M",
         "resources_raided": "6.07K"
       },
       "xSnowBallx": {
@@ -189,35 +189,35 @@
       },
       "glakuns": {
         "level": "19",
-        "power": "425.24K",
+        "power": "426.94K",
         "helps": "2.27K",
         "rss_contrib": "0",
         "iso_contrib": "0",
         "players_killed": "1",
-        "hostiles_killed": "1.10K",
-        "resources_mined": "924.61K",
+        "hostiles_killed": "1.24K",
+        "resources_mined": "974.02K",
         "resources_raided": "600"
       },
       "Twister1967": {
         "level": "20",
-        "power": "471.90K",
+        "power": "472.15K",
         "helps": "2.26K",
         "rss_contrib": "78",
         "iso_contrib": "0",
         "players_killed": "3",
-        "hostiles_killed": "1.89K",
-        "resources_mined": "536.75K",
+        "hostiles_killed": "1.97K",
+        "resources_mined": "595.87K",
         "resources_raided": "271"
       },
       "Smoothie81": {
         "level": "15",
-        "power": "173.06K",
+        "power": "173.69K",
         "helps": "2.18K",
         "rss_contrib": "0",
         "iso_contrib": "0",
         "players_killed": "13",
-        "hostiles_killed": "553",
-        "resources_mined": "86.19K",
+        "hostiles_killed": "624",
+        "resources_mined": "90.95K",
         "resources_raided": "2.31K"
       },
       "thexquizit": {
@@ -228,7 +228,7 @@
         "iso_contrib": "0",
         "players_killed": "13",
         "hostiles_killed": "3.37K",
-        "resources_mined": "338.82K",
+        "resources_mined": "347.82K",
         "resources_raided": "0"
       },
       "TrialsAndTribbles": {
@@ -244,7 +244,7 @@
       },
       "Bacon0Violence": {
         "level": "19",
-        "power": "474.06K",
+        "power": "474.63K",
         "helps": "1.79K",
         "rss_contrib": "0",
         "iso_contrib": "0",
@@ -261,18 +261,18 @@
         "iso_contrib": "0",
         "players_killed": "6",
         "hostiles_killed": "596",
-        "resources_mined": "306.18K",
+        "resources_mined": "309.08K",
         "resources_raided": "696"
       },
       "HadrianMarlow3": {
         "level": "14",
-        "power": "142.20K",
+        "power": "142.78K",
         "helps": "1.75K",
         "rss_contrib": "474",
         "iso_contrib": "0",
-        "players_killed": "101",
-        "hostiles_killed": "1.10K",
-        "resources_mined": "268.47K",
+        "players_killed": "125",
+        "hostiles_killed": "1.13K",
+        "resources_mined": "275.13K",
         "resources_raided": "6.11K"
       },
       "Belswin": {
@@ -293,19 +293,19 @@
         "rss_contrib": "24",
         "iso_contrib": "0",
         "players_killed": "7",
-        "hostiles_killed": "2.24K",
-        "resources_mined": "1.36M",
+        "hostiles_killed": "2.25K",
+        "resources_mined": "1.41M",
         "resources_raided": "302"
       },
       "AnimaPerduta": {
         "level": "12",
-        "power": "59.48K",
+        "power": "61.24K",
         "helps": "797",
         "rss_contrib": "900",
         "iso_contrib": "0",
         "players_killed": "2",
-        "hostiles_killed": "355",
-        "resources_mined": "33.49K",
+        "hostiles_killed": "359",
+        "resources_mined": "40.20K",
         "resources_raided": "0"
       },
       "CmdQuackers": {
@@ -326,7 +326,7 @@
         "rss_contrib": "60",
         "iso_contrib": "0",
         "players_killed": "0",
-        "hostiles_killed": "3.63K",
+        "hostiles_killed": "3.64K",
         "resources_mined": "25.60K",
         "resources_raided": "0"
       },
@@ -343,13 +343,13 @@
       },
       "GarvinFade": {
         "level": "15",
-        "power": "143.13K",
+        "power": "144.53K",
         "helps": "541",
         "rss_contrib": "0",
         "iso_contrib": "0",
         "players_killed": "3",
-        "hostiles_killed": "449",
-        "resources_mined": "46.76K",
+        "hostiles_killed": "577",
+        "resources_mined": "52.26K",
         "resources_raided": "1.38K"
       },
       "FoundPoem122": {
@@ -365,7 +365,7 @@
       },
       "Thatsoalykat": {
         "level": "11",
-        "power": "30.94K",
+        "power": "30.61K",
         "helps": "237",
         "rss_contrib": "0",
         "iso_contrib": "0",
