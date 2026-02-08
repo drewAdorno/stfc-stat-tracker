@@ -378,6 +378,11 @@ def main():
             pull_data(pw, ws_url)
     finally:
         chrome_proc.terminate()
+        # Kill all remaining Chrome processes (child processes can linger)
+        subprocess.run(
+            ["taskkill", "/F", "/IM", "chrome.exe"],
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+        )
 
 
 if __name__ == "__main__":
