@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Player Details — NCC Alliance Tracker</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #0a0e17;
+    color: #c8d6e5;
+    min-height: 100vh;
+    line-height: 1.5;
+  }
+
+  .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+
+  /* Header */
+  header {
+    padding: 20px 0;
+    border-bottom: 1px solid #1a2332;
+    margin-bottom: 24px;
+  }
+  .back-link {
+    display: inline-block;
+    color: #4dabf7;
+    text-decoration: none;
+    font-size: 0.85rem;
+    margin-bottom: 12px;
+  }
+  .back-link:hover { text-decoration: underline; }
+  .player-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .player-header h1 {
+    font-size: 1.8rem;
+    color: #e2e8f0;
+  }
+  .player-meta {
+    font-size: 0.85rem;
+    color: #636e7b;
+    margin-top: 6px;
+  }
+
+  /* Rank badges */
+  .rank {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.78rem;
+    font-weight: 600;
+  }
+  .rank-admiral    { background: #7c3aed22; color: #a78bfa; border: 1px solid #7c3aed44; }
+  .rank-commodore  { background: #dc262622; color: #f87171; border: 1px solid #dc262644; }
+  .rank-premier    { background: #d9770622; color: #fb923c; border: 1px solid #d9770644; }
+  .rank-operative  { background: #0d946822; color: #34d399; border: 1px solid #0d946844; }
+  .rank-agent      { background: #1d4ed822; color: #60a5fa; border: 1px solid #1d4ed844; }
+
+  /* Cards */
+  .cards-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #636e7b;
+    margin-bottom: 8px;
+  }
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  .card {
+    background: #111827;
+    border: 1px solid #1e2d3d;
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+  }
+  .card .label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #636e7b;
+    margin-bottom: 4px;
+  }
+  .card .value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #4dabf7;
+  }
+  .card .delta {
+    font-size: 0.8rem;
+    margin-top: 2px;
+    min-height: 1.2em;
+  }
+
+  /* Delta colors */
+  .delta-pos { color: #34d399; }
+  .delta-neg { color: #f87171; }
+  .delta-zero { color: #3a4250; }
+
+  /* Section */
+  .section {
+    margin-bottom: 28px;
+  }
+  .section-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #e2e8f0;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #1a2332;
+  }
+
+  /* Stat selector buttons */
+  .stat-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+  .stat-btn {
+    background: #111827;
+    border: 1px solid #1e2d3d;
+    color: #8899aa;
+    padding: 6px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .stat-btn:hover { border-color: #4dabf7; color: #c8d6e5; }
+  .stat-btn.active {
+    background: #4dabf7;
+    color: #0a0e17;
+    border-color: #4dabf7;
+    font-weight: 600;
+  }
+
+  /* Chart */
+  .chart-container {
+    background: #111827;
+    border: 1px solid #1e2d3d;
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 20px;
+  }
+  .chart-container canvas {
+    width: 100% !important;
+    max-height: 350px;
+  }
+
+  /* Alliance Standing */
+  .standing-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid #1a2332;
+  }
+  .standing-row:last-child { border-bottom: none; }
+  .standing-label {
+    width: 120px;
+    font-size: 0.85rem;
+    color: #8899aa;
+    flex-shrink: 0;
+  }
+  .standing-rank {
+    width: 80px;
+    font-size: 0.85rem;
+    color: #c8d6e5;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  .standing-bar-wrap {
+    flex: 1;
+    background: #1a2332;
+    border-radius: 4px;
+    height: 18px;
+    overflow: hidden;
+  }
+  .standing-bar {
+    height: 100%;
+    background: #4dabf7;
+    border-radius: 4px;
+    min-width: 2px;
+    transition: width 0.3s;
+  }
+  .standing-pct {
+    width: 50px;
+    font-size: 0.8rem;
+    color: #636e7b;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* Recent Activity */
+  .activity-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px solid #1a2332;
+    font-size: 0.9rem;
+  }
+  .activity-item:last-child { border-bottom: none; }
+  .activity-label { color: #8899aa; }
+  .activity-value { font-weight: 600; }
+  .no-data {
+    color: #4a5568;
+    font-style: italic;
+    padding: 12px 0;
+  }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    padding: 24px 0;
+    margin-top: 28px;
+    border-top: 1px solid #1a2332;
+    font-size: 0.8rem;
+    color: #4a5568;
+  }
+  footer a { color: #4dabf7; text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  /* Loading */
+  .loading {
+    text-align: center;
+    padding: 60px 0;
+    color: #636e7b;
+    font-size: 1.1rem;
+  }
+  .error { color: #f87171; }
+
+  @media (max-width: 600px) {
+    .container { padding: 12px; }
+    .player-header h1 { font-size: 1.3rem; }
+    .card .value { font-size: 1.2rem; }
+    .standing-label { width: 90px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <a class="back-link" href="index.html">&larr; Back to Alliance</a>
+    <div id="player-header"></div>
+  </header>
+
+  <div id="content">
+    <div class="loading">Loading player data...</div>
+  </div>
+
+  <footer>
+    Data sourced from <a href="https://stfc.pro" target="_blank" rel="noopener">stfc.pro</a>
+  </footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+(function() {
+  const $ = id => document.getElementById(id);
+
+  function parseAbbr(str) {
+    if (!str) return 0;
+    str = String(str).trim().replace(/,/g, '');
+    const m = str.match(/^([\d.]+)\s*([KMBQT]?)$/i);
+    if (!m) return 0;
+    const num = parseFloat(m[1]);
+    const suffix = m[2].toUpperCase();
+    if (suffix === 'K') return num * 1e3;
+    if (suffix === 'M') return num * 1e6;
+    if (suffix === 'B') return num * 1e9;
+    if (suffix === 'T') return num * 1e12;
+    if (suffix === 'Q') return num * 1e15;
+    return num;
+  }
+
+  function formatAbbr(n) {
+    if (n === 0) return '0';
+    const abs = Math.abs(n);
+    let val, suf;
+    if (abs >= 1e15)      { val = abs / 1e15; suf = 'Q'; }
+    else if (abs >= 1e12) { val = abs / 1e12; suf = 'T'; }
+    else if (abs >= 1e9)  { val = abs / 1e9;  suf = 'B'; }
+    else if (abs >= 1e6)  { val = abs / 1e6;  suf = 'M'; }
+    else if (abs >= 1e3)  { val = abs / 1e3;  suf = 'K'; }
+    else                  { val = abs;         suf = '';  }
+    return val.toFixed(2).replace(/\.?0+$/, '') + suf;
+  }
+
+  function formatNum(n) {
+    if (n === 0) return '0';
+    const abs = Math.abs(n);
+    const sign = n < 0 ? '-' : '+';
+    let val, suf;
+    if (abs >= 1e15)      { val = abs / 1e15; suf = 'Q'; }
+    else if (abs >= 1e12) { val = abs / 1e12; suf = 'T'; }
+    else if (abs >= 1e9)  { val = abs / 1e9;  suf = 'B'; }
+    else if (abs >= 1e6)  { val = abs / 1e6;  suf = 'M'; }
+    else if (abs >= 1e3)  { val = abs / 1e3;  suf = 'K'; }
+    else                  { val = abs;         suf = '';  }
+    return sign + val.toFixed(2).replace(/\.?0+$/, '') + suf;
+  }
+
+  function esc(s) {
+    const el = document.createElement('span');
+    el.textContent = s || '';
+    return el.innerHTML;
+  }
+
+  function rankClass(r) { return 'rank rank-' + (r || 'agent').toLowerCase(); }
+
+  // Stat definitions
+  const STATS = [
+    { key: 'power',            label: 'Power' },
+    { key: 'level',            label: 'Level' },
+    { key: 'helps',            label: 'Helps' },
+    { key: 'rss_contrib',      label: 'RSS Contrib' },
+    { key: 'iso_contrib',      label: 'ISO Contrib' },
+    { key: 'players_killed',   label: 'PVP Kills' },
+    { key: 'hostiles_killed',  label: 'Hostile Kills' },
+    { key: 'resources_mined',  label: 'RSS Mined' },
+    { key: 'resources_raided', label: 'RSS Raided' },
+  ];
+
+  const STAT_MAP = {};
+  STATS.forEach(s => STAT_MAP[s.key] = s.label);
+
+  const playerId = new URLSearchParams(window.location.search).get('id');
+  if (!playerId) {
+    $('player-header').innerHTML = '';
+    $('content').innerHTML = '<div class="loading error">No player ID specified.</div>';
+    return;
+  }
+
+  let chart = null;
+  let currentStat = 'power';
+
+  function renderChart(dates, player, statKey) {
+    const values = dates.map(d => d.value);
+    const ctx = document.getElementById('stat-chart');
+    if (!ctx) return;
+
+    if (chart) chart.destroy();
+
+    chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: dates.map(d => d.date),
+        datasets: [{
+          label: STAT_MAP[statKey] || statKey,
+          data: values,
+          borderColor: '#4dabf7',
+          backgroundColor: 'rgba(77, 171, 247, 0.1)',
+          pointBackgroundColor: '#4dabf7',
+          pointBorderColor: '#4dabf7',
+          pointRadius: 3,
+          pointHoverRadius: 5,
+          tension: 0.3,
+          fill: true,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: function(ctx) {
+                return STAT_MAP[statKey] + ': ' + formatAbbr(ctx.parsed.y);
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            grid: { color: '#1a2332' },
+            ticks: { color: '#8899aa', maxRotation: 45 },
+          },
+          y: {
+            grid: { color: '#1a2332' },
+            ticks: {
+              color: '#8899aa',
+              callback: function(value) { return formatAbbr(value); }
+            },
+          }
+        }
+      }
+    });
+  }
+
+  function buildTimeSeries(history, id, statKey) {
+    const points = [];
+    for (const entry of history) {
+      const memberData = entry.members[id];
+      if (memberData && memberData[statKey] !== undefined) {
+        points.push({
+          date: entry.date,
+          value: parseAbbr(memberData[statKey]),
+        });
+      }
+    }
+    return points;
+  }
+
+  function render(data, history) {
+    const members = data.members || [];
+    const player = members.find(m => m.id === playerId);
+    if (!player) {
+      $('player-header').innerHTML = '';
+      $('content').innerHTML = '<div class="loading error">Player not found in current data.</div>';
+      return;
+    }
+
+    // Header
+    $('player-header').innerHTML = `
+      <div class="player-header">
+        <h1>${esc(player.name)}</h1>
+        <span class="${rankClass(player.rank)}">${esc(player.rank)}</span>
+      </div>
+      <div class="player-meta">Level ${esc(player.level)} &middot; Joined ${esc(player.join_date)}</div>
+    `;
+    document.title = player.name + ' — NCC Alliance Tracker';
+
+    // Get 1-day-ago snapshot for deltas
+    let pastSnap = null;
+    if (history.length > 0) {
+      const target = new Date();
+      target.setDate(target.getDate() - 1);
+      const targetStr = target.toISOString().slice(0, 10);
+      for (const entry of history) {
+        if (entry.date <= targetStr) pastSnap = entry;
+      }
+      if (!pastSnap) pastSnap = history[0];
+    }
+    const pastMember = pastSnap && pastSnap.members ? pastSnap.members[playerId] : null;
+
+    function deltaHtml(currentStr, field) {
+      if (!pastMember) return '';
+      const current = parseAbbr(currentStr);
+      const past = parseAbbr(pastMember[field] || '0');
+      const diff = current - past;
+      if (diff === 0) return '<span class="delta-zero">-</span>';
+      const cls = diff > 0 ? 'delta-pos' : 'delta-neg';
+      return `<span class="${cls}">${formatNum(diff)}</span>`;
+    }
+
+    function card(label, value, field) {
+      return `<div class="card"><div class="label">${label}</div><div class="value">${esc(value)}</div><div class="delta">${deltaHtml(value, field)}</div></div>`;
+    }
+
+    let html = '';
+
+    // Current Stats Cards
+    html += '<div class="section">';
+    html += '<div class="cards-label">Current Stats</div>';
+    html += '<div class="cards">';
+    html += card('Power', player.power, 'power');
+    html += card('Level', player.level, 'level');
+    html += card('Helps', player.helps, 'helps');
+    html += card('RSS Contrib', player.rss_contrib, 'rss_contrib');
+    html += card('ISO Contrib', player.iso_contrib, 'iso_contrib');
+    html += '</div>';
+    html += '<div class="cards">';
+    html += card('PVP Kills', player.players_killed, 'players_killed');
+    html += card('Hostile Kills', player.hostiles_killed, 'hostiles_killed');
+    html += card('RSS Mined', player.resources_mined, 'resources_mined');
+    html += card('RSS Raided', player.resources_raided, 'resources_raided');
+    html += '</div>';
+    html += '</div>';
+
+    // Chart Section
+    html += '<div class="section">';
+    html += '<div class="section-title">Stat History</div>';
+    if (history.length === 0) {
+      html += '<div class="no-data">No history data available yet.</div>';
+    } else {
+      html += '<div class="stat-bar" id="stat-bar">';
+      for (const s of STATS) {
+        const active = s.key === currentStat ? ' active' : '';
+        html += `<button class="stat-btn${active}" data-stat="${s.key}">${s.label}</button>`;
+      }
+      html += '</div>';
+      html += '<div class="chart-container"><canvas id="stat-chart" height="350"></canvas></div>';
+    }
+    html += '</div>';
+
+    // Alliance Standing
+    html += '<div class="section">';
+    html += '<div class="section-title">Alliance Standing</div>';
+    const standingStats = [
+      { key: 'power', label: 'Power' },
+      { key: 'helps', label: 'Helps' },
+      { key: 'rss_contrib', label: 'RSS Contrib' },
+      { key: 'iso_contrib', label: 'ISO Contrib' },
+      { key: 'players_killed', label: 'PVP Kills' },
+      { key: 'hostiles_killed', label: 'Hostile Kills' },
+      { key: 'resources_mined', label: 'RSS Mined' },
+      { key: 'resources_raided', label: 'RSS Raided' },
+    ];
+    for (const s of standingStats) {
+      const vals = members.map(m => parseAbbr(m[s.key])).sort((a, b) => b - a);
+      const playerVal = parseAbbr(player[s.key]);
+      const rank = vals.indexOf(playerVal) + 1;
+      const total = members.length;
+      const allianceTotal = vals.reduce((a, b) => a + b, 0);
+      const pct = allianceTotal > 0 ? (playerVal / allianceTotal * 100) : 0;
+
+      html += `<div class="standing-row">
+        <div class="standing-label">${s.label}</div>
+        <div class="standing-rank">#${rank} of ${total}</div>
+        <div class="standing-bar-wrap"><div class="standing-bar" style="width:${pct.toFixed(1)}%"></div></div>
+        <div class="standing-pct">${pct.toFixed(1)}%</div>
+      </div>`;
+    }
+    html += '</div>';
+
+    // Recent Activity (1-day changes)
+    html += '<div class="section">';
+    html += '<div class="section-title">Recent Activity (1 Day)</div>';
+    if (!pastMember) {
+      html += '<div class="no-data">No previous data to compare.</div>';
+    } else {
+      let hasActivity = false;
+      for (const s of STATS) {
+        const current = parseAbbr(player[s.key]);
+        const past = parseAbbr(pastMember[s.key] || '0');
+        const diff = current - past;
+        if (diff !== 0) {
+          hasActivity = true;
+          const cls = diff > 0 ? 'delta-pos' : 'delta-neg';
+          html += `<div class="activity-item">
+            <span class="activity-label">${STAT_MAP[s.key]}</span>
+            <span class="activity-value ${cls}">${formatNum(diff)}</span>
+          </div>`;
+        }
+      }
+      if (!hasActivity) {
+        html += '<div class="no-data">No changes in the last day.</div>';
+      }
+    }
+    html += '</div>';
+
+    $('content').innerHTML = html;
+
+    // Init chart if we have history
+    if (history.length > 0) {
+      const series = buildTimeSeries(history, playerId, currentStat);
+      renderChart(series, player, currentStat);
+
+      // Stat selector handlers
+      document.querySelectorAll('#stat-bar .stat-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          currentStat = btn.dataset.stat;
+          document.querySelectorAll('#stat-bar .stat-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const series = buildTimeSeries(history, playerId, currentStat);
+          renderChart(series, player, currentStat);
+        });
+      });
+    }
+  }
+
+  // Load data
+  const dataPromise = fetch('data/latest.json?t=' + Date.now())
+    .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
+
+  const historyPromise = fetch('data/history.json?t=' + Date.now())
+    .then(r => { if (!r.ok) return []; return r.json(); })
+    .catch(() => []);
+
+  Promise.all([dataPromise, historyPromise])
+    .then(([d, h]) => {
+      const history = h.sort((a, b) => a.date.localeCompare(b.date));
+      render(d, history);
+    })
+    .catch(err => {
+      $('player-header').innerHTML = '';
+      $('content').innerHTML = `<div class="loading error">Failed to load data: ${esc(err.message)}</div>`;
+    });
+})();
+</script>
+</body>
+</html>

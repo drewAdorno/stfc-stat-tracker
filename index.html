@@ -183,6 +183,10 @@
   footer a { color: #4dabf7; text-decoration: none; }
   footer a:hover { text-decoration: underline; }
 
+  /* Player name links */
+  .player-link { color: #4dabf7; text-decoration: none; }
+  .player-link:hover { text-decoration: underline; }
+
   /* Loading */
   .loading {
     text-align: center;
@@ -502,7 +506,9 @@
       html += '<tr>';
       for (const col of COLUMNS) {
         const val = m[col.key] || '';
-        if (col.key === 'rank') {
+        if (col.key === 'name') {
+          html += `<td><a class="player-link" href="player.html?id=${encodeURIComponent(m.id)}">${esc(val)}</a></td>`;
+        } else if (col.key === 'rank') {
           html += `<td><span class="${rankClass(val)}">${esc(val)}</span></td>`;
         } else if (period && NUMERIC_KEYS.has(col.key)) {
           const pastVal = getDelta(m, col.key, pastSnap);
