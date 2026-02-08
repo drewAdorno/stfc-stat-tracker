@@ -67,6 +67,13 @@
     margin-top: 2px;
     min-height: 1.2em;
   }
+  .cards-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #636e7b;
+    margin-bottom: 8px;
+  }
 
   /* Period Selector */
   .period-bar {
@@ -131,11 +138,17 @@
 
   /* Delta display in table cells */
   .cell-val { display: block; }
+  .cell-sub { display: block; font-size: 0.7rem; color: #4a5568; margin-top: 1px; }
   .cell-delta {
     display: block;
     font-size: 0.75rem;
     line-height: 1.2;
     margin-top: 1px;
+  }
+  .cell-delta-main {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
   }
 
   /* Delta colors */
@@ -239,6 +252,23 @@
     return sign + formatted + suf;
   }
 
+  function formatAbbr(n) {
+    if (n === 0) return '0';
+    const abs = Math.abs(n);
+    let val, suf;
+    if (abs >= 1e15)      { val = abs / 1e15; suf = 'Q'; }
+    else if (abs >= 1e12) { val = abs / 1e12; suf = 'T'; }
+    else if (abs >= 1e9)  { val = abs / 1e9;  suf = 'B'; }
+    else if (abs >= 1e6)  { val = abs / 1e6;  suf = 'M'; }
+    else if (abs >= 1e3)  { val = abs / 1e3;  suf = 'K'; }
+    else                  { val = abs;         suf = '';  }
+    return val.toFixed(2).replace(/\.?0+$/, '') + suf;
+  }
+
+  function sumField(members, field) {
+    return members.reduce((sum, m) => sum + parseAbbr(m[field]), 0);
+  }
+
   function parseDate(str) {
     if (!str) return 0;
     const d = new Date(str);
@@ -273,7 +303,7 @@
   let history = [];
   let sortCol = 'power';
   let sortAsc = false;
-  let period = null; // null = all time (no deltas), 1/7/30 = days
+  let period = 1; // null = all time (no deltas), 1/7/30 = days
 
   const COLUMNS = [
     { key: 'name',             label: 'Name',              sort: (a,b) => a.name.localeCompare(b.name) },
@@ -336,6 +366,22 @@
     return `<span class="cell-delta ${cls}">${formatNum(diff)}</span>`;
   }
 
+  // Render a gain-focused cell: delta as main value, current total as subtitle
+  function gainCellHtml(currentStr, pastStr) {
+    if (pastStr === 'new') {
+      return `<span class="cell-delta-main delta-new">new</span><span class="cell-sub">${esc(currentStr)}</span>`;
+    }
+    if (pastStr === null) return esc(currentStr);
+    const current = parseAbbr(currentStr);
+    const past = parseAbbr(pastStr);
+    const diff = current - past;
+    if (diff === 0) {
+      return `<span class="cell-delta-main delta-zero">0</span><span class="cell-sub">${esc(currentStr)}</span>`;
+    }
+    const cls = diff > 0 ? 'delta-pos' : 'delta-neg';
+    return `<span class="cell-delta-main ${cls}">${formatNum(diff)}</span><span class="cell-sub">${esc(currentStr)}</span>`;
+  }
+
   function render() {
     if (!data) return;
 
@@ -345,44 +391,80 @@
     // Get past snapshot for deltas
     const pastSnap = period ? getSnapshotDaysAgo(period) : null;
 
-    // Sort
+    // Sort — use delta values when a period is active and column is numeric
+    const DELTA_KEYS = new Set(['level','power','helps','rss_contrib','iso_contrib',
+      'players_killed','hostiles_killed','resources_mined','resources_raided']);
     const colDef = COLUMNS.find(c => c.key === sortCol);
     if (colDef) {
       members.sort((a, b) => {
-        const v = colDef.sort(a, b);
+        let v;
+        if (pastSnap && DELTA_KEYS.has(sortCol)) {
+          const da = getDelta(a, sortCol, pastSnap);
+          const db = getDelta(b, sortCol, pastSnap);
+          // "new" members sort to the bottom regardless of direction
+          if (da === 'new' && db === 'new') return 0;
+          if (da === 'new') return 1;
+          if (db === 'new') return -1;
+          v = (parseAbbr(a[sortCol]) - parseAbbr(da)) - (parseAbbr(b[sortCol]) - parseAbbr(db));
+        } else {
+          v = colDef.sort(a, b);
+        }
         return sortAsc ? v : -v;
       });
     }
 
     let html = '';
 
-    // Summary Cards
+    // Map from card field to summary key (for fields stored in summary)
+    const summaryKeyMap = {
+      power: 'total_power', helps: 'total_helps',
+      rss_contrib: 'total_rss', iso_contrib: 'total_iso',
+    };
+    // Fields where totals are computed from members
+    const computedFields = new Set(['players_killed','hostiles_killed','resources_mined','resources_raided']);
+    function renderCards(cardList) {
+      let out = '';
+      for (const [label, value, field] of cardList) {
+        let cardDelta = '';
+        if (period && pastSnap && field) {
+          if (summaryKeyMap[field] && pastSnap.summary) {
+            const pastKey = summaryKeyMap[field];
+            if (pastSnap.summary[pastKey]) {
+              cardDelta = deltaHtml(value, pastSnap.summary[pastKey]);
+            }
+          } else if (computedFields.has(field) && pastSnap.members) {
+            const pastTotal = Object.values(pastSnap.members)
+              .reduce((sum, m) => sum + parseAbbr(m[field]), 0);
+            cardDelta = deltaHtml(value, formatAbbr(pastTotal));
+          }
+        }
+        out += `<div class="card"><div class="label">${label}</div><div class="value">${esc(value)}</div><div class="delta">${cardDelta}</div></div>`;
+      }
+      return out;
+    }
+
+    // Alliance info cards
     html += '<div class="cards">';
-    const cards = [
+    html += renderCards([
       ['Total Power',   s.total_power  || '—', 'power'],
       ['Members',       s.member_count || '—', null],
       ['League',        s.league       || '—', null],
       ['Avg Level',     s.avg_level    || '—', null],
-      ['Total Helps',   s.total_helps  || '—', 'helps'],
+    ]);
+    html += '</div>';
+
+    // Stat totals cards
+    html += '<div class="cards-label">Alliance Totals</div>';
+    html += '<div class="cards">';
+    html += renderCards([
+      ['Helps',         s.total_helps  || '—', 'helps'],
       ['RSS Contrib',   s.total_rss    || '—', 'rss_contrib'],
       ['ISO Contrib',   s.total_iso    || '—', 'iso_contrib'],
-    ];
-    for (const [label, value, field] of cards) {
-      let cardDelta = '';
-      if (period && pastSnap && pastSnap.summary && field) {
-        // Compute alliance-level delta from summary
-        const pastSummary = pastSnap.summary;
-        const summaryKeyMap = {
-          power: 'total_power', helps: 'total_helps',
-          rss_contrib: 'total_rss', iso_contrib: 'total_iso',
-        };
-        const pastKey = summaryKeyMap[field];
-        if (pastKey && pastSummary[pastKey]) {
-          cardDelta = deltaHtml(value, pastSummary[pastKey]);
-        }
-      }
-      html += `<div class="card"><div class="label">${label}</div><div class="value">${esc(value)}</div><div class="delta">${cardDelta}</div></div>`;
-    }
+      ['PVP Kills',     formatAbbr(sumField(members, 'players_killed')),   'players_killed'],
+      ['Hostile Kills', formatAbbr(sumField(members, 'hostiles_killed')),  'hostiles_killed'],
+      ['RSS Mined',     formatAbbr(sumField(members, 'resources_mined')),  'resources_mined'],
+      ['RSS Raided',    formatAbbr(sumField(members, 'resources_raided')), 'resources_raided'],
+    ]);
     html += '</div>';
 
     // Period selector
@@ -411,7 +493,9 @@
     html += '<div class="table-wrap"><table><thead><tr>';
     for (const col of COLUMNS) {
       const arrow = sortCol === col.key ? (sortAsc ? '&#9650;' : '&#9660;') : '';
-      html += `<th data-col="${col.key}">${col.label}<span class="arrow">${arrow}</span></th>`;
+      let label = col.label;
+      if (period && NUMERIC_KEYS.has(col.key)) label += '<br>Gained';
+      html += `<th data-col="${col.key}">${label}<span class="arrow">${arrow}</span></th>`;
     }
     html += '</tr></thead><tbody>';
     for (const m of members) {
@@ -422,7 +506,7 @@
           html += `<td><span class="${rankClass(val)}">${esc(val)}</span></td>`;
         } else if (period && NUMERIC_KEYS.has(col.key)) {
           const pastVal = getDelta(m, col.key, pastSnap);
-          html += `<td><span class="cell-val">${esc(val)}</span>${deltaHtml(val, pastVal)}</td>`;
+          html += `<td>${gainCellHtml(val, pastVal)}</td>`;
         } else {
           html += `<td>${esc(val)}</td>`;
         }
