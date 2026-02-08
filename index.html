@@ -498,7 +498,7 @@
     for (const col of COLUMNS) {
       const arrow = sortCol === col.key ? (sortAsc ? '&#9650;' : '&#9660;') : '';
       let label = col.label;
-      if (period && NUMERIC_KEYS.has(col.key)) label += '<br>Gained';
+      if (period && (col.key === 'power' || col.key === 'helps')) label += '<br>Gained';
       html += `<th data-col="${col.key}">${label}<span class="arrow">${arrow}</span></th>`;
     }
     html += '</tr></thead><tbody>';
