@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NCC Admin Dashboard</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #0a0e17;
+    color: #c8d6e5;
+    min-height: 100vh;
+    line-height: 1.5;
+  }
+
+  .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+
+  /* Header */
+  header {
+    text-align: center;
+    padding: 30px 0 20px;
+    border-bottom: 1px solid #1a2332;
+    margin-bottom: 24px;
+  }
+  header h1 {
+    font-size: 1.8rem;
+    color: #e2e8f0;
+    letter-spacing: 1px;
+  }
+  header h1 span { color: #4dabf7; }
+  .updated {
+    font-size: 0.85rem;
+    color: #636e7b;
+    margin-top: 6px;
+  }
+
+  /* Login */
+  #login-gate {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 60vh;
+  }
+  .login-box {
+    background: #111827;
+    border: 1px solid #1e2d3d;
+    border-radius: 12px;
+    padding: 40px;
+    text-align: center;
+    max-width: 360px;
+    width: 100%;
+  }
+  .login-box h2 {
+    color: #e2e8f0;
+    font-size: 1.3rem;
+    margin-bottom: 20px;
+  }
+  .login-box input {
+    width: 100%;
+    padding: 10px 14px;
+    background: #0a0e17;
+    border: 1px solid #1e2d3d;
+    border-radius: 6px;
+    color: #c8d6e5;
+    font-size: 1rem;
+    font-family: inherit;
+    margin-bottom: 14px;
+  }
+  .login-box input:focus {
+    outline: none;
+    border-color: #4dabf7;
+  }
+  .login-box button {
+    width: 100%;
+    padding: 10px;
+    background: #4dabf7;
+    color: #0a0e17;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .login-box button:hover { background: #74c0fc; }
+  .login-error {
+    color: #f87171;
+    font-size: 0.85rem;
+    margin-top: 10px;
+    min-height: 1.2em;
+  }
+
+  /* Sections */
+  .section {
+    margin-bottom: 32px;
+  }
+  .section-header {
+    font-size: 1.15rem;
+    color: #e2e8f0;
+    font-weight: 600;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #1e2d3d;
+    margin-bottom: 16px;
+  }
+
+  /* Tables */
+  .table-wrap {
+    overflow-x: auto;
+    border: 1px solid #1e2d3d;
+    border-radius: 10px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  th, td {
+    padding: 10px 14px;
+    text-align: left;
+    white-space: nowrap;
+  }
+  th {
+    background: #111827;
+    color: #8899aa;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    position: sticky;
+    top: 0;
+  }
+  tr { border-bottom: 1px solid #1a2332; }
+  tr:last-child { border-bottom: none; }
+  tr:hover td { background: #111827; }
+  td { font-size: 0.9rem; }
+
+  /* Rank badges */
+  .rank {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.78rem;
+    font-weight: 600;
+  }
+  .rank-admiral    { background: #7c3aed22; color: #a78bfa; border: 1px solid #7c3aed44; }
+  .rank-commodore  { background: #dc262622; color: #f87171; border: 1px solid #dc262644; }
+  .rank-premier    { background: #d9770622; color: #fb923c; border: 1px solid #d9770644; }
+  .rank-operative  { background: #0d946822; color: #34d399; border: 1px solid #0d946844; }
+  .rank-agent      { background: #1d4ed822; color: #60a5fa; border: 1px solid #1d4ed844; }
+
+  /* Delta colors */
+  .delta-pos { color: #34d399; }
+  .delta-neg { color: #f87171; }
+  .delta-zero { color: #3a4250; }
+
+  /* Cards grid for bottom contributors */
+  .mini-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+  }
+  .mini-card {
+    background: #111827;
+    border: 1px solid #1e2d3d;
+    border-radius: 10px;
+    padding: 16px;
+  }
+  .mini-card h3 {
+    font-size: 0.85rem;
+    color: #8899aa;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 10px;
+  }
+  .mini-card ol {
+    list-style: none;
+    counter-reset: rank;
+  }
+  .mini-card ol li {
+    counter-increment: rank;
+    padding: 4px 0;
+    font-size: 0.88rem;
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #1a2332;
+  }
+  .mini-card ol li:last-child { border-bottom: none; }
+  .mini-card ol li::before {
+    content: counter(rank) ".";
+    color: #636e7b;
+    margin-right: 8px;
+    font-weight: 600;
+    min-width: 1.5em;
+  }
+  .mini-card .li-name { flex: 1; }
+  .mini-card .li-rank {
+    margin: 0 8px;
+  }
+  .mini-card .li-val {
+    color: #636e7b;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Rank distribution */
+  .rank-dist {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .rank-dist-item {
+    background: #111827;
+    border: 1px solid #1e2d3d;
+    border-radius: 10px;
+    padding: 16px 24px;
+    text-align: center;
+    min-width: 120px;
+  }
+  .rank-dist-item .rd-count {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .rank-dist-item .rd-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  /* Power movers grid */
+  .movers-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  /* Empty state */
+  .empty {
+    color: #4a5568;
+    font-style: italic;
+    padding: 12px 0;
+  }
+
+  /* Player name links */
+  .player-link { color: #4dabf7; text-decoration: none; }
+  .player-link:hover { text-decoration: underline; }
+
+  /* Loading / Error */
+  .loading {
+    text-align: center;
+    padding: 60px 0;
+    color: #636e7b;
+    font-size: 1.1rem;
+  }
+  .error { color: #f87171; }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    padding: 24px 0;
+    margin-top: 28px;
+    border-top: 1px solid #1a2332;
+    font-size: 0.8rem;
+    color: #4a5568;
+  }
+  footer a { color: #4dabf7; text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  @media (max-width: 600px) {
+    .container { padding: 12px; }
+    header h1 { font-size: 1.3rem; }
+    .movers-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1><span>NCC</span> Admin Dashboard</h1>
+    <div class="updated" id="updated"></div>
+  </header>
+
+  <div id="login-gate">
+    <div class="login-box">
+      <h2>Alliance Leaders Only</h2>
+      <input type="password" id="pw-input" placeholder="Enter password" autocomplete="off">
+      <button id="pw-btn">Enter</button>
+      <div class="login-error" id="pw-error"></div>
+    </div>
+  </div>
+
+  <div id="content" style="display:none">
+    <div class="loading">Loading alliance data...</div>
+  </div>
+
+  <footer style="display:none" id="footer-el">
+    Data sourced from <a href="https://stfc.pro" target="_blank" rel="noopener">stfc.pro</a>
+    &middot; <a href="index.html">Main Dashboard</a>
+  </footer>
+</div>
+
+<script>
+(function() {
+  const $ = id => document.getElementById(id);
+
+  // --- Auth gate ---
+  const PASSWORD = 'salsa';
+
+  function checkAuth() {
+    return sessionStorage.getItem('ncc_admin_auth') === 'ok';
+  }
+
+  function showDashboard() {
+    $('login-gate').style.display = 'none';
+    $('content').style.display = '';
+    $('footer-el').style.display = '';
+    loadData();
+  }
+
+  if (checkAuth()) {
+    showDashboard();
+  } else {
+    $('pw-btn').addEventListener('click', tryLogin);
+    $('pw-input').addEventListener('keydown', e => { if (e.key === 'Enter') tryLogin(); });
+  }
+
+  function tryLogin() {
+    const val = $('pw-input').value;
+    if (val === PASSWORD) {
+      sessionStorage.setItem('ncc_admin_auth', 'ok');
+      showDashboard();
+    } else {
+      $('pw-error').textContent = 'Incorrect password';
+      $('pw-input').value = '';
+      $('pw-input').focus();
+    }
+  }
+
+  // --- Utility functions ---
+  function parseAbbr(str) {
+    if (!str) return 0;
+    str = String(str).trim().replace(/,/g, '');
+    const m = str.match(/^([\d.]+)\s*([KMBQT]?)$/i);
+    if (!m) return 0;
+    const num = parseFloat(m[1]);
+    const suffix = m[2].toUpperCase();
+    if (suffix === 'K') return num * 1e3;
+    if (suffix === 'M') return num * 1e6;
+    if (suffix === 'B') return num * 1e9;
+    if (suffix === 'T') return num * 1e12;
+    if (suffix === 'Q') return num * 1e15;
+    return num;
+  }
+
+  function formatAbbr(n) {
+    if (n === 0) return '0';
+    const abs = Math.abs(n);
+    const sign = n < 0 ? '-' : '';
+    let val, suf;
+    if (abs >= 1e15)      { val = abs / 1e15; suf = 'Q'; }
+    else if (abs >= 1e12) { val = abs / 1e12; suf = 'T'; }
+    else if (abs >= 1e9)  { val = abs / 1e9;  suf = 'B'; }
+    else if (abs >= 1e6)  { val = abs / 1e6;  suf = 'M'; }
+    else if (abs >= 1e3)  { val = abs / 1e3;  suf = 'K'; }
+    else                  { val = abs;         suf = '';  }
+    return sign + val.toFixed(2).replace(/\.?0+$/, '') + suf;
+  }
+
+  function formatNum(n) {
+    if (n === 0) return '0';
+    const abs = Math.abs(n);
+    const sign = n < 0 ? '-' : '+';
+    let val, suf;
+    if (abs >= 1e15)      { val = abs / 1e15; suf = 'Q'; }
+    else if (abs >= 1e12) { val = abs / 1e12; suf = 'T'; }
+    else if (abs >= 1e9)  { val = abs / 1e9;  suf = 'B'; }
+    else if (abs >= 1e6)  { val = abs / 1e6;  suf = 'M'; }
+    else if (abs >= 1e3)  { val = abs / 1e3;  suf = 'K'; }
+    else                  { val = abs;         suf = '';  }
+    return sign + val.toFixed(2).replace(/\.?0+$/, '') + suf;
+  }
+
+  function esc(s) {
+    const el = document.createElement('span');
+    el.textContent = s || '';
+    return el.innerHTML;
+  }
+
+  function rankClass(r) { return 'rank rank-' + (r || 'agent').toLowerCase(); }
+
+  const NUMERIC_FIELDS = [
+    'level', 'power', 'helps', 'rss_contrib', 'iso_contrib',
+    'players_killed', 'hostiles_killed', 'resources_mined', 'resources_raided',
+  ];
+
+  function playerLink(member) {
+    return `<a class="player-link" href="player.html?id=${encodeURIComponent(member.id)}">${esc(member.name)}</a>`;
+  }
+
+  // --- Data loading ---
+  function loadData() {
+    const dataP = fetch('data/latest.json?t=' + Date.now())
+      .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
+    const histP = fetch('data/history.json?t=' + Date.now())
+      .then(r => { if (!r.ok) return []; return r.json(); })
+      .catch(() => []);
+
+    Promise.all([dataP, histP])
+      .then(([data, hist]) => {
+        hist.sort((a, b) => a.date.localeCompare(b.date));
+        const d = new Date(data.pulled_at);
+        $('updated').textContent = 'Last updated: ' + d.toLocaleDateString('en-US', {
+          year: 'numeric', month: 'short', day: 'numeric',
+          hour: '2-digit', minute: '2-digit'
+        });
+        render(data, hist);
+      })
+      .catch(err => {
+        $('content').innerHTML = `<div class="loading error">Failed to load data: ${esc(err.message)}</div>`;
+      });
+  }
+
+  function getSnapshotDaysAgo(history, days) {
+    if (!history.length) return null;
+    const target = new Date();
+    target.setDate(target.getDate() - days);
+    const targetStr = target.toISOString().slice(0, 10);
+    let best = null;
+    for (const entry of history) {
+      if (entry.date <= targetStr) best = entry;
+    }
+    if (!best) best = history[0];
+    return best;
+  }
+
+  function render(data, history) {
+    const members = data.members || [];
+    const latest = history.length ? history[history.length - 1] : null;
+    const snap1 = getSnapshotDaysAgo(history, 1);
+    const snap7 = getSnapshotDaysAgo(history, 7);
+    let html = '';
+
+    // --- 1. Inactive Members ---
+    html += renderInactive(members, history);
+
+    // --- 2. New Members ---
+    html += renderNewMembers(members);
+
+    // --- 3. Members Who Left ---
+    html += renderLeftMembers(members, latest);
+
+    // --- 4. Lowest Contributors ---
+    html += renderLowestContributors(members, history);
+
+    // --- 5. Power Movers (7-Day) ---
+    html += renderPowerMovers(members, snap7);
+
+    // --- 6. Rank Distribution ---
+    html += renderRankDistribution(members);
+
+    $('content').innerHTML = html;
+  }
+
+  // --- Section renderers ---
+
+  function renderInactive(members, history) {
+    // Walk backwards through history to count consecutive days with zero change
+    const inactive = [];
+    for (const m of members) {
+      let daysInactive = 0;
+      // Go from most recent snapshot backward
+      for (let i = history.length - 1; i >= 1; i--) {
+        const curr = history[i];
+        const prev = history[i - 1];
+        const currData = curr.members[m.id];
+        const prevData = prev.members[m.id];
+        if (!currData || !prevData) break;
+        let changed = false;
+        for (const f of NUMERIC_FIELDS) {
+          if (parseAbbr(currData[f]) !== parseAbbr(prevData[f])) {
+            changed = true;
+            break;
+          }
+        }
+        if (changed) break;
+        daysInactive++;
+      }
+      if (daysInactive > 0) {
+        inactive.push({ ...m, daysInactive });
+      }
+    }
+    inactive.sort((a, b) => b.daysInactive - a.daysInactive);
+
+    let s = '<div class="section"><div class="section-header">Inactive Members (No Gains)</div>';
+    if (inactive.length === 0) {
+      s += '<div class="empty">No inactive members detected</div>';
+    } else {
+      s += '<div class="table-wrap"><table><thead><tr>';
+      s += '<th>Name</th><th>Rank</th><th>Level</th><th>Power</th><th>Days Inactive</th>';
+      s += '</tr></thead><tbody>';
+      for (const m of inactive) {
+        s += `<tr>
+          <td>${playerLink(m)}</td>
+          <td><span class="${rankClass(m.rank)}">${esc(m.rank)}</span></td>
+          <td>${esc(m.level)}</td>
+          <td>${esc(m.power)}</td>
+          <td style="color:#f87171; font-weight:600">${m.daysInactive}</td>
+        </tr>`;
+      }
+      s += '</tbody></table></div>';
+    }
+    s += '</div>';
+    return s;
+  }
+
+  function renderNewMembers(members) {
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - 7);
+    const newMembers = members.filter(m => {
+      if (!m.join_date) return false;
+      return new Date(m.join_date) >= cutoff;
+    });
+
+    let s = '<div class="section"><div class="section-header">New Members (Last 7 Days)</div>';
+    if (newMembers.length === 0) {
+      s += '<div class="empty">No new members in the last 7 days</div>';
+    } else {
+      s += '<div class="table-wrap"><table><thead><tr>';
+      s += '<th>Name</th><th>Rank</th><th>Level</th><th>Power</th><th>Join Date</th>';
+      s += '</tr></thead><tbody>';
+      for (const m of newMembers) {
+        s += `<tr>
+          <td>${playerLink(m)}</td>
+          <td><span class="${rankClass(m.rank)}">${esc(m.rank)}</span></td>
+          <td>${esc(m.level)}</td>
+          <td>${esc(m.power)}</td>
+          <td>${esc(m.join_date)}</td>
+        </tr>`;
+      }
+      s += '</tbody></table></div>';
+    }
+    s += '</div>';
+    return s;
+  }
+
+  function renderLeftMembers(members, latestSnap) {
+    let left = [];
+    if (latestSnap && latestSnap.members) {
+      const currentIds = new Set(members.map(m => m.id));
+      for (const [id, mData] of Object.entries(latestSnap.members)) {
+        if (!currentIds.has(id)) {
+          left.push({ id, ...mData, lastSeen: latestSnap.date });
+        }
+      }
+    }
+
+    let s = '<div class="section"><div class="section-header">Members Who Left</div>';
+    if (left.length === 0) {
+      s += '<div class="empty">No members have left since tracking began</div>';
+    } else {
+      s += '<div class="table-wrap"><table><thead><tr>';
+      s += '<th>Name</th><th>Last Level</th><th>Last Power</th><th>Last Seen</th>';
+      s += '</tr></thead><tbody>';
+      for (const m of left) {
+        s += `<tr>
+          <td>${esc(m.name)}</td>
+          <td>${esc(m.level)}</td>
+          <td>${esc(m.power)}</td>
+          <td>${esc(m.lastSeen)}</td>
+        </tr>`;
+      }
+      s += '</tbody></table></div>';
+    }
+    s += '</div>';
+    return s;
+  }
+
+  function renderLowestContributors(members, history) {
+    // For helps, compute gain since member's first appearance in history
+    // (lifetime helps is meaningless — we want alliance-specific contribution)
+    function getHelpsGained(m) {
+      for (const snap of history) {
+        const past = snap.members[m.id];
+        if (past) return parseAbbr(m.helps) - parseAbbr(past.helps);
+      }
+      return 0; // no history — can't compute gain
+    }
+
+    const categories = [
+      { label: 'Lowest Helps (Gained)', field: 'helps', valueFn: getHelpsGained, formatFn: formatAbbr },
+      { label: 'Lowest RSS Contrib', field: 'rss_contrib' },
+      { label: 'Lowest ISO Contrib', field: 'iso_contrib' },
+    ];
+
+    let s = '<div class="section"><div class="section-header">Lowest Contributors (Bottom 5)</div>';
+    s += '<div class="mini-cards">';
+    for (const cat of categories) {
+      const getValue = cat.valueFn || (m => parseAbbr(m[cat.field]));
+      const formatVal = cat.formatFn || (v => esc(members.find(x => x._sortVal === v) ? '' : String(v)));
+      const enriched = members.map(m => ({ ...m, _sortVal: getValue(m) }));
+      enriched.sort((a, b) => a._sortVal - b._sortVal);
+      const bottom = enriched.slice(0, 5);
+      s += `<div class="mini-card"><h3>${cat.label}</h3><ol>`;
+      for (const m of bottom) {
+        const display = cat.valueFn ? formatAbbr(m._sortVal) : esc(m[cat.field]);
+        s += `<li>
+          <span class="li-name">${playerLink(m)}</span>
+          <span class="li-rank"><span class="${rankClass(m.rank)}">${esc(m.rank)}</span></span>
+          <span class="li-val">${display}</span>
+        </li>`;
+      }
+      s += '</ol></div>';
+    }
+    s += '</div></div>';
+    return s;
+  }
+
+  function renderPowerMovers(members, snap7) {
+    let s = '<div class="section"><div class="section-header">Power Movers (7-Day)</div>';
+    if (!snap7 || !snap7.members) {
+      s += '<div class="empty">Not enough history for 7-day comparison</div></div>';
+      return s;
+    }
+
+    // Compute deltas
+    const deltas = [];
+    for (const m of members) {
+      const past = snap7.members[m.id];
+      if (!past) continue;
+      const curr = parseAbbr(m.power);
+      const prev = parseAbbr(past.power);
+      deltas.push({ ...m, delta: curr - prev, currPower: curr });
+    }
+
+    const gainers = [...deltas].sort((a, b) => b.delta - a.delta).slice(0, 5);
+    const losers = [...deltas].sort((a, b) => a.delta - b.delta).slice(0, 5).filter(m => m.delta < 0);
+
+    s += '<div class="movers-grid">';
+
+    // Top gainers
+    s += '<div class="mini-card"><h3>Top Gainers</h3><ol>';
+    for (const m of gainers) {
+      const cls = m.delta > 0 ? 'delta-pos' : (m.delta < 0 ? 'delta-neg' : 'delta-zero');
+      s += `<li>
+        <span class="li-name">${playerLink(m)}</span>
+        <span class="li-val"><span class="${cls}">${formatNum(m.delta)}</span> &middot; ${formatAbbr(m.currPower)}</span>
+      </li>`;
+    }
+    s += '</ol></div>';
+
+    // Top losers
+    s += '<div class="mini-card"><h3>Top Losers</h3>';
+    if (losers.length === 0) {
+      s += '<div class="empty">No power losses</div>';
+    } else {
+      s += '<ol>';
+      for (const m of losers) {
+        s += `<li>
+          <span class="li-name">${playerLink(m)}</span>
+          <span class="li-val"><span class="delta-neg">${formatNum(m.delta)}</span> &middot; ${formatAbbr(m.currPower)}</span>
+        </li>`;
+      }
+      s += '</ol>';
+    }
+    s += '</div>';
+
+    s += '</div></div>';
+    return s;
+  }
+
+  function renderRankDistribution(members) {
+    const ranks = ['Admiral', 'Commodore', 'Premier', 'Operative', 'Agent'];
+    const counts = {};
+    for (const r of ranks) counts[r] = 0;
+    for (const m of members) {
+      const r = m.rank || 'Agent';
+      const key = ranks.find(rk => rk.toLowerCase() === r.toLowerCase()) || 'Agent';
+      counts[key]++;
+    }
+
+    let s = '<div class="section"><div class="section-header">Rank Distribution</div>';
+    s += '<div class="rank-dist">';
+    for (const r of ranks) {
+      s += `<div class="rank-dist-item">
+        <div class="rd-count"><span class="${rankClass(r)}" style="font-size:inherit; padding:0; border:none; background:none">${counts[r]}</span></div>
+        <div class="rd-label"><span class="${rankClass(r)}">${r}</span></div>
+      </div>`;
+    }
+    s += '</div></div>';
+    return s;
+  }
+
+})();
+</script>
+</body>
+</html>
