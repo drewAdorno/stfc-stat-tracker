@@ -310,9 +310,10 @@
   }
 
   // Get the delta for a member's field vs a past snapshot
-  function getDelta(memberName, field, pastSnapshot) {
+  function getDelta(member, field, pastSnapshot) {
     if (!pastSnapshot || !pastSnapshot.members) return null;
-    const past = pastSnapshot.members[memberName];
+    // Look up by player ID first, then fall back to name (for old history entries)
+    const past = (member.id && pastSnapshot.members[member.id]) || pastSnapshot.members[member.name];
     if (!past) return 'new'; // member wasn't in the alliance then
     return past[field] || '0';
   }
@@ -420,7 +421,7 @@
         if (col.key === 'rank') {
           html += `<td><span class="${rankClass(val)}">${esc(val)}</span></td>`;
         } else if (period && NUMERIC_KEYS.has(col.key)) {
-          const pastVal = getDelta(m.name, col.key, pastSnap);
+          const pastVal = getDelta(m, col.key, pastSnap);
           html += `<td><span class="cell-val">${esc(val)}</span>${deltaHtml(val, pastVal)}</td>`;
         } else {
           html += `<td>${esc(val)}</td>`;

@@ -106,20 +106,30 @@ def scrape_leaderboard(page, url, stat_label):
         const rows = [];
         document.querySelectorAll('table tbody tr').forEach(tr => {
             const cells = [];
-            tr.querySelectorAll('td').forEach(td => {
+            let playerId = null;
+            tr.querySelectorAll('td').forEach((td, idx) => {
                 cells.push((td.innerText || '').trim());
+                // Player name is in column 1
+                if (idx === 1) {
+                    const link = td.querySelector('a[href*="/players/"]');
+                    if (link) {
+                        const m = link.href.match(/\\/players\\/(\\d+)/);
+                        if (m) playerId = m[1];
+                    }
+                }
             });
-            if (cells.length >= 6) rows.push(cells);
+            if (cells.length >= 6) rows.push({cells: cells, playerId: playerId});
         });
         return rows;
     }""")
 
     result = {}
     for row in rows:
-        # row: [rank, name, alliance, server, level, stat_value, ...]
-        name = row[1]
-        value = row[5]
-        result[name] = value
+        # row: {cells: [rank, name, alliance, server, level, stat_value, ...], playerId}
+        cells = row["cells"]
+        key = row.get("playerId") or cells[1]  # prefer ID, fall back to name
+        value = cells[5]
+        result[key] = value
 
     print(f"  Got {len(result)} members for {stat_label}")
     return result
@@ -211,19 +221,27 @@ def pull_data(playwright, ws_endpoint):
             const rows = [];
             document.querySelectorAll('table tr').forEach(tr => {
                 const cells = [];
-                tr.querySelectorAll('th, td').forEach(cell => {
+                let playerId = null;
+                tr.querySelectorAll('th, td').forEach((cell, idx) => {
                     cells.push((cell.innerText || '').trim());
+                    // First cell (Name) may contain a player profile link
+                    if (idx === 0) {
+                        const link = cell.querySelector('a[href*="/players/"]');
+                        if (link) {
+                            const m = link.href.match(/\\/players\\/(\\d+)/);
+                            if (m) playerId = m[1];
+                        }
+                    }
                 });
-                // Filter out empty trailing cells and header-only rows
                 const cleaned = cells.filter(c => c !== '');
-                if (cleaned.length > 0) rows.push(cleaned);
+                if (cleaned.length > 0) rows.push({cells: cleaned, playerId: playerId});
             });
             return rows;
         }""")
 
     # Collect all pages of members
     all_rows = extract_table_rows()
-    header = all_rows[0] if all_rows else []
+    header = all_rows[0] if all_rows else {}
     members = all_rows[1:] if len(all_rows) > 1 else []
     print(f"Page 1: got {len(members)} members")
 
@@ -248,9 +266,13 @@ def pull_data(playwright, ws_endpoint):
     field_names = ["name", "rank", "level", "power", "helps", "rss_contrib", "iso_contrib", "join_date"]
     member_list = []
     for row in members:
+        cells = row.get("cells", row) if isinstance(row, dict) else row
         member = {}
         for i, field in enumerate(field_names):
-            member[field] = row[i] if i < len(row) else ""
+            member[field] = cells[i] if i < len(cells) else ""
+        # Add player ID if available
+        if isinstance(row, dict) and row.get("playerId"):
+            member["id"] = row["playerId"]
         member_list.append(member)
 
     # Scrape leaderboard pages for additional stats
@@ -262,11 +284,11 @@ def pull_data(playwright, ws_endpoint):
             print(f"  WARNING: Failed to scrape {label}: {e}")
             leaderboard_data[key] = {}
 
-    # Merge leaderboard stats into member records
+    # Merge leaderboard stats into member records (match by ID, fall back to name)
     for member in member_list:
-        name = member["name"]
+        lookup_key = member.get("id", member["name"])
         for key, _, _ in LEADERBOARD_PAGES:
-            member[key] = leaderboard_data.get(key, {}).get(name, "0")
+            member[key] = leaderboard_data.get(key, {}).get(lookup_key, "0")
 
     # Save with timestamp
     timestamp = datetime.now().strftime("%Y-%m-%d_%H%M%S")
@@ -316,12 +338,13 @@ def update_history(record):
 
     today = datetime.now().strftime("%Y-%m-%d")
 
-    # Build compact member snapshot (name -> tracked numeric fields only)
+    # Build compact member snapshot (player ID -> tracked numeric fields + name)
     members_snapshot = {}
     for m in record.get("members", []):
-        members_snapshot[m["name"]] = {
-            field: m.get(field, "0") for field in TRACKED_FIELDS
-        }
+        key = m.get("id", m["name"])
+        entry_data = {field: m.get(field, "0") for field in TRACKED_FIELDS}
+        entry_data["name"] = m["name"]
+        members_snapshot[key] = entry_data
 
     entry = {
         "date": today,
