@@ -2,18 +2,18 @@
   {
     "date": "2026-02-07",
     "summary": {
-      "total_power": "191.18M",
+      "total_power": "194.45M",
       "member_count": "34",
       "league": "Adept League",
       "total_helps": "200.31K",
-      "total_rss": "250.60K",
-      "total_iso": "210.59M",
+      "total_rss": "250.64K",
+      "total_iso": "212.85M",
       "avg_level": "22"
     },
     "members": {
       "LuckyPete": {
         "level": "46",
-        "power": "49.50M",
+        "power": "50.24M",
         "helps": "17.33K",
         "rss_contrib": "103.69K",
         "iso_contrib": "178.40M",
@@ -24,9 +24,9 @@
       },
       "Dяew": {
         "level": "25",
-        "power": "2.20M",
+        "power": "2.23M",
         "helps": "30.93K",
-        "rss_contrib": "2.64K",
+        "rss_contrib": "2.68K",
         "iso_contrib": "4.72M",
         "players_killed": "75",
         "hostiles_killed": "32.93K",
@@ -79,10 +79,10 @@
       },
       "AdmiralStorie": {
         "level": "42",
-        "power": "26.10M",
+        "power": "26.24M",
         "helps": "4.28K",
         "rss_contrib": "1.68K",
-        "iso_contrib": "27.47M",
+        "iso_contrib": "29.72M",
         "players_killed": "8",
         "hostiles_killed": "10.39K",
         "resources_mined": "20.45M",
@@ -90,7 +90,7 @@
       },
       "Muckenstein": {
         "level": "33",
-        "power": "5.89M",
+        "power": "5.95M",
         "helps": "3.94K",
         "rss_contrib": "42",
         "iso_contrib": "0",
@@ -101,7 +101,7 @@
       },
       "Toaster8675309": {
         "level": "19",
-        "power": "243.65K",
+        "power": "253.99K",
         "helps": "3.73K",
         "rss_contrib": "0",
         "iso_contrib": "0",
@@ -111,8 +111,8 @@
         "resources_raided": "7.84K"
       },
       "Markonetorpedo": {
-        "level": "25",
-        "power": "2.14M",
+        "level": "26",
+        "power": "2.28M",
         "helps": "2.62K",
         "rss_contrib": "0",
         "iso_contrib": "0",
@@ -134,7 +134,7 @@
       },
       "GrandWeiner": {
         "level": "30",
-        "power": "3.76M",
+        "power": "3.72M",
         "helps": "15.06K",
         "rss_contrib": "618",
         "iso_contrib": "0",
@@ -178,7 +178,7 @@
       },
       "Twister1967": {
         "level": "20",
-        "power": "471.15K",
+        "power": "565.19K",
         "helps": "2.35K",
         "rss_contrib": "78",
         "iso_contrib": "0",
@@ -189,7 +189,7 @@
       },
       "glakuns": {
         "level": "19",
-        "power": "428.79K",
+        "power": "439.89K",
         "helps": "2.34K",
         "rss_contrib": "0",
         "iso_contrib": "0",
@@ -200,7 +200,7 @@
       },
       "LadyLain": {
         "level": "22",
-        "power": "716.89K",
+        "power": "697.37K",
         "helps": "2.34K",
         "rss_contrib": "132",
         "iso_contrib": "0",
@@ -211,7 +211,7 @@
       },
       "Smoothie81": {
         "level": "16",
-        "power": "177.58K",
+        "power": "183.66K",
         "helps": "2.25K",
         "rss_contrib": "0",
         "iso_contrib": "0",
@@ -222,7 +222,7 @@
       },
       "thexquizit": {
         "level": "19",
-        "power": "312.52K",
+        "power": "315.07K",
         "helps": "2.17K",
         "rss_contrib": "24",
         "iso_contrib": "0",
@@ -233,7 +233,7 @@
       },
       "TrialsAndTribbles": {
         "level": "18",
-        "power": "435.37K",
+        "power": "435.55K",
         "helps": "2.02K",
         "rss_contrib": "36",
         "iso_contrib": "0",
@@ -244,7 +244,7 @@
       },
       "HadrianMarlow3": {
         "level": "14",
-        "power": "146.58K",
+        "power": "162.14K",
         "helps": "1.81K",
         "rss_contrib": "474",
         "iso_contrib": "0",
@@ -255,18 +255,18 @@
       },
       "Bacon0Violence": {
         "level": "19",
-        "power": "474.63K",
+        "power": "475.85K",
         "helps": "1.79K",
         "rss_contrib": "0",
         "iso_contrib": "0",
         "players_killed": "4",
         "hostiles_killed": "1.10K",
         "resources_mined": "278.43K",
-        "resources_raided": "86"
+        "resources_raided": "99"
       },
       "OfficerJoseppi": {
-        "level": "14",
-        "power": "149.54K",
+        "level": "15",
+        "power": "153.28K",
         "helps": "1.78K",
         "rss_contrib": "0",
         "iso_contrib": "0",
@@ -288,7 +288,7 @@
       },
       "KnightofBAAWA": {
         "level": "19",
-        "power": "505.76K",
+        "power": "505.94K",
         "helps": "891",
         "rss_contrib": "24",
         "iso_contrib": "0",
@@ -298,8 +298,8 @@
         "resources_raided": "302"
       },
       "AnimaPerduta": {
-        "level": "12",
-        "power": "65.59K",
+        "level": "13",
+        "power": "71.27K",
         "helps": "849",
         "rss_contrib": "900",
         "iso_contrib": "0",
@@ -310,7 +310,7 @@
       },
       "CmdQuackers": {
         "level": "16",
-        "power": "183.55K",
+        "power": "187.49K",
         "helps": "746",
         "rss_contrib": "2.07K",
         "iso_contrib": "0",
@@ -321,7 +321,7 @@
       },
       "Officer Gar8434310": {
         "level": "13",
-        "power": "64.04K",
+        "power": "82.16K",
         "helps": "684",
         "rss_contrib": "60",
         "iso_contrib": "0",
@@ -331,8 +331,8 @@
         "resources_raided": "0"
       },
       "GarvinFade": {
-        "level": "15",
-        "power": "168.61K",
+        "level": "16",
+        "power": "170.14K",
         "helps": "635",
         "rss_contrib": "36",
         "iso_contrib": "0",
@@ -343,7 +343,7 @@
       },
       "DLanick": {
         "level": "15",
-        "power": "106.26K",
+        "power": "111.86K",
         "helps": "575",
         "rss_contrib": "0",
         "iso_contrib": "0",
