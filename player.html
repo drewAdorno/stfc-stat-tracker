@@ -421,13 +421,34 @@
       return;
     }
 
+    // Collect name history from snapshots
+    const nameHistory = [];
+    let lastName = null;
+    for (const entry of history) {
+      const m = entry.members[playerId];
+      if (m && m.name && m.name !== lastName) {
+        nameHistory.push({ date: entry.date, name: m.name });
+        lastName = m.name;
+      }
+    }
+    // Add current name if different from last history entry
+    if (player.name !== lastName) {
+      nameHistory.push({ date: 'now', name: player.name });
+    }
+    // Only show if there have been name changes (more than 1 name)
+    const pastNames = nameHistory.filter(n => n.name !== player.name);
+
     // Header
+    let metaHtml = `Level ${esc(player.level)} &middot; Joined ${esc(player.join_date)}`;
+    if (pastNames.length > 0) {
+      metaHtml += ` &middot; Formerly: ${pastNames.map(n => `<span style="color:#8899aa">${esc(n.name)}</span> <span style="color:#4a5568;font-size:0.78rem">(${n.date})</span>`).join(', ')}`;
+    }
     $('player-header').innerHTML = `
       <div class="player-header">
         <h1>${esc(player.name)}</h1>
         <span class="${rankClass(player.rank)}">${esc(player.rank)}</span>
       </div>
-      <div class="player-meta">Level ${esc(player.level)} &middot; Joined ${esc(player.join_date)}</div>
+      <div class="player-meta">${metaHtml}</div>
     `;
     document.title = player.name + ' — NCC Alliance Tracker';
 
