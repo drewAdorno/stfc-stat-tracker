@@ -424,12 +424,12 @@
   {
     "date": "2026-02-08",
     "summary": {
-      "total_power": "221.98M",
+      "total_power": "224.39M",
       "member_count": "35",
       "league": "Adept League",
       "total_helps": "216.59K",
-      "total_rss": "287.20K",
-      "total_iso": "217.23M",
+      "total_rss": "287.56K",
+      "total_iso": "219.99M",
       "avg_level": "23"
     },
     "members": {
@@ -485,7 +485,7 @@
         "level": "20",
         "power": "840.04K",
         "helps": "6.27K",
-        "rss_contrib": "0",
+        "rss_contrib": "348",
         "iso_contrib": "0",
         "players_killed": "15",
         "hostiles_killed": "3.98K",
@@ -498,7 +498,7 @@
         "power": "30.56M",
         "helps": "4.67K",
         "rss_contrib": "1.68K",
-        "iso_contrib": "30.60M",
+        "iso_contrib": "33.36M",
         "players_killed": "8",
         "hostiles_killed": "11.28K",
         "resources_mined": "21.39M",
@@ -689,7 +689,7 @@
         "level": "19",
         "power": "333.76K",
         "helps": "2.43K",
-        "rss_contrib": "24",
+        "rss_contrib": "36",
         "iso_contrib": "0",
         "players_killed": "13",
         "hostiles_killed": "3.76K",
@@ -754,7 +754,7 @@
         "players_killed": "15",
         "hostiles_killed": "1.03K",
         "resources_mined": "175.32K",
-        "resources_raided": "10.14K",
+        "resources_raided": "11.29K",
         "name": "LadyAud"
       },
       "3394175627": {
