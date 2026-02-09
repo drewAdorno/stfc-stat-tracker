@@ -870,11 +870,11 @@
   {
     "date": "2026-02-09",
     "summary": {
-      "total_power": "229.46M",
+      "total_power": "239.44M",
       "member_count": "36",
       "league": "Adept League",
       "total_helps": "222.64K",
-      "total_rss": "328.24K",
+      "total_rss": "328.34K",
       "total_iso": "223.93M",
       "avg_level": "23"
     },
@@ -1039,7 +1039,7 @@
         "level": "22",
         "power": "684.20K",
         "helps": "5.50K",
-        "rss_contrib": "210",
+        "rss_contrib": "318",
         "iso_contrib": "0",
         "players_killed": "7",
         "hostiles_killed": "1.56K",
