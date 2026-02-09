@@ -881,7 +881,7 @@
     "members": {
       "1231726616": {
         "level": "48",
-        "power": "60.84M",
+        "power": "60.74M",
         "helps": "17.82K",
         "rss_contrib": "103.69K",
         "iso_contrib": "183.14M",
@@ -893,7 +893,7 @@
       },
       "2644617547": {
         "level": "25",
-        "power": "2.35M",
+        "power": "2.28M",
         "helps": "31.38K",
         "rss_contrib": "2.68K",
         "iso_contrib": "6.75M",
@@ -917,7 +917,7 @@
       },
       "2107718692": {
         "level": "38",
-        "power": "7.15M",
+        "power": "7.06M",
         "helps": "19.24K",
         "rss_contrib": "52.30K",
         "iso_contrib": "0",
@@ -929,7 +929,7 @@
       },
       "4172478581": {
         "level": "20",
-        "power": "840.37K",
+        "power": "861.94K",
         "helps": "6.60K",
         "rss_contrib": "378",
         "iso_contrib": "0",
@@ -953,7 +953,7 @@
       },
       "3996322497": {
         "level": "33",
-        "power": "6.39M",
+        "power": "6.51M",
         "helps": "4.15K",
         "rss_contrib": "138",
         "iso_contrib": "0",
@@ -1025,7 +1025,7 @@
       },
       "1225166314": {
         "level": "39",
-        "power": "17.41M",
+        "power": "17.65M",
         "helps": "8.52K",
         "rss_contrib": "76.50K",
         "iso_contrib": "684.00K",
@@ -1037,7 +1037,7 @@
       },
       "891890017": {
         "level": "22",
-        "power": "684.22K",
+        "power": "689.05K",
         "helps": "5.50K",
         "rss_contrib": "318",
         "iso_contrib": "0",
@@ -1061,7 +1061,7 @@
       },
       "2919158696": {
         "level": "21",
-        "power": "747.35K",
+        "power": "711.30K",
         "helps": "2.91K",
         "rss_contrib": "78",
         "iso_contrib": "0",
@@ -1073,7 +1073,7 @@
       },
       "3247539895": {
         "level": "20",
-        "power": "470.55K",
+        "power": "467.71K",
         "helps": "2.87K",
         "rss_contrib": "0",
         "iso_contrib": "0",
@@ -1085,7 +1085,7 @@
       },
       "181224344": {
         "level": "19",
-        "power": "350.00K",
+        "power": "365.43K",
         "helps": "2.72K",
         "rss_contrib": "36",
         "iso_contrib": "0",
@@ -1145,7 +1145,7 @@
       },
       "1696653671": {
         "level": "15",
-        "power": "196.36K",
+        "power": "200.93K",
         "helps": "2.46K",
         "rss_contrib": "582",
         "iso_contrib": "0",
@@ -1157,7 +1157,7 @@
       },
       "924969815": {
         "level": "15",
-        "power": "163.53K",
+        "power": "164.48K",
         "helps": "2.20K",
         "rss_contrib": "0",
         "iso_contrib": "0",
@@ -1169,7 +1169,7 @@
       },
       "3559543003": {
         "level": "19",
-        "power": "513.93K",
+        "power": "514.54K",
         "helps": "2.18K",
         "rss_contrib": "0",
         "iso_contrib": "0",
@@ -1181,7 +1181,7 @@
       },
       "1331036012": {
         "level": "13",
-        "power": "83.71K",
+        "power": "88.44K",
         "helps": "1.45K",
         "rss_contrib": "24",
         "iso_contrib": "0",
@@ -1217,7 +1217,7 @@
       },
       "1995189823": {
         "level": "14",
-        "power": "130.76K",
+        "power": "137.56K",
         "helps": "1.19K",
         "rss_contrib": "900",
         "iso_contrib": "0",
@@ -1229,7 +1229,7 @@
       },
       "3179608653": {
         "level": "17",
-        "power": "249.35K",
+        "power": "290.05K",
         "helps": "1.13K",
         "rss_contrib": "2.07K",
         "iso_contrib": "0",
@@ -1252,8 +1252,8 @@
         "name": "Zevexian"
       },
       "3144363534": {
-        "level": "13",
-        "power": "130.99K",
+        "level": "14",
+        "power": "134.80K",
         "helps": "994",
         "rss_contrib": "432",
         "iso_contrib": "0",
