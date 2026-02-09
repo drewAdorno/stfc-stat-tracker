@@ -870,18 +870,18 @@
   {
     "date": "2026-02-09",
     "summary": {
-      "total_power": "230.07M",
+      "total_power": "229.46M",
       "member_count": "36",
       "league": "Adept League",
       "total_helps": "221.23K",
-      "total_rss": "328.22K",
-      "total_iso": "223.26M",
+      "total_rss": "328.24K",
+      "total_iso": "223.93M",
       "avg_level": "22"
     },
     "members": {
       "1231726616": {
         "level": "47",
-        "power": "53.77M",
+        "power": "54.31M",
         "helps": "17.78K",
         "rss_contrib": "103.69K",
         "iso_contrib": "183.14M",
@@ -893,10 +893,10 @@
       },
       "2644617547": {
         "level": "25",
-        "power": "2.32M",
+        "power": "2.34M",
         "helps": "31.23K",
         "rss_contrib": "2.68K",
-        "iso_contrib": "6.08M",
+        "iso_contrib": "6.75M",
         "players_killed": "75",
         "hostiles_killed": "33.69K",
         "resources_mined": "10.02M",
@@ -905,7 +905,7 @@
       },
       "788279554": {
         "level": "49",
-        "power": "75.24M",
+        "power": "75.25M",
         "helps": "13.63K",
         "rss_contrib": "85.33K",
         "iso_contrib": "0",
@@ -941,7 +941,7 @@
       },
       "4150803274": {
         "level": "42",
-        "power": "30.68M",
+        "power": "30.90M",
         "helps": "4.90K",
         "rss_contrib": "1.68K",
         "iso_contrib": "33.36M",
@@ -953,7 +953,7 @@
       },
       "3996322497": {
         "level": "33",
-        "power": "6.25M",
+        "power": "6.39M",
         "helps": "4.09K",
         "rss_contrib": "138",
         "iso_contrib": "0",
@@ -965,7 +965,7 @@
       },
       "1468722486": {
         "level": "19",
-        "power": "263.01K",
+        "power": "284.61K",
         "helps": "4.08K",
         "rss_contrib": "60",
         "iso_contrib": "0",
@@ -1049,7 +1049,7 @@
       },
       "426305808": {
         "level": "20",
-        "power": "596.25K",
+        "power": "589.75K",
         "helps": "5.12K",
         "rss_contrib": "0",
         "iso_contrib": "0",
@@ -1072,8 +1072,8 @@
         "name": "Twister1967"
       },
       "3247539895": {
-        "level": "19",
-        "power": "468.03K",
+        "level": "20",
+        "power": "471.59K",
         "helps": "2.82K",
         "rss_contrib": "0",
         "iso_contrib": "0",
@@ -1109,7 +1109,7 @@
       },
       "454434908": {
         "level": "17",
-        "power": "192.81K",
+        "power": "206.32K",
         "helps": "2.55K",
         "rss_contrib": "0",
         "iso_contrib": "0",
@@ -1133,7 +1133,7 @@
       },
       "634840318": {
         "level": "18",
-        "power": "434.62K",
+        "power": "434.92K",
         "helps": "2.53K",
         "rss_contrib": "60",
         "iso_contrib": "0",
@@ -1145,7 +1145,7 @@
       },
       "1696653671": {
         "level": "15",
-        "power": "195.17K",
+        "power": "198.25K",
         "helps": "2.37K",
         "rss_contrib": "582",
         "iso_contrib": "0",
@@ -1157,7 +1157,7 @@
       },
       "924969815": {
         "level": "15",
-        "power": "161.39K",
+        "power": "163.13K",
         "helps": "2.17K",
         "rss_contrib": "0",
         "iso_contrib": "0",
@@ -1169,7 +1169,7 @@
       },
       "3559543003": {
         "level": "19",
-        "power": "509.83K",
+        "power": "513.93K",
         "helps": "2.12K",
         "rss_contrib": "0",
         "iso_contrib": "0",
@@ -1181,9 +1181,9 @@
       },
       "1331036012": {
         "level": "13",
-        "power": "86.87K",
+        "power": "83.71K",
         "helps": "1.42K",
-        "rss_contrib": "12",
+        "rss_contrib": "24",
         "iso_contrib": "0",
         "players_killed": "17",
         "hostiles_killed": "1.10K",
@@ -1217,7 +1217,7 @@
       },
       "1995189823": {
         "level": "14",
-        "power": "126.09K",
+        "power": "129.49K",
         "helps": "1.17K",
         "rss_contrib": "900",
         "iso_contrib": "0",
@@ -1277,7 +1277,7 @@
       },
       "646297596": {
         "level": "16",
-        "power": "176.90K",
+        "power": "182.26K",
         "helps": "741",
         "rss_contrib": "36",
         "iso_contrib": "0",
