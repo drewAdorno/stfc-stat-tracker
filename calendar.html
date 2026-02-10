@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NCC Alliance Calendar</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #0a0e17;
+    color: #c8d6e5;
+    min-height: 100vh;
+    line-height: 1.5;
+  }
+
+  .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+
+  /* Header */
+  header {
+    text-align: center;
+    padding: 30px 0 20px;
+    border-bottom: 1px solid #1a2332;
+    margin-bottom: 24px;
+  }
+  header h1 {
+    font-size: 1.8rem;
+    color: #e2e8f0;
+    letter-spacing: 1px;
+  }
+  header h1 span { color: #4dabf7; }
+
+  /* Nav */
+  nav {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 24px;
+  }
+  nav a {
+    background: #111827;
+    border: 1px solid #1e2d3d;
+    color: #8899aa;
+    padding: 6px 16px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: all 0.15s;
+  }
+  nav a:hover { border-color: #4dabf7; color: #c8d6e5; }
+  nav a.active {
+    background: #4dabf7;
+    color: #0a0e17;
+    border-color: #4dabf7;
+    font-weight: 600;
+  }
+
+  /* Calendar embed */
+  .calendar-wrap {
+    background: #111827;
+    border: 1px solid #1e2d3d;
+    border-radius: 10px;
+    padding: 16px;
+    overflow: hidden;
+  }
+  .calendar-wrap iframe {
+    width: 100%;
+    height: 600px;
+    border: 0;
+    border-radius: 6px;
+    filter: invert(0.85) hue-rotate(180deg);
+  }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    padding: 24px 0;
+    margin-top: 28px;
+    border-top: 1px solid #1a2332;
+    font-size: 0.8rem;
+    color: #4a5568;
+  }
+  footer a { color: #4dabf7; text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  @media (max-width: 600px) {
+    .container { padding: 12px; }
+    header h1 { font-size: 1.3rem; }
+    .calendar-wrap iframe { height: 450px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>&#x1F680; <span>NCC</span> Alliance Calendar</h1>
+  </header>
+
+  <nav>
+    <a href="index.html">Tracker</a>
+    <a href="calendar.html" class="active">Calendar</a>
+  </nav>
+
+  <div class="calendar-wrap">
+    <iframe src="https://calendar.google.com/calendar/embed?src=3c9b8eacf3e7e4cd15837083d7f6a8fc7f314ff25b7a67765f104c8bdf6c92ae%40group.calendar.google.com&ctz=America%2FNew_York" scrolling="no"></iframe>
+  </div>
+
+  <footer>
+    Data sourced from <a href="https://stfc.pro" target="_blank" rel="noopener">stfc.pro</a>
+  </footer>
+</div>
+</body>
+</html>
