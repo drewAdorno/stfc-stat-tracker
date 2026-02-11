@@ -1762,19 +1762,19 @@
   {
     "date": "2026-02-11",
     "summary": {
-      "total_power": "256.99M",
+      "total_power": "263.96M",
       "member_count": "37",
       "league": "Adept League",
-      "total_helps": "231.05K",
-      "total_rss": "382.13K",
+      "total_helps": "232.74K",
+      "total_rss": "382.16K",
       "total_iso": "235.66M",
       "avg_level": "23"
     },
     "members": {
       "1231726616": {
         "level": "48",
-        "power": "64.56M",
-        "helps": "18.16K",
+        "power": "64.81M",
+        "helps": "18.20K",
         "rss_contrib": "103.69K",
         "iso_contrib": "184.87M",
         "players_killed": "211",
@@ -1785,9 +1785,9 @@
       },
       "2644617547": {
         "level": "25",
-        "power": "2.38M",
-        "helps": "31.72K",
-        "rss_contrib": "2.68K",
+        "power": "2.34M",
+        "helps": "31.79K",
+        "rss_contrib": "2.71K",
         "iso_contrib": "7.58M",
         "players_killed": "75",
         "hostiles_killed": "35.90K",
@@ -1798,7 +1798,7 @@
       "788279554": {
         "level": "49",
         "power": "80.27M",
-        "helps": "13.83K",
+        "helps": "13.89K",
         "rss_contrib": "85.33K",
         "iso_contrib": "0",
         "players_killed": "14",
@@ -1810,7 +1810,7 @@
       "2107718692": {
         "level": "38",
         "power": "7.16M",
-        "helps": "19.41K",
+        "helps": "19.45K",
         "rss_contrib": "52.30K",
         "iso_contrib": "0",
         "players_killed": "28",
@@ -1821,8 +1821,8 @@
       },
       "4172478581": {
         "level": "21",
-        "power": "870.16K",
-        "helps": "7.14K",
+        "power": "871.41K",
+        "helps": "7.22K",
         "rss_contrib": "438",
         "iso_contrib": "0",
         "players_killed": "17",
@@ -1833,8 +1833,8 @@
       },
       "891890017": {
         "level": "22",
-        "power": "723.96K",
-        "helps": "5.91K",
+        "power": "950.59K",
+        "helps": "5.93K",
         "rss_contrib": "954",
         "iso_contrib": "0",
         "players_killed": "7",
@@ -1845,8 +1845,8 @@
       },
       "4150803274": {
         "level": "44",
-        "power": "38.22M",
-        "helps": "5.57K",
+        "power": "38.32M",
+        "helps": "5.75K",
         "rss_contrib": "1.68K",
         "iso_contrib": "42.54M",
         "players_killed": "8",
@@ -1858,7 +1858,7 @@
       "3996322497": {
         "level": "33",
         "power": "6.57M",
-        "helps": "4.43K",
+        "helps": "4.48K",
         "rss_contrib": "138",
         "iso_contrib": "0",
         "players_killed": "15",
@@ -1869,8 +1869,8 @@
       },
       "1468722486": {
         "level": "19",
-        "power": "265.05K",
-        "helps": "4.16K",
+        "power": "286.13K",
+        "helps": "4.19K",
         "rss_contrib": "60",
         "iso_contrib": "0",
         "players_killed": "32",
@@ -1905,8 +1905,8 @@
       },
       "1995189823": {
         "level": "14",
-        "power": "156.34K",
-        "helps": "1.48K",
+        "power": "156.57K",
+        "helps": "1.50K",
         "rss_contrib": "900",
         "iso_contrib": "0",
         "players_killed": "3",
@@ -1918,7 +1918,7 @@
       "3144363534": {
         "level": "14",
         "power": "159.48K",
-        "helps": "1.19K",
+        "helps": "1.23K",
         "rss_contrib": "432",
         "iso_contrib": "0",
         "players_killed": "8",
@@ -1941,8 +1941,8 @@
       },
       "3971545627": {
         "level": "31",
-        "power": "4.63M",
-        "helps": "15.82K",
+        "power": "4.64M",
+        "helps": "15.89K",
         "rss_contrib": "618",
         "iso_contrib": "0",
         "players_killed": "28",
@@ -1954,7 +1954,7 @@
       "1225166314": {
         "level": "41",
         "power": "24.53M",
-        "helps": "9.37K",
+        "helps": "9.50K",
         "rss_contrib": "121.80K",
         "iso_contrib": "684.00K",
         "players_killed": "21",
@@ -1966,7 +1966,7 @@
       "426305808": {
         "level": "21",
         "power": "686.22K",
-        "helps": "5.40K",
+        "helps": "5.47K",
         "rss_contrib": "0",
         "iso_contrib": "0",
         "players_killed": "71",
@@ -1977,8 +1977,8 @@
       },
       "2919158696": {
         "level": "22",
-        "power": "919.16K",
-        "helps": "3.29K",
+        "power": "926.52K",
+        "helps": "3.39K",
         "rss_contrib": "108",
         "iso_contrib": "0",
         "players_killed": "3",
@@ -1990,7 +1990,7 @@
       "181224344": {
         "level": "19",
         "power": "376.18K",
-        "helps": "3.10K",
+        "helps": "3.21K",
         "rss_contrib": "48",
         "iso_contrib": "0",
         "players_killed": "23",
@@ -2001,8 +2001,8 @@
       },
       "3247539895": {
         "level": "20",
-        "power": "509.52K",
-        "helps": "3.08K",
+        "power": "507.14K",
+        "helps": "3.15K",
         "rss_contrib": "0",
         "iso_contrib": "0",
         "players_killed": "2",
@@ -2014,7 +2014,7 @@
       "634840318": {
         "level": "18",
         "power": "444.00K",
-        "helps": "3.00K",
+        "helps": "3.02K",
         "rss_contrib": "84",
         "iso_contrib": "0",
         "players_killed": "3",
@@ -2025,8 +2025,8 @@
       },
       "454434908": {
         "level": "17",
-        "power": "227.22K",
-        "helps": "2.87K",
+        "power": "233.34K",
+        "helps": "2.90K",
         "rss_contrib": "0",
         "iso_contrib": "0",
         "players_killed": "13",
@@ -2037,8 +2037,8 @@
       },
       "1696653671": {
         "level": "15",
-        "power": "224.47K",
-        "helps": "2.72K",
+        "power": "226.04K",
+        "helps": "2.81K",
         "rss_contrib": "672",
         "iso_contrib": "0",
         "players_killed": "134",
@@ -2050,7 +2050,7 @@
       "4232573353": {
         "level": "22",
         "power": "1.24M",
-        "helps": "2.66K",
+        "helps": "2.71K",
         "rss_contrib": "132",
         "iso_contrib": "0",
         "players_killed": "8",
@@ -2061,8 +2061,8 @@
       },
       "924969815": {
         "level": "15",
-        "power": "177.11K",
-        "helps": "2.61K",
+        "power": "178.41K",
+        "helps": "2.67K",
         "rss_contrib": "0",
         "iso_contrib": "0",
         "players_killed": "6",
@@ -2086,7 +2086,7 @@
       "3559543003": {
         "level": "19",
         "power": "541.16K",
-        "helps": "2.38K",
+        "helps": "2.40K",
         "rss_contrib": "0",
         "iso_contrib": "0",
         "players_killed": "17",
@@ -2097,8 +2097,8 @@
       },
       "1331036012": {
         "level": "14",
-        "power": "125.84K",
-        "helps": "1.74K",
+        "power": "140.87K",
+        "helps": "1.81K",
         "rss_contrib": "24",
         "iso_contrib": "0",
         "players_killed": "26",
@@ -2109,8 +2109,8 @@
       },
       "3394175627": {
         "level": "20",
-        "power": "534.26K",
-        "helps": "1.56K",
+        "power": "535.94K",
+        "helps": "1.60K",
         "rss_contrib": "84",
         "iso_contrib": "0",
         "players_killed": "9",
@@ -2146,7 +2146,7 @@
       "1323131230": {
         "level": "16",
         "power": "151.68K",
-        "helps": "1.22K",
+        "helps": "1.25K",
         "rss_contrib": "24",
         "iso_contrib": "0",
         "players_killed": "6",
@@ -2157,8 +2157,8 @@
       },
       "3741993341": {
         "level": "17",
-        "power": "139.97K",
-        "helps": "965",
+        "power": "141.59K",
+        "helps": "1.01K",
         "rss_contrib": "0",
         "iso_contrib": "0",
         "players_killed": "3",
@@ -2168,9 +2168,9 @@
         "name": "DLanick"
       },
       "646297596": {
-        "level": "16",
-        "power": "194.97K",
-        "helps": "866",
+        "level": "17",
+        "power": "207.24K",
+        "helps": "888",
         "rss_contrib": "36",
         "iso_contrib": "0",
         "players_killed": "3",
