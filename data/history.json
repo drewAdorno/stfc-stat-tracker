@@ -1762,7 +1762,7 @@
   {
     "date": "2026-02-11",
     "summary": {
-      "total_power": "256.31M",
+      "total_power": "256.99M",
       "member_count": "37",
       "league": "Adept League",
       "total_helps": "231.05K",
@@ -1773,7 +1773,7 @@
     "members": {
       "1231726616": {
         "level": "48",
-        "power": "65.22M",
+        "power": "64.56M",
         "helps": "18.16K",
         "rss_contrib": "103.69K",
         "iso_contrib": "184.87M",
@@ -1797,7 +1797,7 @@
       },
       "788279554": {
         "level": "49",
-        "power": "75.11M",
+        "power": "80.27M",
         "helps": "13.83K",
         "rss_contrib": "85.33K",
         "iso_contrib": "0",
@@ -1805,7 +1805,7 @@
         "hostiles_killed": "5.45K",
         "resources_mined": "5.58M",
         "resources_raided": "1.72M",
-        "name": "SalsaPorthos"
+        "name": "JamesTSalsa"
       },
       "2107718692": {
         "level": "38",
@@ -1821,7 +1821,7 @@
       },
       "4172478581": {
         "level": "21",
-        "power": "922.90K",
+        "power": "870.16K",
         "helps": "7.14K",
         "rss_contrib": "438",
         "iso_contrib": "0",
@@ -1857,7 +1857,7 @@
       },
       "3996322497": {
         "level": "33",
-        "power": "6.39M",
+        "power": "6.57M",
         "helps": "4.43K",
         "rss_contrib": "138",
         "iso_contrib": "0",
@@ -1917,7 +1917,7 @@
       },
       "3144363534": {
         "level": "14",
-        "power": "152.10K",
+        "power": "159.48K",
         "helps": "1.19K",
         "rss_contrib": "432",
         "iso_contrib": "0",
@@ -1964,8 +1964,8 @@
         "name": "Grauerwulffe42"
       },
       "426305808": {
-        "level": "20",
-        "power": "642.13K",
+        "level": "21",
+        "power": "686.22K",
         "helps": "5.40K",
         "rss_contrib": "0",
         "iso_contrib": "0",
@@ -1976,8 +1976,8 @@
         "name": "gloomiedoom"
       },
       "2919158696": {
-        "level": "21",
-        "power": "789.52K",
+        "level": "22",
+        "power": "919.16K",
         "helps": "3.29K",
         "rss_contrib": "108",
         "iso_contrib": "0",
@@ -1989,7 +1989,7 @@
       },
       "181224344": {
         "level": "19",
-        "power": "380.20K",
+        "power": "376.18K",
         "helps": "3.10K",
         "rss_contrib": "48",
         "iso_contrib": "0",
@@ -2001,7 +2001,7 @@
       },
       "3247539895": {
         "level": "20",
-        "power": "501.89K",
+        "power": "509.52K",
         "helps": "3.08K",
         "rss_contrib": "0",
         "iso_contrib": "0",
@@ -2037,7 +2037,7 @@
       },
       "1696653671": {
         "level": "15",
-        "power": "223.77K",
+        "power": "224.47K",
         "helps": "2.72K",
         "rss_contrib": "672",
         "iso_contrib": "0",
@@ -2049,7 +2049,7 @@
       },
       "4232573353": {
         "level": "22",
-        "power": "1.23M",
+        "power": "1.24M",
         "helps": "2.66K",
         "rss_contrib": "132",
         "iso_contrib": "0",
@@ -2097,7 +2097,7 @@
       },
       "1331036012": {
         "level": "14",
-        "power": "122.16K",
+        "power": "125.84K",
         "helps": "1.74K",
         "rss_contrib": "24",
         "iso_contrib": "0",
@@ -2109,7 +2109,7 @@
       },
       "3394175627": {
         "level": "20",
-        "power": "535.29K",
+        "power": "534.26K",
         "helps": "1.56K",
         "rss_contrib": "84",
         "iso_contrib": "0",
@@ -2145,7 +2145,7 @@
       },
       "1323131230": {
         "level": "16",
-        "power": "150.95K",
+        "power": "151.68K",
         "helps": "1.22K",
         "rss_contrib": "24",
         "iso_contrib": "0",
