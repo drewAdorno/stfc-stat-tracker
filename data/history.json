@@ -1316,12 +1316,12 @@
   {
     "date": "2026-02-10",
     "summary": {
-      "total_power": "247.30M",
+      "total_power": "250.97M",
       "member_count": "36",
       "league": "Adept League",
       "total_helps": "228.27K",
-      "total_rss": "354.98K",
-      "total_iso": "231.55M",
+      "total_rss": "355.00K",
+      "total_iso": "232.37M",
       "avg_level": "23"
     },
     "members": {
@@ -1342,7 +1342,7 @@
         "power": "2.39M",
         "helps": "31.64K",
         "rss_contrib": "2.68K",
-        "iso_contrib": "6.75M",
+        "iso_contrib": "7.58M",
         "players_killed": "75",
         "hostiles_killed": "35.64K",
         "resources_mined": "12.45M",
@@ -1658,14 +1658,14 @@
         "players_killed": "21",
         "hostiles_killed": "1.15K",
         "resources_mined": "234.28K",
-        "resources_raided": "11.29K",
+        "resources_raided": "11.97K",
         "name": "LadyAud"
       },
       "3394175627": {
         "level": "20",
         "power": "535.25K",
         "helps": "1.46K",
-        "rss_contrib": "72",
+        "rss_contrib": "84",
         "iso_contrib": "0",
         "players_killed": "9",
         "hostiles_killed": "2.49K",
