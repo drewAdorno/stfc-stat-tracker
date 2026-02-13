@@ -2678,11 +2678,11 @@
   {
     "date": "2026-02-13",
     "summary": {
-      "total_power": "283.85M",
+      "total_power": "284.62M",
       "member_count": "37",
       "league": "Adept League",
       "total_helps": "249.53K",
-      "total_rss": "438.23K",
+      "total_rss": "447.25K",
       "total_iso": "253.24M",
       "avg_level": "23"
     },
@@ -2713,7 +2713,7 @@
       },
       "788279554": {
         "level": "49",
-        "power": "80.40M",
+        "power": "80.66M",
         "helps": "14.04K",
         "rss_contrib": "85.33K",
         "iso_contrib": "0",
@@ -2823,7 +2823,7 @@
         "level": "15",
         "power": "189.49K",
         "helps": "1.83K",
-        "rss_contrib": "900",
+        "rss_contrib": "912",
         "iso_contrib": "0",
         "players_killed": "4",
         "hostiles_killed": "683",
@@ -2833,7 +2833,7 @@
       },
       "3144363534": {
         "level": "14",
-        "power": "179.56K",
+        "power": "179.20K",
         "helps": "1.36K",
         "rss_contrib": "432",
         "iso_contrib": "0",
@@ -2871,7 +2871,7 @@
         "level": "41",
         "power": "28.13M",
         "helps": "9.96K",
-        "rss_contrib": "121.80K",
+        "rss_contrib": "130.80K",
         "iso_contrib": "684.00K",
         "players_killed": "26",
         "hostiles_killed": "8.51K",
@@ -2881,7 +2881,7 @@
       },
       "426305808": {
         "level": "23",
-        "power": "1.26M",
+        "power": "1.51M",
         "helps": "5.73K",
         "rss_contrib": "0",
         "iso_contrib": "0",
@@ -2892,8 +2892,8 @@
         "name": "gloomiedoom"
       },
       "2919158696": {
-        "level": "24",
-        "power": "2.01M",
+        "level": "25",
+        "power": "2.14M",
         "helps": "3.86K",
         "rss_contrib": "108",
         "iso_contrib": "0",
@@ -2905,7 +2905,7 @@
       },
       "181224344": {
         "level": "21",
-        "power": "414.96K",
+        "power": "420.16K",
         "helps": "3.62K",
         "rss_contrib": "48",
         "iso_contrib": "0",
@@ -2989,7 +2989,7 @@
       },
       "3559543003": {
         "level": "19",
-        "power": "568.55K",
+        "power": "571.10K",
         "helps": "2.77K",
         "rss_contrib": "0",
         "iso_contrib": "0",
@@ -3027,7 +3027,7 @@
         "level": "20",
         "power": "567.89K",
         "helps": "1.90K",
-        "rss_contrib": "150",
+        "rss_contrib": "156",
         "iso_contrib": "0",
         "players_killed": "9",
         "hostiles_killed": "2.68K",
