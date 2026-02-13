@@ -2220,18 +2220,18 @@
   {
     "date": "2026-02-12",
     "summary": {
-      "total_power": "278.78M",
+      "total_power": "284.36M",
       "member_count": "37",
       "league": "Adept League",
       "total_helps": "240.44K",
-      "total_rss": "401.98K",
-      "total_iso": "250.16M",
+      "total_rss": "402.01K",
+      "total_iso": "250.69M",
       "avg_level": "23"
     },
     "members": {
       "1231726616": {
         "level": "48",
-        "power": "70.16M",
+        "power": "72.82M",
         "helps": "18.65K",
         "rss_contrib": "117.19K",
         "iso_contrib": "188.17M",
@@ -2243,10 +2243,10 @@
       },
       "2644617547": {
         "level": "25",
-        "power": "2.43M",
+        "power": "2.54M",
         "helps": "32.18K",
-        "rss_contrib": "2.71K",
-        "iso_contrib": "8.18M",
+        "rss_contrib": "2.75K",
+        "iso_contrib": "8.70M",
         "players_killed": "75",
         "hostiles_killed": "37.11K",
         "resources_mined": "12.97M",
@@ -2278,8 +2278,8 @@
         "name": "colewchambers"
       },
       "4172478581": {
-        "level": "23",
-        "power": "1.79M",
+        "level": "25",
+        "power": "2.35M",
         "helps": "7.67K",
         "rss_contrib": "1.55K",
         "iso_contrib": "0",
@@ -2291,7 +2291,7 @@
       },
       "4150803274": {
         "level": "45",
-        "power": "40.93M",
+        "power": "42.07M",
         "helps": "6.25K",
         "rss_contrib": "2.31K",
         "iso_contrib": "53.13M",
@@ -2303,7 +2303,7 @@
       },
       "891890017": {
         "level": "22",
-        "power": "1.42M",
+        "power": "1.43M",
         "helps": "6.23K",
         "rss_contrib": "3.92K",
         "iso_contrib": "0",
@@ -2363,7 +2363,7 @@
       },
       "1995189823": {
         "level": "15",
-        "power": "180.41K",
+        "power": "181.01K",
         "helps": "1.73K",
         "rss_contrib": "900",
         "iso_contrib": "0",
@@ -2375,7 +2375,7 @@
       },
       "3144363534": {
         "level": "14",
-        "power": "174.89K",
+        "power": "175.14K",
         "helps": "1.33K",
         "rss_contrib": "432",
         "iso_contrib": "0",
@@ -2399,7 +2399,7 @@
       },
       "3971545627": {
         "level": "31",
-        "power": "4.71M",
+        "power": "4.72M",
         "helps": "16.41K",
         "rss_contrib": "2.06K",
         "iso_contrib": "0",
@@ -2411,7 +2411,7 @@
       },
       "1225166314": {
         "level": "41",
-        "power": "26.85M",
+        "power": "27.38M",
         "helps": "9.82K",
         "rss_contrib": "121.80K",
         "iso_contrib": "684.00K",
@@ -2494,8 +2494,8 @@
         "name": "Smoothie81"
       },
       "1696653671": {
-        "level": "15",
-        "power": "238.64K",
+        "level": "16",
+        "power": "240.87K",
         "helps": "3.12K",
         "rss_contrib": "672",
         "iso_contrib": "0",
@@ -2531,7 +2531,7 @@
       },
       "3559543003": {
         "level": "19",
-        "power": "566.99K",
+        "power": "561.69K",
         "helps": "2.61K",
         "rss_contrib": "0",
         "iso_contrib": "0",
@@ -2578,8 +2578,8 @@
         "name": "KnightofBAAWA"
       },
       "3179608653": {
-        "level": "18",
-        "power": "331.19K",
+        "level": "19",
+        "power": "341.78K",
         "helps": "1.73K",
         "rss_contrib": "2.17K",
         "iso_contrib": "0",
@@ -2639,7 +2639,7 @@
       },
       "2566884649": {
         "level": "13",
-        "power": "78.73K",
+        "power": "80.62K",
         "helps": "444",
         "rss_contrib": "0",
         "iso_contrib": "0",
