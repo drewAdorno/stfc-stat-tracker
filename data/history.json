@@ -2701,7 +2701,7 @@
       },
       "2644617547": {
         "level": "26",
-        "power": "3.31M",
+        "power": "3.20M",
         "helps": "32.47K",
         "rss_contrib": "2.75K",
         "iso_contrib": "9.00M",
@@ -2737,7 +2737,7 @@
       },
       "4172478581": {
         "level": "25",
-        "power": "2.36M",
+        "power": "2.31M",
         "helps": "7.85K",
         "rss_contrib": "1.55K",
         "iso_contrib": "825.00K",
@@ -2761,7 +2761,7 @@
       },
       "891890017": {
         "level": "22",
-        "power": "1.43M",
+        "power": "1.44M",
         "helps": "6.38K",
         "rss_contrib": "3.92K",
         "iso_contrib": "0",
@@ -2785,7 +2785,7 @@
       },
       "1468722486": {
         "level": "19",
-        "power": "287.69K",
+        "power": "288.50K",
         "helps": "4.28K",
         "rss_contrib": "60",
         "iso_contrib": "0",
@@ -2821,7 +2821,7 @@
       },
       "1995189823": {
         "level": "15",
-        "power": "189.79K",
+        "power": "190.49K",
         "helps": "1.89K",
         "rss_contrib": "912",
         "iso_contrib": "0",
@@ -2857,7 +2857,7 @@
       },
       "3971545627": {
         "level": "31",
-        "power": "4.77M",
+        "power": "4.78M",
         "helps": "16.53K",
         "rss_contrib": "2.06K",
         "iso_contrib": "0",
@@ -2881,7 +2881,7 @@
       },
       "426305808": {
         "level": "23",
-        "power": "1.76M",
+        "power": "1.77M",
         "helps": "5.89K",
         "rss_contrib": "0",
         "iso_contrib": "0",
@@ -2905,7 +2905,7 @@
       },
       "181224344": {
         "level": "23",
-        "power": "946.65K",
+        "power": "974.74K",
         "helps": "3.72K",
         "rss_contrib": "48",
         "iso_contrib": "0",
@@ -2941,7 +2941,7 @@
       },
       "1696653671": {
         "level": "16",
-        "power": "260.75K",
+        "power": "262.33K",
         "helps": "3.36K",
         "rss_contrib": "672",
         "iso_contrib": "0",
@@ -2965,7 +2965,7 @@
       },
       "924969815": {
         "level": "16",
-        "power": "187.90K",
+        "power": "191.74K",
         "helps": "3.24K",
         "rss_contrib": "0",
         "iso_contrib": "0",
@@ -2977,7 +2977,7 @@
       },
       "4232573353": {
         "level": "24",
-        "power": "1.60M",
+        "power": "1.68M",
         "helps": "3.04K",
         "rss_contrib": "132",
         "iso_contrib": "0",
@@ -3013,7 +3013,7 @@
       },
       "1331036012": {
         "level": "14",
-        "power": "156.61K",
+        "power": "157.46K",
         "helps": "2.14K",
         "rss_contrib": "24",
         "iso_contrib": "0",
@@ -3025,7 +3025,7 @@
       },
       "3394175627": {
         "level": "20",
-        "power": "567.89K",
+        "power": "597.93K",
         "helps": "1.92K",
         "rss_contrib": "156",
         "iso_contrib": "0",
@@ -3084,8 +3084,8 @@
         "name": "DLanick"
       },
       "646297596": {
-        "level": "17",
-        "power": "229.88K",
+        "level": "18",
+        "power": "271.66K",
         "helps": "1.01K",
         "rss_contrib": "36",
         "iso_contrib": "0",
