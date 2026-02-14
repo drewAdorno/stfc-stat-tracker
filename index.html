@@ -352,8 +352,15 @@
   function getDelta(member, field, pastSnapshot) {
     if (!pastSnapshot || !pastSnapshot.members) return null;
     // Look up by player ID first, then fall back to name (for old history entries)
-    const past = (member.id && pastSnapshot.members[member.id]) || pastSnapshot.members[member.name];
-    if (!past) return 'new'; // member wasn't in the alliance then
+    let past = (member.id && pastSnapshot.members[member.id]) || pastSnapshot.members[member.name];
+    if (!past) {
+      // Member wasn't in this snapshot — find their earliest recorded entry
+      for (const entry of history) {
+        const m = (member.id && entry.members && entry.members[member.id]) || (entry.members && entry.members[member.name]);
+        if (m) { past = m; break; }
+      }
+      if (!past) return 'new'; // truly never seen before
+    }
     return past[field] || '0';
   }
 
