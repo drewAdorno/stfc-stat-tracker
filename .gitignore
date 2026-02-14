@@ -3,3 +3,5 @@ chrome_debug.log
 __pycache__/
 .claude/
 run_daily.log
+.env
+data/.last_notification_date

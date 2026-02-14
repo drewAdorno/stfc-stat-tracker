@@ -32,6 +32,12 @@ if !ERRORLEVEL! neq 0 (
     git push origin main >> "%LOG_FILE%" 2>&1
 )
 
+echo Sending Discord notification... >> "%LOG_FILE%"
+"%PYTHON_EXE%" send_discord_notification.py >> "%LOG_FILE%" 2>&1
+if !ERRORLEVEL! neq 0 (
+    echo WARNING: Discord notification failed >> "%LOG_FILE%"
+)
+
 :end
 echo Run finished: %date% %time% >> "%LOG_FILE%"
 echo. >> "%LOG_FILE%"

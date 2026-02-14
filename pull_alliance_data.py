@@ -40,17 +40,23 @@ def launch_chrome():
     """Launch Chrome normally with remote debugging enabled.
     Returns (process, ws_url) - the websocket URL for CDP connection."""
     stderr_log = BASE_DIR / "chrome_debug.log"
-    cmd = (
-        f'"{CHROME_PATH}"'
-        f" --remote-debugging-port={DEBUG_PORT}"
-        f' --user-data-dir="{SESSION_DIR}"'
-        f" --no-first-run"
-        f" --no-default-browser-check"
-        f" {ALLIANCE_URL}"
-    )
-    print("Launching Chrome (no automation flags)...")
+    cmd = [
+        CHROME_PATH,
+        f"--remote-debugging-port={DEBUG_PORT}",
+        f"--user-data-dir={SESSION_DIR}",
+        "--no-first-run",
+        "--no-default-browser-check",
+        ALLIANCE_URL,
+    ]
+    print("Launching Chrome (minimized, no automation flags)...")
     log_handle = open(stderr_log, "w")
-    proc = subprocess.Popen(cmd, shell=True, stderr=log_handle, stdout=log_handle)
+
+    # Launch Chrome minimized so it doesn't steal focus
+    startupinfo = subprocess.STARTUPINFO()
+    startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+    startupinfo.wShowWindow = 7  # SW_SHOWMINNOACTIVE
+
+    proc = subprocess.Popen(cmd, stderr=log_handle, stdout=log_handle, startupinfo=startupinfo)
 
     # Wait for Chrome to write the DevTools URL to the log
     ws_url = None
