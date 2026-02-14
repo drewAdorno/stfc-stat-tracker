@@ -2678,11 +2678,11 @@
   {
     "date": "2026-02-13",
     "summary": {
-      "total_power": "289.89M",
+      "total_power": "290.70M",
       "member_count": "37",
       "league": "Adept League",
       "total_helps": "251.12K",
-      "total_rss": "447.40K",
+      "total_rss": "520.21K",
       "total_iso": "256.04M",
       "avg_level": "24"
     },
@@ -2691,7 +2691,7 @@
         "level": "48",
         "power": "71.84M",
         "helps": "18.80K",
-        "rss_contrib": "117.19K",
+        "rss_contrib": "144.19K",
         "iso_contrib": "189.89M",
         "players_killed": "211",
         "hostiles_killed": "48.90K",
@@ -2739,7 +2739,7 @@
         "level": "25",
         "power": "2.36M",
         "helps": "7.85K",
-        "rss_contrib": "1.55K",
+        "rss_contrib": "6.62K",
         "iso_contrib": "825.00K",
         "players_killed": "17",
         "hostiles_killed": "8.77K",
@@ -2763,7 +2763,7 @@
         "level": "22",
         "power": "1.45M",
         "helps": "6.38K",
-        "rss_contrib": "3.92K",
+        "rss_contrib": "7.17K",
         "iso_contrib": "0",
         "players_killed": "7",
         "hostiles_killed": "1.91K",
@@ -2871,7 +2871,7 @@
         "level": "41",
         "power": "28.18M",
         "helps": "10.13K",
-        "rss_contrib": "130.80K",
+        "rss_contrib": "168.30K",
         "iso_contrib": "684.00K",
         "players_killed": "28",
         "hostiles_killed": "8.56K",
@@ -3092,7 +3092,7 @@
         "players_killed": "3",
         "hostiles_killed": "759",
         "resources_mined": "115.49K",
-        "resources_raided": "1.38K",
+        "resources_raided": "1.97K",
         "name": "GarvinFade"
       },
       "2566884649": {
