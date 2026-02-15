@@ -1,13 +1,13 @@
 {
-  "pulled_at": "2026-02-15T08:05:53.111933",
+  "pulled_at": "2026-02-15T08:04:07.682589",
   "alliance_url": "https://v3.stfc.pro/alliances/3974286889",
   "summary": {
-    "total_power": "303.59M",
+    "total_power": "300.17M",
     "member_count": "37",
     "league": "Adept League",
     "total_helps": "251.12K",
-    "total_rss": "548.53K",
-    "total_iso": "268.03M",
+    "total_rss": "520.68K",
+    "total_iso": "260.99M",
     "avg_level": "24"
   },
   "members": [
@@ -15,22 +15,22 @@
       "name": "LuckyPete",
       "rank": "Admiral",
       "level": "48",
-      "power": "69.57M",
+      "power": "73.35M",
       "helps": "18.80K",
       "rss_contrib": "144.19K",
-      "iso_contrib": "193.34M",
+      "iso_contrib": "191.62M",
       "join_date": "Dec 22, 2025",
       "id": "1231726616",
       "players_killed": "211",
       "resources_mined": "74.86M",
-      "hostiles_killed": "48.90K",
-      "resources_raided": "68.62B"
+      "hostiles_killed": "0",
+      "resources_raided": "0"
     },
     {
       "name": "Dяew",
       "rank": "Commodore",
       "level": "26",
-      "power": "3.19M",
+      "power": "3.24M",
       "helps": "32.47K",
       "rss_contrib": "2.78K",
       "iso_contrib": "9.90M",
@@ -38,29 +38,29 @@
       "id": "2644617547",
       "players_killed": "75",
       "resources_mined": "13.04M",
-      "hostiles_killed": "38.78K",
-      "resources_raided": "38.72M"
+      "hostiles_killed": "0",
+      "resources_raided": "0"
     },
     {
-      "name": "SalsaSpock",
+      "name": "JamesTSalsa",
       "rank": "Commodore",
       "level": "49",
-      "power": "84.70M",
+      "power": "84.09M",
       "helps": "14.07K",
-      "rss_contrib": "107.83K",
+      "rss_contrib": "85.33K",
       "iso_contrib": "0",
       "join_date": "Dec 25, 2025",
       "id": "788279554",
       "players_killed": "14",
       "resources_mined": "6.31M",
-      "hostiles_killed": "5.62K",
-      "resources_raided": "1.72M"
+      "hostiles_killed": "0",
+      "resources_raided": "0"
     },
     {
       "name": "colewchambers",
       "rank": "Operative",
-      "level": "41",
-      "power": "11.12M",
+      "level": "39",
+      "power": "10.60M",
       "helps": "25.88K",
       "rss_contrib": "88.49K",
       "iso_contrib": "0",
@@ -68,59 +68,59 @@
       "id": "2107718692",
       "players_killed": "28",
       "resources_mined": "7.08M",
-      "hostiles_killed": "12.63K",
-      "resources_raided": "11.97K"
+      "hostiles_killed": "0",
+      "resources_raided": "0"
     },
     {
       "name": "Nalarha",
       "rank": "Operative",
       "level": "25",
-      "power": "2.62M",
+      "power": "2.47M",
       "helps": "7.85K",
       "rss_contrib": "6.62K",
-      "iso_contrib": "3.90M",
+      "iso_contrib": "2.02M",
       "join_date": "Feb 2, 2026",
       "id": "4172478581",
       "players_killed": "17",
       "resources_mined": "2.02M",
-      "hostiles_killed": "8.77K",
-      "resources_raided": "9.37K"
+      "hostiles_killed": "0",
+      "resources_raided": "0"
     },
     {
       "name": "AdmiralStorie",
       "rank": "Operative",
       "level": "46",
-      "power": "44.27M",
+      "power": "43.22M",
       "helps": "6.49K",
       "rss_contrib": "2.50K",
-      "iso_contrib": "59.60M",
+      "iso_contrib": "56.16M",
       "join_date": "Jan 24, 2026",
       "id": "4150803274",
       "players_killed": "8",
       "resources_mined": "38.28M",
-      "hostiles_killed": "16.91K",
-      "resources_raided": "152.10K"
+      "hostiles_killed": "0",
+      "resources_raided": "0"
     },
     {
       "name": "PhraggleRawk",
       "rank": "Operative",
-      "level": "23",
-      "power": "1.66M",
+      "level": "22",
+      "power": "1.44M",
       "helps": "6.38K",
-      "rss_contrib": "7.24K",
+      "rss_contrib": "7.17K",
       "iso_contrib": "0",
       "join_date": "Feb 1, 2026",
       "id": "891890017",
       "players_killed": "7",
       "resources_mined": "1.20M",
-      "hostiles_killed": "1.91K",
+      "hostiles_killed": "0",
       "resources_raided": "0"
     },
     {
       "name": "Seurat",
       "rank": "Operative",
       "level": "34",
-      "power": "8.31M",
+      "power": "8.22M",
       "helps": "4.83K",
       "rss_contrib": "138",
       "iso_contrib": "0",
@@ -128,14 +128,14 @@
       "id": "3996322497",
       "players_killed": "15",
       "resources_mined": "5.23M",
-      "hostiles_killed": "9.01K",
-      "resources_raided": "9.27K"
+      "hostiles_killed": "0",
+      "resources_raided": "0"
     },
     {
       "name": "Toaster8675309",
       "rank": "Operative",
       "level": "19",
-      "power": "271.76K",
+      "power": "289.30K",
       "helps": "4.28K",
       "rss_contrib": "60",
       "iso_contrib": "0",
@@ -143,14 +143,14 @@
       "id": "1468722486",
       "players_killed": "32",
       "resources_mined": "669.35K",
-      "hostiles_killed": "609",
-      "resources_raided": "7.84K"
+      "hostiles_killed": "0",
+      "resources_raided": "0"
     },
     {
       "name": "Markonetorpedo",
       "rank": "Operative",
       "level": "28",
-      "power": "2.75M",
+      "power": "2.41M",
       "helps": "3.24K",
       "rss_contrib": "7.57K",
       "iso_contrib": "0",
@@ -158,8 +158,8 @@
       "id": "3062609042",
       "players_killed": "43",
       "resources_mined": "2.34M",
-      "hostiles_killed": "5.32K",
-      "resources_raided": "10.00K"
+      "hostiles_killed": "0",
+      "resources_raided": "0"
     },
     {
       "name": "GobblemyGnobble",
@@ -173,14 +173,14 @@
       "id": "1544471839",
       "players_killed": "5",
       "resources_mined": "1.74M",
-      "hostiles_killed": "1.27K",
-      "resources_raided": "6.34K"
+      "hostiles_killed": "0",
+      "resources_raided": "0"
     },
     {
       "name": "AnimaPerduta",
       "rank": "Operative",
-      "level": "16",
-      "power": "204.41K",
+      "level": "15",
+      "power": "201.62K",
       "helps": "1.89K",
       "rss_contrib": "912",
       "iso_contrib": "0",
@@ -188,14 +188,14 @@
       "id": "1995189823",
       "players_killed": "4",
       "resources_mined": "131.32K",
-      "hostiles_killed": "683",
+      "hostiles_killed": "0",
       "resources_raided": "0"
     },
     {
       "name": "Officer Gar8434310",
       "rank": "Operative",
       "level": "15",
-      "power": "197.61K",
+      "power": "186.77K",
       "helps": "1.38K",
       "rss_contrib": "432",
       "iso_contrib": "0",
@@ -203,8 +203,8 @@
       "id": "3144363534",
       "players_killed": "9",
       "resources_mined": "114.17K",
-      "hostiles_killed": "6.98K",
-      "resources_raided": "877"
+      "hostiles_killed": "0",
+      "resources_raided": "0"
     },
     {
       "name": "AZTreeFella",
@@ -218,44 +218,44 @@
       "id": "3970527992",
       "players_killed": "22",
       "resources_mined": "10.04M",
-      "hostiles_killed": "12.50K",
-      "resources_raided": "54.67K"
+      "hostiles_killed": "0",
+      "resources_raided": "0"
     },
     {
       "name": "NianderWallace",
       "rank": "Agent",
-      "level": "32",
-      "power": "6.25M",
+      "level": "31",
+      "power": "4.97M",
       "helps": "16.53K",
-      "rss_contrib": "2.32K",
+      "rss_contrib": "2.06K",
       "iso_contrib": "0",
       "join_date": "Feb 5, 2026",
       "id": "3971545627",
       "players_killed": "30",
       "resources_mined": "4.68M",
-      "hostiles_killed": "31.09K",
-      "resources_raided": "5.87M"
+      "hostiles_killed": "0",
+      "resources_raided": "0"
     },
     {
       "name": "Grauerwulffe42",
       "rank": "Agent",
-      "level": "42",
-      "power": "31.39M",
+      "level": "41",
+      "power": "30.28M",
       "helps": "10.13K",
-      "rss_contrib": "173.10K",
+      "rss_contrib": "168.30K",
       "iso_contrib": "684.00K",
       "join_date": "Feb 8, 2026",
       "id": "1225166314",
       "players_killed": "28",
       "resources_mined": "2.88M",
-      "hostiles_killed": "8.56K",
-      "resources_raided": "1.18M"
+      "hostiles_killed": "0",
+      "resources_raided": "0"
     },
     {
       "name": "gloomiedoom",
       "rank": "Agent",
-      "level": "25",
-      "power": "2.20M",
+      "level": "24",
+      "power": "2.09M",
       "helps": "5.89K",
       "rss_contrib": "0",
       "iso_contrib": "0",
@@ -263,14 +263,14 @@
       "id": "426305808",
       "players_killed": "71",
       "resources_mined": "3.51M",
-      "hostiles_killed": "6.70K",
-      "resources_raided": "6.07K"
+      "hostiles_killed": "0",
+      "resources_raided": "0"
     },
     {
       "name": "Twister1967",
       "rank": "Agent",
       "level": "25",
-      "power": "2.53M",
+      "power": "2.31M",
       "helps": "3.90K",
       "rss_contrib": "216",
       "iso_contrib": "600.00K",
@@ -278,14 +278,14 @@
       "id": "2919158696",
       "players_killed": "3",
       "resources_mined": "1.34M",
-      "hostiles_killed": "3.98K",
-      "resources_raided": "271"
+      "hostiles_killed": "0",
+      "resources_raided": "0"
     },
     {
       "name": "thexquizit",
       "rank": "Agent",
-      "level": "24",
-      "power": "1.75M",
+      "level": "23",
+      "power": "1.32M",
       "helps": "3.72K",
       "rss_contrib": "48",
       "iso_contrib": "0",
@@ -293,29 +293,29 @@
       "id": "181224344",
       "players_killed": "32",
       "resources_mined": "631.51K",
-      "hostiles_killed": "5.09K",
+      "hostiles_killed": "0",
       "resources_raided": "0"
     },
     {
       "name": "TrialsAndTribbles",
       "rank": "Agent",
       "level": "19",
-      "power": "485.46K",
+      "power": "480.16K",
       "helps": "3.64K",
-      "rss_contrib": "120",
+      "rss_contrib": "108",
       "iso_contrib": "0",
       "join_date": "Feb 6, 2026",
       "id": "634840318",
       "players_killed": "3",
       "resources_mined": "2.77M",
-      "hostiles_killed": "6.07K",
-      "resources_raided": "821"
+      "hostiles_killed": "0",
+      "resources_raided": "0"
     },
     {
       "name": "glakuns",
       "rank": "Agent",
       "level": "25",
-      "power": "2.36M",
+      "power": "1.66M",
       "helps": "3.48K",
       "rss_contrib": "144",
       "iso_contrib": "0",
@@ -323,14 +323,14 @@
       "id": "3247539895",
       "players_killed": "2",
       "resources_mined": "1.61M",
-      "hostiles_killed": "1.73K",
-      "resources_raided": "783"
+      "hostiles_killed": "0",
+      "resources_raided": "0"
     },
     {
       "name": "HadrianMarlow3",
       "rank": "Agent",
       "level": "16",
-      "power": "308.57K",
+      "power": "285.03K",
       "helps": "3.36K",
       "rss_contrib": "672",
       "iso_contrib": "0",
@@ -338,14 +338,14 @@
       "id": "1696653671",
       "players_killed": "134",
       "resources_mined": "484.00K",
-      "hostiles_killed": "2.28K",
-      "resources_raided": "39.07M"
+      "hostiles_killed": "0",
+      "resources_raided": "0"
     },
     {
       "name": "Smoothie81",
       "rank": "Agent",
       "level": "17",
-      "power": "285.02K",
+      "power": "271.84K",
       "helps": "3.33K",
       "rss_contrib": "0",
       "iso_contrib": "0",
@@ -353,14 +353,14 @@
       "id": "454434908",
       "players_killed": "13",
       "resources_mined": "145.80K",
-      "hostiles_killed": "741",
-      "resources_raided": "2.31K"
+      "hostiles_killed": "0",
+      "resources_raided": "0"
     },
     {
       "name": "OfficerJoseppi",
       "rank": "Agent",
       "level": "16",
-      "power": "204.79K",
+      "power": "199.51K",
       "helps": "3.24K",
       "rss_contrib": "0",
       "iso_contrib": "0",
@@ -368,14 +368,14 @@
       "id": "924969815",
       "players_killed": "6",
       "resources_mined": "456.94K",
-      "hostiles_killed": "1.12K",
-      "resources_raided": "696"
+      "hostiles_killed": "0",
+      "resources_raided": "0"
     },
     {
       "name": "LadyLain",
       "rank": "Agent",
       "level": "24",
-      "power": "1.89M",
+      "power": "1.78M",
       "helps": "3.04K",
       "rss_contrib": "132",
       "iso_contrib": "0",
@@ -383,14 +383,14 @@
       "id": "4232573353",
       "players_killed": "8",
       "resources_mined": "2.35M",
-      "hostiles_killed": "4.53K",
-      "resources_raided": "4.41K"
+      "hostiles_killed": "0",
+      "resources_raided": "0"
     },
     {
       "name": "Bacon0Violence",
       "rank": "Agent",
       "level": "20",
-      "power": "610.73K",
+      "power": "618.61K",
       "helps": "2.82K",
       "rss_contrib": "0",
       "iso_contrib": "0",
@@ -398,8 +398,8 @@
       "id": "3559543003",
       "players_killed": "21",
       "resources_mined": "668.96K",
-      "hostiles_killed": "1.82K",
-      "resources_raided": "12.88K"
+      "hostiles_killed": "0",
+      "resources_raided": "0"
     },
     {
       "name": "xSnowBallx",
@@ -413,14 +413,14 @@
       "id": "624256805",
       "players_killed": "62",
       "resources_mined": "814.92K",
-      "hostiles_killed": "8.07K",
-      "resources_raided": "2.70K"
+      "hostiles_killed": "0",
+      "resources_raided": "0"
     },
     {
       "name": "LadyAud",
       "rank": "Agent",
-      "level": "15",
-      "power": "173.93K",
+      "level": "14",
+      "power": "164.29K",
       "helps": "2.14K",
       "rss_contrib": "24",
       "iso_contrib": "0",
@@ -428,29 +428,29 @@
       "id": "1331036012",
       "players_killed": "26",
       "resources_mined": "318.28K",
-      "hostiles_killed": "1.57K",
-      "resources_raided": "12.02K"
+      "hostiles_killed": "0",
+      "resources_raided": "0"
     },
     {
       "name": "KnightofBAAWA",
       "rank": "Agent",
-      "level": "21",
-      "power": "678.85K",
+      "level": "20",
+      "power": "655.49K",
       "helps": "1.92K",
-      "rss_contrib": "324",
+      "rss_contrib": "294",
       "iso_contrib": "0",
       "join_date": "Feb 6, 2026",
       "id": "3394175627",
       "players_killed": "9",
       "resources_mined": "1.90M",
-      "hostiles_killed": "2.68K",
-      "resources_raided": "3.24K"
+      "hostiles_killed": "0",
+      "resources_raided": "0"
     },
     {
       "name": "CmdQuackers",
       "rank": "Agent",
       "level": "19",
-      "power": "367.10K",
+      "power": "364.46K",
       "helps": "1.84K",
       "rss_contrib": "2.17K",
       "iso_contrib": "0",
@@ -458,23 +458,23 @@
       "id": "3179608653",
       "players_killed": "3",
       "resources_mined": "444.12K",
-      "hostiles_killed": "1.09K",
-      "resources_raided": "143"
+      "hostiles_killed": "0",
+      "resources_raided": "0"
     },
     {
       "name": "Zevexian",
       "rank": "Agent",
       "level": "16",
-      "power": "181.58K",
+      "power": "170.44K",
       "helps": "1.47K",
-      "rss_contrib": "204",
+      "rss_contrib": "24",
       "iso_contrib": "0",
       "join_date": "Feb 9, 2026",
       "id": "1323131230",
       "players_killed": "6",
       "resources_mined": "154.59K",
-      "hostiles_killed": "858",
-      "resources_raided": "701"
+      "hostiles_killed": "0",
+      "resources_raided": "0"
     },
     {
       "name": "Belswin",
@@ -488,8 +488,8 @@
       "id": "3695764808",
       "players_killed": "4",
       "resources_mined": "150.51K",
-      "hostiles_killed": "915",
-      "resources_raided": "101"
+      "hostiles_killed": "0",
+      "resources_raided": "0"
     },
     {
       "name": "DLanick",
@@ -503,14 +503,14 @@
       "id": "3741993341",
       "players_killed": "3",
       "resources_mined": "75.23K",
-      "hostiles_killed": "453",
-      "resources_raided": "3.92K"
+      "hostiles_killed": "0",
+      "resources_raided": "0"
     },
     {
       "name": "GarvinFade",
       "rank": "Agent",
-      "level": "19",
-      "power": "334.17K",
+      "level": "18",
+      "power": "299.10K",
       "helps": "1.01K",
       "rss_contrib": "36",
       "iso_contrib": "0",
@@ -518,8 +518,8 @@
       "id": "646297596",
       "players_killed": "3",
       "resources_mined": "115.49K",
-      "hostiles_killed": "759",
-      "resources_raided": "3.13K"
+      "hostiles_killed": "0",
+      "resources_raided": "0"
     },
     {
       "name": "FoundPoem122",
@@ -533,7 +533,7 @@
       "id": "2566884649",
       "players_killed": "0",
       "resources_mined": "13.11K",
-      "hostiles_killed": "234",
+      "hostiles_killed": "0",
       "resources_raided": "0"
     },
     {
@@ -548,7 +548,7 @@
       "id": "70223809",
       "players_killed": "0",
       "resources_mined": "915",
-      "hostiles_killed": "62",
+      "hostiles_killed": "0",
       "resources_raided": "0"
     },
     {
