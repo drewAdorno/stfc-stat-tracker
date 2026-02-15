@@ -3597,15 +3597,15 @@
       "total_power": "309.41M",
       "member_count": "37",
       "league": "Adept League",
-      "total_helps": "251.12K",
-      "total_rss": "548.59K",
+      "total_helps": "253.04K",
+      "total_rss": "549.65K",
       "total_iso": "268.03M",
       "avg_level": "24"
     },
     "members": {
       "1231726616": {
         "level": "48",
-        "power": "74.05M",
+        "power": "73.08M",
         "helps": "18.80K",
         "rss_contrib": "144.19K",
         "iso_contrib": "193.34M",
@@ -3617,7 +3617,7 @@
       },
       "2644617547": {
         "level": "26",
-        "power": "3.38M",
+        "power": "3.26M",
         "helps": "32.47K",
         "rss_contrib": "2.82K",
         "iso_contrib": "9.90M",
@@ -3653,7 +3653,7 @@
       },
       "4172478581": {
         "level": "25",
-        "power": "2.62M",
+        "power": "2.51M",
         "helps": "7.85K",
         "rss_contrib": "6.62K",
         "iso_contrib": "3.90M",
@@ -3665,7 +3665,7 @@
       },
       "4150803274": {
         "level": "46",
-        "power": "44.27M",
+        "power": "44.30M",
         "helps": "6.49K",
         "rss_contrib": "2.50K",
         "iso_contrib": "59.60M",
@@ -3677,7 +3677,7 @@
       },
       "891890017": {
         "level": "23",
-        "power": "1.66M",
+        "power": "1.72M",
         "helps": "6.38K",
         "rss_contrib": "7.24K",
         "iso_contrib": "0",
@@ -3701,7 +3701,7 @@
       },
       "1468722486": {
         "level": "19",
-        "power": "271.76K",
+        "power": "272.73K",
         "helps": "4.28K",
         "rss_contrib": "60",
         "iso_contrib": "0",
@@ -3737,7 +3737,7 @@
       },
       "1995189823": {
         "level": "16",
-        "power": "204.41K",
+        "power": "210.82K",
         "helps": "1.89K",
         "rss_contrib": "912",
         "iso_contrib": "0",
@@ -3773,7 +3773,7 @@
       },
       "3971545627": {
         "level": "32",
-        "power": "6.25M",
+        "power": "6.28M",
         "helps": "16.53K",
         "rss_contrib": "2.32K",
         "iso_contrib": "0",
@@ -3821,7 +3821,7 @@
       },
       "181224344": {
         "level": "24",
-        "power": "1.74M",
+        "power": "1.73M",
         "helps": "3.72K",
         "rss_contrib": "48",
         "iso_contrib": "0",
@@ -3857,7 +3857,7 @@
       },
       "1696653671": {
         "level": "16",
-        "power": "308.57K",
+        "power": "313.34K",
         "helps": "3.36K",
         "rss_contrib": "672",
         "iso_contrib": "0",
@@ -3881,7 +3881,7 @@
       },
       "924969815": {
         "level": "16",
-        "power": "204.79K",
+        "power": "209.66K",
         "helps": "3.24K",
         "rss_contrib": "0",
         "iso_contrib": "0",
@@ -3893,7 +3893,7 @@
       },
       "4232573353": {
         "level": "25",
-        "power": "2.01M",
+        "power": "2.08M",
         "helps": "3.04K",
         "rss_contrib": "132",
         "iso_contrib": "0",
@@ -3929,7 +3929,7 @@
       },
       "1331036012": {
         "level": "15",
-        "power": "173.93K",
+        "power": "174.16K",
         "helps": "2.14K",
         "rss_contrib": "24",
         "iso_contrib": "0",
@@ -3941,7 +3941,7 @@
       },
       "3394175627": {
         "level": "21",
-        "power": "685.01K",
+        "power": "685.62K",
         "helps": "1.92K",
         "rss_contrib": "348",
         "iso_contrib": "0",
@@ -3950,6 +3950,18 @@
         "resources_mined": "1.90M",
         "resources_raided": "3.24K",
         "name": "KnightofBAAWA"
+      },
+      "525392480": {
+        "level": "29",
+        "power": "3.82M",
+        "helps": "1.92K",
+        "rss_contrib": "1.06K",
+        "iso_contrib": "0",
+        "players_killed": "8",
+        "hostiles_killed": "1.81K",
+        "resources_mined": "1.19M",
+        "resources_raided": "1.04K",
+        "name": "TenseBeagle96229"
       },
       "3179608653": {
         "level": "19",
@@ -3965,7 +3977,7 @@
       },
       "1323131230": {
         "level": "16",
-        "power": "183.93K",
+        "power": "190.35K",
         "helps": "1.47K",
         "rss_contrib": "204",
         "iso_contrib": "0",
