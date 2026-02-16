@@ -3602,15 +3602,15 @@
       "total_power": "316.46M",
       "member_count": "38",
       "league": "Adept League",
-      "total_helps": "253.04K",
-      "total_rss": "594.04K",
+      "total_helps": "248.89K",
+      "total_rss": "593.89K",
       "total_iso": "273.93M",
       "avg_level": "25"
     },
     "members": {
       "1231726616": {
         "level": "48",
-        "power": "72.27M",
+        "power": "72.73M",
         "helps": "18.80K",
         "rss_contrib": "144.19K",
         "iso_contrib": "193.34M",
@@ -3682,7 +3682,7 @@
       },
       "891890017": {
         "level": "23",
-        "power": "1.73M",
+        "power": "1.76M",
         "helps": "6.38K",
         "rss_contrib": "7.30K",
         "iso_contrib": "0",
@@ -3814,7 +3814,7 @@
       },
       "2919158696": {
         "level": "26",
-        "power": "2.76M",
+        "power": "2.66M",
         "helps": "3.90K",
         "rss_contrib": "216",
         "iso_contrib": "1.20M",
@@ -3826,7 +3826,7 @@
       },
       "181224344": {
         "level": "28",
-        "power": "2.16M",
+        "power": "2.20M",
         "helps": "3.72K",
         "rss_contrib": "180",
         "iso_contrib": "325.20K",
@@ -3838,7 +3838,7 @@
       },
       "634840318": {
         "level": "19",
-        "power": "491.35K",
+        "power": "491.75K",
         "helps": "3.64K",
         "rss_contrib": "132",
         "iso_contrib": "0",
@@ -3874,7 +3874,7 @@
       },
       "454434908": {
         "level": "17",
-        "power": "292.49K",
+        "power": "297.19K",
         "helps": "3.33K",
         "rss_contrib": "0",
         "iso_contrib": "0",
@@ -3886,19 +3886,19 @@
       },
       "924969815": {
         "level": "16",
-        "power": "214.84K",
+        "power": "215.63K",
         "helps": "3.24K",
         "rss_contrib": "0",
         "iso_contrib": "0",
         "players_killed": "6",
         "hostiles_killed": "1.12K",
         "resources_mined": "456.94K",
-        "resources_raided": "696",
+        "resources_raided": "816",
         "name": "OfficerJoseppi"
       },
       "4232573353": {
         "level": "27",
-        "power": "2.37M",
+        "power": "2.38M",
         "helps": "3.04K",
         "rss_contrib": "132",
         "iso_contrib": "300.00K",
@@ -3920,33 +3920,21 @@
         "resources_raided": "12.88K",
         "name": "Bacon0Violence"
       },
-      "624256805": {
-        "level": "22",
-        "power": "1.42M",
-        "helps": "2.55K",
-        "rss_contrib": "156",
-        "iso_contrib": "0",
-        "players_killed": "0",
-        "hostiles_killed": "0",
-        "resources_mined": "0",
-        "resources_raided": "0",
-        "name": "xSnowBallx"
-      },
       "1331036012": {
         "level": "17",
-        "power": "193.13K",
+        "power": "203.31K",
         "helps": "2.14K",
         "rss_contrib": "48",
         "iso_contrib": "0",
         "players_killed": "26",
         "hostiles_killed": "1.57K",
         "resources_mined": "318.28K",
-        "resources_raided": "26.28K",
+        "resources_raided": "27.35K",
         "name": "LadyAud"
       },
       "3394175627": {
         "level": "21",
-        "power": "693.94K",
+        "power": "700.29K",
         "helps": "1.92K",
         "rss_contrib": "804",
         "iso_contrib": "0",
@@ -3992,18 +3980,6 @@
         "resources_raided": "701",
         "name": "Zevexian"
       },
-      "3695764808": {
-        "level": "13",
-        "power": "97.13K",
-        "helps": "1.36K",
-        "rss_contrib": "0",
-        "iso_contrib": "0",
-        "players_killed": "0",
-        "hostiles_killed": "0",
-        "resources_mined": "0",
-        "resources_raided": "0",
-        "name": "Belswin"
-      },
       "3741993341": {
         "level": "19",
         "power": "175.20K",
@@ -4018,7 +3994,7 @@
       },
       "646297596": {
         "level": "19",
-        "power": "344.88K",
+        "power": "340.92K",
         "helps": "1.01K",
         "rss_contrib": "36",
         "iso_contrib": "0",
@@ -4039,18 +4015,6 @@
         "resources_mined": "13.11K",
         "resources_raided": "0",
         "name": "FoundPoem122"
-      },
-      "70223809": {
-        "level": "11",
-        "power": "30.61K",
-        "helps": "237",
-        "rss_contrib": "0",
-        "iso_contrib": "0",
-        "players_killed": "0",
-        "hostiles_killed": "0",
-        "resources_mined": "0",
-        "resources_raided": "0",
-        "name": "Thatsoalykat"
       },
       "1240347945": {
         "level": "6",
