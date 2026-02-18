@@ -181,18 +181,28 @@ def find_left_members(members, history):
 
 
 def find_inactive(members, history):
-    """Walk history backwards, count consecutive zero-change days per member."""
-    if len(history) < 2:
+    """Walk history backwards, count consecutive zero-change days per member.
+
+    Skips the latest entry (current/partial day) since the notification runs
+    right after the first scrape of the day, when data is nearly identical to
+    the previous day's final scrape.  Also skips entries with empty member data
+    (failed scrapes) so they don't break the consecutive-day walk.
+    """
+    # Filter to entries that actually have member data
+    valid = [h for h in history if h.get("members")]
+    if len(valid) < 3:
         return []
+    # Drop the latest (partial day) entry; compare completed days only
+    valid = valid[:-1]
     inactive = []
     for m in members:
         mid = m.get("id")
         if not mid:
             continue
         days_inactive = 0
-        for i in range(len(history) - 1, 0, -1):
-            curr_snap = history[i].get("members", {})
-            prev_snap = history[i - 1].get("members", {})
+        for i in range(len(valid) - 1, 0, -1):
+            curr_snap = valid[i].get("members", {})
+            prev_snap = valid[i - 1].get("members", {})
             curr_data = curr_snap.get(mid)
             prev_data = prev_snap.get(mid)
             if not curr_data or not prev_data:
@@ -432,6 +442,11 @@ def main():
     if not latest:
         safe_print("ERROR: data/latest.json not found")
         sys.exit(1)
+
+    members = latest.get("members", [])
+    if len(members) < 10:
+        safe_print(f"WARNING: latest.json has only {len(members)} members — scrape may have failed. Skipping notification.")
+        sys.exit(0)
 
     history = load_json(DATA_DIR / "history.json") or []
     history.sort(key=lambda e: e.get("date", ""))

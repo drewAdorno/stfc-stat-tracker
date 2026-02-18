@@ -150,6 +150,15 @@ def main():
     prev_members = load_members(prev_path)
     curr_members = load_members(curr_path)
 
+    # Guard against bad scrapes — if either snapshot has very few members,
+    # the site was probably down and we'd send false join/leave alerts.
+    if len(curr_members) < 10:
+        safe_print(f"WARNING: Current snapshot has only {len(curr_members)} members — scrape may have failed. Skipping alerts.")
+        sys.exit(0)
+    if len(prev_members) < 10:
+        safe_print(f"WARNING: Previous snapshot has only {len(prev_members)} members — skipping alerts.")
+        sys.exit(0)
+
     changes = detect_changes(prev_members, curr_members)
 
     if not has_changes(changes):

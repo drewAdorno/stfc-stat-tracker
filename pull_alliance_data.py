@@ -268,6 +268,12 @@ def pull_data(playwright, ws_endpoint):
 
     print(f"Total members scraped: {len(members)}")
 
+    # Abort if scrape looks bad (site down, Cloudflare block, empty table)
+    if len(members) < 10:
+        print(f"ERROR: Only got {len(members)} members — site may be down. Skipping save.")
+        browser.close()
+        sys.exit(1)
+
     # Build structured member list
     field_names = ["name", "rank", "level", "power", "helps", "rss_contrib", "iso_contrib", "join_date"]
     member_list = []

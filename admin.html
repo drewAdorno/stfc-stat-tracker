@@ -463,14 +463,17 @@
   // --- Section renderers ---
 
   function renderInactive(members, history) {
-    // Walk backwards through history to count consecutive days with zero change
+    // Walk backwards through completed days to count consecutive zero-change days.
+    // Skip the latest entry (partial day) and entries with no member data (failed scrapes).
+    const valid = history.filter(h => h.members && Object.keys(h.members).length > 0);
+    if (valid.length < 3) return '<div class="section"><div class="section-header">Inactive Members (No Gains)</div><div class="empty">Not enough history data</div></div>';
+    const completed = valid.slice(0, -1); // drop current partial day
     const inactive = [];
     for (const m of members) {
       let daysInactive = 0;
-      // Go from most recent snapshot backward
-      for (let i = history.length - 1; i >= 1; i--) {
-        const curr = history[i];
-        const prev = history[i - 1];
+      for (let i = completed.length - 1; i >= 1; i--) {
+        const curr = completed[i];
+        const prev = completed[i - 1];
         const currData = curr.members[m.id];
         const prevData = prev.members[m.id];
         if (!currData || !prevData) break;
