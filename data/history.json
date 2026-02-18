@@ -4521,7 +4521,7 @@
       },
       "4172478581": {
         "level": "26",
-        "power": "3.54M",
+        "power": "3.45M",
         "helps": "9.75K",
         "rss_contrib": "11.43K",
         "iso_contrib": "9.07M",
@@ -4545,7 +4545,7 @@
       },
       "4150803274": {
         "level": "46",
-        "power": "52.05M",
+        "power": "53.45M",
         "helps": "8.69K",
         "rss_contrib": "2.50K",
         "iso_contrib": "69.10M",
@@ -4556,8 +4556,8 @@
         "name": "AdmiralStorie"
       },
       "891890017": {
-        "level": "23",
-        "power": "1.89M",
+        "level": "24",
+        "power": "2.01M",
         "helps": "7.39K",
         "rss_contrib": "7.30K",
         "iso_contrib": "0",
@@ -4569,7 +4569,7 @@
       },
       "3996322497": {
         "level": "34",
-        "power": "8.62M",
+        "power": "8.73M",
         "helps": "5.44K",
         "rss_contrib": "138",
         "iso_contrib": "0",
@@ -4653,7 +4653,7 @@
       },
       "3971545627": {
         "level": "33",
-        "power": "7.34M",
+        "power": "7.35M",
         "helps": "18.63K",
         "rss_contrib": "6.35K",
         "iso_contrib": "0",
@@ -4737,7 +4737,7 @@
       },
       "924969815": {
         "level": "16",
-        "power": "226.84K",
+        "power": "231.72K",
         "helps": "4.65K",
         "rss_contrib": "0",
         "iso_contrib": "0",
@@ -4761,7 +4761,7 @@
       },
       "4232573353": {
         "level": "28",
-        "power": "2.69M",
+        "power": "2.75M",
         "helps": "4.08K",
         "rss_contrib": "132",
         "iso_contrib": "787.80K",
@@ -4797,7 +4797,7 @@
       },
       "3394175627": {
         "level": "21",
-        "power": "758.70K",
+        "power": "758.93K",
         "helps": "3.29K",
         "rss_contrib": "1.07K",
         "iso_contrib": "0",
@@ -4809,14 +4809,14 @@
       },
       "1331036012": {
         "level": "18",
-        "power": "321.74K",
+        "power": "330.76K",
         "helps": "3.29K",
         "rss_contrib": "54",
         "iso_contrib": "0",
         "players_killed": "52",
         "hostiles_killed": "1.99K",
         "resources_mined": "467.91K",
-        "resources_raided": "43.10K",
+        "resources_raided": "44.03K",
         "name": "LadyAud"
       },
       "1323131230": {
