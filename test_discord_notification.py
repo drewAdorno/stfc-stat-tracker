@@ -26,12 +26,25 @@ def members():
 
 @pytest.fixture
 def history():
-    """Synthetic history with 3 snapshots (days -2, -1, today)."""
+    """Synthetic history with 4 snapshots (days -3, -2, -1, today).
+
+    find_inactive drops the latest (partial day) entry, so we need 4 entries
+    to have 3 completed days for comparison.
+    """
     today = datetime.now()
-    dates = [(today - timedelta(days=i)).strftime("%Y-%m-%d") for i in [2, 1, 0]]
+    dates = [(today - timedelta(days=i)).strftime("%Y-%m-%d") for i in [3, 2, 1, 0]]
     return [
         {
             "date": dates[0],
+            "summary": {"total_power": "175M", "member_count": "5", "total_helps": "750", "total_rss": "9M", "total_iso": "4.5M"},
+            "members": {
+                "1": {"name": "Alice", "level": "37", "power": "85M", "helps": "350", "players_killed": "8", "hostiles_killed": "90", "resources_mined": "900K", "resources_raided": "450K", "rss_contrib": "900K", "iso_contrib": "450K"},
+                "2": {"name": "Bob", "level": "35", "power": "50M", "helps": "200", "players_killed": "5", "hostiles_killed": "50", "resources_mined": "500K", "resources_raided": "200K", "rss_contrib": "500K", "iso_contrib": "200K"},
+                "5": {"name": "Eve", "level": "32", "power": "40M", "helps": "200", "players_killed": "3", "hostiles_killed": "30", "resources_mined": "300K", "resources_raided": "100K", "rss_contrib": "300K", "iso_contrib": "100K"},
+            },
+        },
+        {
+            "date": dates[1],
             "summary": {"total_power": "180M", "member_count": "5", "total_helps": "800", "total_rss": "10M", "total_iso": "5M"},
             "members": {
                 "1": {"name": "Alice", "level": "38", "power": "90M", "helps": "400", "players_killed": "10", "hostiles_killed": "100", "resources_mined": "1M", "resources_raided": "500K", "rss_contrib": "1M", "iso_contrib": "500K"},
@@ -40,7 +53,7 @@ def history():
             },
         },
         {
-            "date": dates[1],
+            "date": dates[2],
             "summary": {"total_power": "185M", "member_count": "4", "total_helps": "850", "total_rss": "11M", "total_iso": "5.5M"},
             "members": {
                 "1": {"name": "Alice", "level": "39", "power": "95M", "helps": "450", "players_killed": "12", "hostiles_killed": "110", "resources_mined": "1.1M", "resources_raided": "550K", "rss_contrib": "1.1M", "iso_contrib": "550K"},
@@ -49,7 +62,7 @@ def history():
             },
         },
         {
-            "date": dates[2],
+            "date": dates[3],
             "summary": {"total_power": "185M", "member_count": "4", "total_helps": "850", "total_rss": "11M", "total_iso": "5.5M"},
             "members": {
                 "1": {"name": "Alice", "level": "40", "power": "100M", "helps": "500", "players_killed": "15", "hostiles_killed": "120", "resources_mined": "1.2M", "resources_raided": "600K", "rss_contrib": "1.2M", "iso_contrib": "600K"},
@@ -202,6 +215,45 @@ class TestFindInactive:
 
     def test_too_few_snapshots(self, members):
         assert sdn.find_inactive(members, [{"date": "2026-01-01", "members": {}}]) == []
+
+    def test_empty_entries_filtered(self, members):
+        """Empty history entries (failed scrapes) should be skipped, not break the walk."""
+        today = datetime.now()
+        dates = [(today - timedelta(days=i)).strftime("%Y-%m-%d") for i in [3, 2, 1, 0]]
+        bob_data = {"name": "Bob", "level": "35", "power": "50M", "helps": "200",
+                    "players_killed": "5", "hostiles_killed": "50", "resources_mined": "500K",
+                    "resources_raided": "200K", "rss_contrib": "500K", "iso_contrib": "200K"}
+        history_with_gap = [
+            {"date": dates[0], "summary": {}, "members": {"2": bob_data}},
+            {"date": dates[1], "summary": {}, "members": {}},  # failed scrape
+            {"date": dates[2], "summary": {}, "members": {"2": bob_data}},
+            {"date": dates[3], "summary": {}, "members": {"2": bob_data}},
+        ]
+        result = sdn.find_inactive(members, history_with_gap)
+        bob = next((m for m in result if m["name"] == "Bob"), None)
+        # After filtering empty entry and dropping latest: 2 valid entries remain
+        # Bob unchanged across those → 1 day inactive
+        assert bob is not None
+        assert bob["days"] == 1
+
+    def test_partial_day_not_counted(self, members):
+        """The latest entry (partial day) should not be used for comparison."""
+        today = datetime.now()
+        dates = [(today - timedelta(days=i)).strftime("%Y-%m-%d") for i in [2, 1, 0]]
+        alice_active = {"name": "Alice", "level": "40", "power": "100M", "helps": "500",
+                        "players_killed": "15", "hostiles_killed": "120", "resources_mined": "1.2M",
+                        "resources_raided": "600K", "rss_contrib": "1.2M", "iso_contrib": "600K"}
+        alice_old = {**alice_active, "power": "90M", "helps": "400"}
+        # Latest entry has same data as day before (simulates midnight scrape)
+        history = [
+            {"date": dates[0], "summary": {}, "members": {"1": alice_old}},
+            {"date": dates[1], "summary": {}, "members": {"1": alice_active}},
+            {"date": dates[2], "summary": {}, "members": {"1": alice_active}},  # partial day = same
+        ]
+        result = sdn.find_inactive(members, history)
+        alice = next((m for m in result if m["name"] == "Alice"), None)
+        # Alice changed between day -2 and day -1; the identical partial day is dropped
+        assert alice is None
 
 
 class TestFindPowerMovers:
