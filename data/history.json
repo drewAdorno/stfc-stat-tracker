@@ -4467,18 +4467,18 @@
   {
     "date": "2026-02-18",
     "summary": {
-      "total_power": "296.21M",
+      "total_power": "330.81M",
       "member_count": "34",
       "league": "Adept League",
       "total_helps": "292.54K",
-      "total_rss": "471.99K",
-      "total_iso": "286.36M",
+      "total_rss": "644.74K",
+      "total_iso": "287.34M",
       "avg_level": "26"
     },
     "members": {
       "1231726616": {
         "level": "48",
-        "power": "76.16M",
+        "power": "75.70M",
         "helps": "20.22K",
         "rss_contrib": "144.19K",
         "iso_contrib": "195.07M",
@@ -4488,21 +4488,9 @@
         "resources_raided": "68.62B",
         "name": "LuckyPete"
       },
-      "1225166314": {
-        "level": "43",
-        "power": "33.43M",
-        "helps": "12.91K",
-        "rss_contrib": "6.04K",
-        "iso_contrib": "0",
-        "players_killed": "37",
-        "hostiles_killed": "10.02K",
-        "resources_mined": "4.57M",
-        "resources_raided": "1.19M",
-        "name": "Grauerwulffe42"
-      },
       "2644617547": {
         "level": "26",
-        "power": "3.55M",
+        "power": "3.58M",
         "helps": "33.18K",
         "rss_contrib": "2.89K",
         "iso_contrib": "10.50M",
@@ -4514,7 +4502,7 @@
       },
       "788279554": {
         "level": "49",
-        "power": "84.52M",
+        "power": "85.27M",
         "helps": "15.45K",
         "rss_contrib": "134.83K",
         "iso_contrib": "0",
@@ -4524,17 +4512,17 @@
         "resources_raided": "1.72M",
         "name": "SalsaSpock"
       },
-      "2107718692": {
-        "level": "41",
-        "power": "12.14M",
-        "helps": "34.99K",
-        "rss_contrib": "138.41K",
-        "iso_contrib": "0",
-        "players_killed": "28",
-        "hostiles_killed": "14.67K",
-        "resources_mined": "8.93M",
-        "resources_raided": "11.97K",
-        "name": "colewchambers"
+      "1225166314": {
+        "level": "43",
+        "power": "34.64M",
+        "helps": "12.91K",
+        "rss_contrib": "178.29K",
+        "iso_contrib": "684.00K",
+        "players_killed": "37",
+        "hostiles_killed": "10.02K",
+        "resources_mined": "4.57M",
+        "resources_raided": "1.19M",
+        "name": "Grauerwulffe42"
       },
       "4172478581": {
         "level": "26",
@@ -4548,9 +4536,21 @@
         "resources_raided": "9.71K",
         "name": "Nalarha"
       },
+      "2107718692": {
+        "level": "41",
+        "power": "12.14M",
+        "helps": "34.99K",
+        "rss_contrib": "138.41K",
+        "iso_contrib": "0",
+        "players_killed": "28",
+        "hostiles_killed": "14.67K",
+        "resources_mined": "8.93M",
+        "resources_raided": "11.97K",
+        "name": "colewchambers"
+      },
       "4150803274": {
         "level": "46",
-        "power": "51.83M",
+        "power": "53.39M",
         "helps": "8.57K",
         "rss_contrib": "2.50K",
         "iso_contrib": "69.10M",
@@ -4610,7 +4610,7 @@
       },
       "1995189823": {
         "level": "16",
-        "power": "244.04K",
+        "power": "247.81K",
         "helps": "2.45K",
         "rss_contrib": "912",
         "iso_contrib": "0",
@@ -4658,7 +4658,7 @@
       },
       "3971545627": {
         "level": "33",
-        "power": "7.14M",
+        "power": "7.17M",
         "helps": "18.54K",
         "rss_contrib": "6.35K",
         "iso_contrib": "0",
@@ -4682,7 +4682,7 @@
       },
       "634840318": {
         "level": "19",
-        "power": "501.57K",
+        "power": "504.97K",
         "helps": "5.46K",
         "rss_contrib": "144",
         "iso_contrib": "0",
@@ -4694,7 +4694,7 @@
       },
       "181224344": {
         "level": "28",
-        "power": "2.19M",
+        "power": "2.20M",
         "helps": "5.22K",
         "rss_contrib": "180",
         "iso_contrib": "325.20K",
@@ -4706,10 +4706,10 @@
       },
       "2919158696": {
         "level": "26",
-        "power": "2.92M",
+        "power": "2.95M",
         "helps": "5.10K",
         "rss_contrib": "216",
-        "iso_contrib": "1.50M",
+        "iso_contrib": "1.80M",
         "players_killed": "3",
         "hostiles_killed": "5.00K",
         "resources_mined": "2.84M",
@@ -4718,7 +4718,7 @@
       },
       "1696653671": {
         "level": "17",
-        "power": "399.34K",
+        "power": "400.34K",
         "helps": "4.89K",
         "rss_contrib": "2.81K",
         "iso_contrib": "0",
@@ -4730,7 +4730,7 @@
       },
       "3247539895": {
         "level": "25",
-        "power": "2.40M",
+        "power": "2.34M",
         "helps": "4.61K",
         "rss_contrib": "144",
         "iso_contrib": "0",
@@ -4742,7 +4742,7 @@
       },
       "924969815": {
         "level": "16",
-        "power": "226.05K",
+        "power": "226.84K",
         "helps": "4.53K",
         "rss_contrib": "0",
         "iso_contrib": "0",
@@ -4778,7 +4778,7 @@
       },
       "3559543003": {
         "level": "20",
-        "power": "759.26K",
+        "power": "789.45K",
         "helps": "3.88K",
         "rss_contrib": "0",
         "iso_contrib": "0",
@@ -4790,9 +4790,9 @@
       },
       "525392480": {
         "level": "30",
-        "power": "4.54M",
+        "power": "4.57M",
         "helps": "3.78K",
-        "rss_contrib": "1.45K",
+        "rss_contrib": "1.95K",
         "iso_contrib": "0",
         "players_killed": "8",
         "hostiles_killed": "3.09K",
@@ -4814,7 +4814,7 @@
       },
       "1331036012": {
         "level": "18",
-        "power": "278.28K",
+        "power": "328.23K",
         "helps": "3.17K",
         "rss_contrib": "54",
         "iso_contrib": "0",
@@ -4826,7 +4826,7 @@
       },
       "1323131230": {
         "level": "16",
-        "power": "219.48K",
+        "power": "222.40K",
         "helps": "2.62K",
         "rss_contrib": "204",
         "iso_contrib": "0",
@@ -4838,7 +4838,7 @@
       },
       "3179608653": {
         "level": "19",
-        "power": "413.51K",
+        "power": "402.92K",
         "helps": "2.44K",
         "rss_contrib": "2.29K",
         "iso_contrib": "0",
