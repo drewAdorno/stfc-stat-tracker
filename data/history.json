@@ -4033,18 +4033,18 @@
   {
     "date": "2026-02-17",
     "summary": {
-      "total_power": "294.84M",
+      "total_power": "296.21M",
       "member_count": "34",
       "league": "Adept League",
       "total_helps": "279.62K",
       "total_rss": "465.94K",
-      "total_iso": "285.53M",
+      "total_iso": "286.36M",
       "avg_level": "25"
     },
     "members": {
       "1231726616": {
         "level": "48",
-        "power": "75.88M",
+        "power": "76.09M",
         "helps": "20.22K",
         "rss_contrib": "144.19K",
         "iso_contrib": "195.07M",
@@ -4080,7 +4080,7 @@
       },
       "2107718692": {
         "level": "41",
-        "power": "11.83M",
+        "power": "12.14M",
         "helps": "34.99K",
         "rss_contrib": "138.41K",
         "iso_contrib": "0",
@@ -4092,10 +4092,10 @@
       },
       "4172478581": {
         "level": "26",
-        "power": "3.33M",
+        "power": "3.53M",
         "helps": "9.60K",
         "rss_contrib": "11.43K",
-        "iso_contrib": "8.55M",
+        "iso_contrib": "9.07M",
         "players_killed": "20",
         "hostiles_killed": "13.76K",
         "resources_mined": "5.72M",
@@ -4104,7 +4104,7 @@
       },
       "4150803274": {
         "level": "46",
-        "power": "51.69M",
+        "power": "51.83M",
         "helps": "8.57K",
         "rss_contrib": "2.50K",
         "iso_contrib": "69.10M",
@@ -4116,7 +4116,7 @@
       },
       "891890017": {
         "level": "23",
-        "power": "1.87M",
+        "power": "1.89M",
         "helps": "7.35K",
         "rss_contrib": "7.30K",
         "iso_contrib": "0",
@@ -4128,7 +4128,7 @@
       },
       "3996322497": {
         "level": "34",
-        "power": "8.59M",
+        "power": "8.66M",
         "helps": "5.42K",
         "rss_contrib": "138",
         "iso_contrib": "0",
@@ -4140,7 +4140,7 @@
       },
       "1468722486": {
         "level": "19",
-        "power": "306.51K",
+        "power": "311.13K",
         "helps": "4.76K",
         "rss_contrib": "60",
         "iso_contrib": "0",
@@ -4164,7 +4164,7 @@
       },
       "1995189823": {
         "level": "16",
-        "power": "241.01K",
+        "power": "239.98K",
         "helps": "2.45K",
         "rss_contrib": "912",
         "iso_contrib": "0",
@@ -4188,7 +4188,7 @@
       },
       "3144363534": {
         "level": "15",
-        "power": "229.62K",
+        "power": "228.58K",
         "helps": "1.77K",
         "rss_contrib": "432",
         "iso_contrib": "0",
@@ -4212,7 +4212,7 @@
       },
       "3971545627": {
         "level": "33",
-        "power": "7.04M",
+        "power": "7.13M",
         "helps": "18.54K",
         "rss_contrib": "6.35K",
         "iso_contrib": "0",
@@ -4236,7 +4236,7 @@
       },
       "634840318": {
         "level": "19",
-        "power": "495.15K",
+        "power": "501.55K",
         "helps": "5.46K",
         "rss_contrib": "144",
         "iso_contrib": "0",
@@ -4260,10 +4260,10 @@
       },
       "2919158696": {
         "level": "26",
-        "power": "2.80M",
+        "power": "2.84M",
         "helps": "5.10K",
         "rss_contrib": "216",
-        "iso_contrib": "1.20M",
+        "iso_contrib": "1.50M",
         "players_killed": "3",
         "hostiles_killed": "5.00K",
         "resources_mined": "2.84M",
@@ -4272,7 +4272,7 @@
       },
       "1696653671": {
         "level": "17",
-        "power": "397.44K",
+        "power": "397.84K",
         "helps": "4.89K",
         "rss_contrib": "2.81K",
         "iso_contrib": "0",
@@ -4296,7 +4296,7 @@
       },
       "924969815": {
         "level": "16",
-        "power": "223.55K",
+        "power": "224.46K",
         "helps": "4.53K",
         "rss_contrib": "0",
         "iso_contrib": "0",
@@ -4308,7 +4308,7 @@
       },
       "454434908": {
         "level": "17",
-        "power": "306.41K",
+        "power": "304.96K",
         "helps": "4.16K",
         "rss_contrib": "0",
         "iso_contrib": "0",
@@ -4320,7 +4320,7 @@
       },
       "4232573353": {
         "level": "28",
-        "power": "2.64M",
+        "power": "2.66M",
         "helps": "4.02K",
         "rss_contrib": "132",
         "iso_contrib": "787.80K",
@@ -4344,7 +4344,7 @@
       },
       "525392480": {
         "level": "30",
-        "power": "4.52M",
+        "power": "4.53M",
         "helps": "3.78K",
         "rss_contrib": "1.45K",
         "iso_contrib": "0",
@@ -4356,7 +4356,7 @@
       },
       "3394175627": {
         "level": "21",
-        "power": "748.18K",
+        "power": "749.88K",
         "helps": "3.22K",
         "rss_contrib": "1.07K",
         "iso_contrib": "0",
@@ -4368,7 +4368,7 @@
       },
       "1331036012": {
         "level": "18",
-        "power": "268.03K",
+        "power": "276.99K",
         "helps": "3.17K",
         "rss_contrib": "54",
         "iso_contrib": "0",
@@ -4380,7 +4380,7 @@
       },
       "1323131230": {
         "level": "16",
-        "power": "217.16K",
+        "power": "219.35K",
         "helps": "2.62K",
         "rss_contrib": "204",
         "iso_contrib": "0",
