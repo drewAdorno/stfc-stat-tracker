@@ -5330,18 +5330,18 @@
   {
     "date": "2026-02-20",
     "summary": {
-      "total_power": "339.06M",
+      "total_power": "339.03M",
       "member_count": "34",
       "league": "Adept League",
       "total_helps": "320.36K",
-      "total_rss": "22.73K",
-      "total_iso": "313.61M",
+      "total_rss": "23.41K",
+      "total_iso": "314.87M",
       "avg_level": "26"
     },
     "members": {
       "1231726616": {
         "level": "48",
-        "power": "76.18M",
+        "power": "76.56M",
         "helps": "21.13K",
         "rss_contrib": "22.59K",
         "iso_contrib": "201.90M",
@@ -5353,7 +5353,7 @@
       },
       "2644617547": {
         "level": "26",
-        "power": "3.60M",
+        "power": "3.56M",
         "helps": "33.49K",
         "rss_contrib": "0",
         "iso_contrib": "10.50M",
@@ -5389,7 +5389,7 @@
       },
       "4172478581": {
         "level": "28",
-        "power": "4.64M",
+        "power": "4.54M",
         "helps": "10.20K",
         "rss_contrib": "0",
         "iso_contrib": "15.21M",
@@ -5416,7 +5416,7 @@
         "power": "53.77M",
         "helps": "9.45K",
         "rss_contrib": "0",
-        "iso_contrib": "77.09M",
+        "iso_contrib": "78.05M",
         "players_killed": "8",
         "hostiles_killed": "21.44K",
         "resources_mined": "59.20M",
@@ -5449,7 +5449,7 @@
       },
       "1468722486": {
         "level": "19",
-        "power": "319.22K",
+        "power": "320.09K",
         "helps": "4.90K",
         "rss_contrib": "0",
         "iso_contrib": "0",
@@ -5473,7 +5473,7 @@
       },
       "1995189823": {
         "level": "17",
-        "power": "281.92K",
+        "power": "282.42K",
         "helps": "2.76K",
         "rss_contrib": "0",
         "iso_contrib": "0",
@@ -5521,9 +5521,9 @@
       },
       "3971545627": {
         "level": "33",
-        "power": "7.62M",
+        "power": "7.63M",
         "helps": "18.99K",
-        "rss_contrib": "0",
+        "rss_contrib": "534",
         "iso_contrib": "0",
         "players_killed": "56",
         "hostiles_killed": "38.67K",
@@ -5533,7 +5533,7 @@
       },
       "426305808": {
         "level": "25",
-        "power": "2.37M",
+        "power": "2.41M",
         "helps": "7.00K",
         "rss_contrib": "0",
         "iso_contrib": "0",
@@ -5560,7 +5560,7 @@
         "power": "2.91M",
         "helps": "5.65K",
         "rss_contrib": "0",
-        "iso_contrib": "3.00M",
+        "iso_contrib": "3.30M",
         "players_killed": "3",
         "hostiles_killed": "6.03K",
         "resources_mined": "4.29M",
@@ -5593,7 +5593,7 @@
       },
       "924969815": {
         "level": "16",
-        "power": "239.47K",
+        "power": "245.06K",
         "helps": "5.13K",
         "rss_contrib": "0",
         "iso_contrib": "0",
@@ -5604,8 +5604,8 @@
         "name": "OfficerJoseppi"
       },
       "3247539895": {
-        "level": "25",
-        "power": "2.35M",
+        "level": "26",
+        "power": "2.42M",
         "helps": "5.07K",
         "rss_contrib": "0",
         "iso_contrib": "0",
@@ -5629,7 +5629,7 @@
       },
       "454434908": {
         "level": "18",
-        "power": "322.42K",
+        "power": "323.63K",
         "helps": "4.50K",
         "rss_contrib": "0",
         "iso_contrib": "0",
@@ -5667,7 +5667,7 @@
         "level": "21",
         "power": "805.83K",
         "helps": "3.54K",
-        "rss_contrib": "0",
+        "rss_contrib": "144",
         "iso_contrib": "0",
         "players_killed": "9",
         "hostiles_killed": "3.22K",
@@ -5677,7 +5677,7 @@
       },
       "1331036012": {
         "level": "18",
-        "power": "366.82K",
+        "power": "370.24K",
         "helps": "3.41K",
         "rss_contrib": "0",
         "iso_contrib": "0",
