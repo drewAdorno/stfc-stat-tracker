@@ -1,7 +1,8 @@
 """
 STFC API-Based Data Puller
 Pulls all server 716 player data via the v3.stfc.pro REST API.
-Uses curl_cffi with Chrome TLS impersonation to bypass Cloudflare.
+Windows: Uses curl_cffi with Chrome TLS impersonation to bypass Cloudflare.
+Linux/EC2: Uses Playwright browser to bypass Cloudflare (datacenter IPs get challenged).
 Auto-refreshes cookies via Chrome CDP when they expire.
 """
 
@@ -332,6 +333,125 @@ def fetch_all_players(cookie_dict):
 
 
 # ---------------------------------------------------------------------------
+# Playwright-based API fetch (for Linux/EC2 where Cloudflare blocks curl_cffi)
+# ---------------------------------------------------------------------------
+
+def _load_cookie_list():
+    """Load session cookies as a list of Playwright-format dicts."""
+    with open(COOKIE_FILE, "r", encoding="utf-8") as f:
+        raw = json.load(f)
+
+    pw_cookies = []
+    for c in raw:
+        entry = {
+            "name": c["name"],
+            "value": c["value"],
+            "domain": c.get("domain", ".stfc.pro"),
+            "path": c.get("path", "/"),
+        }
+        if c.get("expires") and c["expires"] > 0:
+            entry["expires"] = c["expires"]
+        if c.get("secure"):
+            entry["secure"] = True
+        if c.get("sameSite"):
+            val = c["sameSite"].capitalize()
+            if val in ("Strict", "Lax", "None"):
+                entry["sameSite"] = val
+        pw_cookies.append(entry)
+    return pw_cookies
+
+
+def fetch_all_players_browser():
+    """Use Playwright browser to fetch API pages (bypasses Cloudflare)."""
+    safe_print("Using Playwright browser for API calls (Cloudflare bypass)...")
+    SESSION_DIR.mkdir(exist_ok=True)
+
+    all_players = []
+    total_count = None
+
+    with sync_playwright() as pw:
+        context = pw.chromium.launch_persistent_context(
+            user_data_dir=str(SESSION_DIR),
+            headless=False,
+            args=["--no-sandbox", "--disable-gpu"],
+        )
+
+        # Inject session cookies
+        try:
+            pw_cookies = _load_cookie_list()
+            context.add_cookies(pw_cookies)
+            safe_print(f"Injected {len(pw_cookies)} cookies into browser")
+        except Exception as e:
+            safe_print(f"WARNING: Could not inject cookies: {e}")
+
+        page = context.pages[0] if context.pages else context.new_page()
+
+        # Visit the site first to establish Cloudflare clearance
+        safe_print("Establishing Cloudflare clearance...")
+        page.goto(ALLIANCE_URL, wait_until="domcontentloaded", timeout=60_000)
+        time.sleep(3)
+
+        # Check if we hit login page
+        if "login" in page.url.lower():
+            safe_print("ERROR: Redirected to login page. Session cookies may be expired.")
+            context.close()
+            return None, 403
+
+        page_num = 1
+        while True:
+            url = (
+                f"{API_BASE}?server={SERVER}"
+                f"&sortBy=power&sortOrder=desc"
+                f"&page={page_num}&pageCount={PAGE_SIZE}"
+            )
+            safe_print(f"Fetching page {page_num} via browser...")
+            resp = page.goto(url, wait_until="domcontentloaded", timeout=60_000)
+
+            if resp.status in (401, 403):
+                safe_print(f"Browser API request returned {resp.status}")
+                context.close()
+                return None, resp.status
+
+            if resp.status != 200:
+                safe_print(f"ERROR: Browser API returned status {resp.status}")
+                context.close()
+                sys.exit(1)
+
+            body_text = page.inner_text("body")
+            data = json.loads(body_text)
+
+            if total_count is None:
+                total_count = data.get("count", 0)
+                total_pages = (total_count + PAGE_SIZE - 1) // PAGE_SIZE
+                safe_print(f"Total players on server {SERVER}: {total_count} ({total_pages} pages)")
+
+            players = data.get("players", [])
+            if not players:
+                break
+
+            all_players.extend(players)
+            safe_print(f"  Page {page_num}: got {len(players)} players (total so far: {len(all_players)})")
+
+            if len(all_players) >= total_count:
+                break
+
+            page_num += 1
+            time.sleep(2)
+
+        # Save any new cookies (including cf_clearance) back to file
+        fresh_cookies = context.cookies("https://v3.stfc.pro")
+        if fresh_cookies:
+            with open(COOKIE_FILE, "w", encoding="utf-8") as f:
+                json.dump(fresh_cookies, f, indent=2)
+            safe_print(f"Updated cookie file ({len(fresh_cookies)} cookies)")
+
+        context.close()
+
+    safe_print(f"Fetched {len(all_players)} players total")
+    return all_players, total_count
+
+
+# ---------------------------------------------------------------------------
 # Data mapping & output
 # ---------------------------------------------------------------------------
 
@@ -392,30 +512,42 @@ def main():
     DATA_DIR.mkdir(exist_ok=True)
     SESSION_DIR.mkdir(exist_ok=True)
 
-    # Check if cookies need refreshing before we even try
-    if cookies_expired():
-        safe_print("Cookies expired or missing - refreshing automatically...")
-        if not refresh_cookies():
-            safe_print("FATAL: Could not refresh cookies.")
+    if not IS_WINDOWS:
+        # Linux/EC2: use Playwright browser to bypass Cloudflare
+        if cookies_expired():
+            safe_print("FATAL: Cookies expired. Copy fresh session_cookies.json from Windows.")
             sys.exit(1)
 
-    cookie_dict = load_cookies()
-    all_players, result = fetch_all_players(cookie_dict)
+        all_players, result = fetch_all_players_browser()
 
-    # If auth failed, try refreshing cookies once and retry
-    if all_players is None:
-        safe_print(f"API returned {result} - refreshing cookies and retrying...")
-        if not refresh_cookies():
-            safe_print("FATAL: Could not refresh cookies.")
+        if all_players is None:
+            safe_print(f"FATAL: Browser API returned {result}.")
+            safe_print("Session cookies may be expired - copy fresh ones from Windows.")
             sys.exit(1)
+    else:
+        # Windows: use curl_cffi (residential IP passes Cloudflare)
+        if cookies_expired():
+            safe_print("Cookies expired or missing - refreshing automatically...")
+            if not refresh_cookies():
+                safe_print("FATAL: Could not refresh cookies.")
+                sys.exit(1)
 
         cookie_dict = load_cookies()
         all_players, result = fetch_all_players(cookie_dict)
 
         if all_players is None:
-            safe_print(f"FATAL: API still returning {result} after cookie refresh.")
-            safe_print("Manual intervention required - run extract_cookies.py.")
-            sys.exit(1)
+            safe_print(f"API returned {result} - refreshing cookies and retrying...")
+            if not refresh_cookies():
+                safe_print("FATAL: Could not refresh cookies.")
+                sys.exit(1)
+
+            cookie_dict = load_cookies()
+            all_players, result = fetch_all_players(cookie_dict)
+
+            if all_players is None:
+                safe_print(f"FATAL: API still returning {result} after cookie refresh.")
+                safe_print("Manual intervention required - run extract_cookies.py.")
+                sys.exit(1)
 
     if len(all_players) < 10:
         safe_print(f"ERROR: Only got {len(all_players)} players - something went wrong. Skipping save.")
