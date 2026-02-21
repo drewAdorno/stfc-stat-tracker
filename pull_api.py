@@ -6,6 +6,7 @@ Linux/EC2: Uses Playwright browser to bypass Cloudflare (datacenter IPs get chal
 Auto-refreshes cookies via Chrome CDP when they expire.
 """
 
+import base64
 import gzip
 import json
 import platform
@@ -408,21 +409,35 @@ def fetch_all_players_browser():
             )
             safe_print(f"Fetching page {page_num} via browser...")
 
-            # Use Playwright's request API (shares browser cookies/CF clearance)
-            resp = context.request.get(url)
-            status = resp.status
+            # Use in-page fetch() to inherit Cloudflare clearance.
+            # Response is gzip-compressed without proper Content-Encoding,
+            # so we read as ArrayBuffer and base64-encode for Python to decompress.
+            result = page.evaluate("""async (url) => {
+                const resp = await fetch(url);
+                if (!resp.ok) {
+                    return { status: resp.status, b64: null };
+                }
+                const buf = await resp.arrayBuffer();
+                const bytes = new Uint8Array(buf);
+                let binary = '';
+                for (let i = 0; i < bytes.length; i++) {
+                    binary += String.fromCharCode(bytes[i]);
+                }
+                return { status: resp.status, b64: btoa(binary) };
+            }""", url)
 
+            status = result["status"]
             if status in (401, 403):
                 safe_print(f"Browser API request returned {status}")
                 context.close()
                 return None, status
 
-            if status != 200:
+            if status != 200 or not result.get("b64"):
                 safe_print(f"ERROR: Browser API returned status {status}")
                 context.close()
                 sys.exit(1)
 
-            body = resp.body()
+            body = base64.b64decode(result["b64"])
             if body[:2] == b'\x1f\x8b':
                 body = gzip.decompress(body)
             data = json.loads(body.decode("utf-8"))
