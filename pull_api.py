@@ -409,18 +409,16 @@ def fetch_all_players_browser():
             safe_print(f"Fetching page {page_num} via browser...")
 
             # Use fetch() inside the browser to avoid download triggers
+            # Request identity encoding to avoid gzip issues
             result = page.evaluate("""async (url) => {
-                const resp = await fetch(url);
+                const resp = await fetch(url, {
+                    headers: { 'Accept-Encoding': 'identity' }
+                });
                 if (!resp.ok) {
                     return { status: resp.status, data: null };
                 }
-                try {
-                    const data = await resp.json();
-                    return { status: resp.status, data: data };
-                } catch (e) {
-                    const text = await resp.text();
-                    return { status: resp.status, data: null, error: text.substring(0, 300) };
-                }
+                const data = await resp.json();
+                return { status: resp.status, data: data };
             }""", url)
 
             status = result["status"]
