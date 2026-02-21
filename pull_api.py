@@ -362,6 +362,20 @@ def _load_cookie_list():
     return pw_cookies
 
 
+def _scrape_league(page):
+    """Scrape league text from the alliance page."""
+    try:
+        text = page.inner_text("body")
+        for line in text.split("\n"):
+            line = line.strip()
+            if "League" in line and line != "League":
+                safe_print(f"League: {line}")
+                return line
+    except Exception as e:
+        safe_print(f"WARNING: Could not scrape league: {e}")
+    return ""
+
+
 def fetch_all_players_browser():
     """Use Playwright browser to fetch API pages (bypasses Cloudflare)."""
     safe_print("Using Playwright browser for API calls (Cloudflare bypass)...")
@@ -397,6 +411,9 @@ def fetch_all_players_browser():
             safe_print("ERROR: Redirected to login page. Session cookies may be expired.")
             context.close()
             return None, 403
+
+        # Scrape league info from the alliance page while we're here
+        league = _scrape_league(page)
 
         page_num = 1
         while True:
@@ -468,7 +485,7 @@ def fetch_all_players_browser():
         context.close()
 
     safe_print(f"Fetched {len(all_players)} players total")
-    return all_players, total_count
+    return all_players, total_count, league
 
 
 # ---------------------------------------------------------------------------
@@ -486,7 +503,7 @@ def map_player(raw):
         "helps": d.get("ahelps", 0),
         "rss_contrib": d.get("acontrib", 0),
         "iso_contrib": d.get("aisocontrib", 0),
-        "join_date": d.get("ajoined", ""),
+        "join_date": d.get("ajoined", "").split("T")[0] if d.get("ajoined") else "",
         "id": str(d.get("playerid", "")),
         "players_killed": d.get("pdestroyed", 0),
         "hostiles_killed": d.get("hdestroyed", 0),
@@ -498,7 +515,7 @@ def map_player(raw):
     }
 
 
-def save_data(all_players, total_count):
+def save_data(all_players, total_count, league=""):
     """Map all players, store in SQLite, and export JSON files for dashboards."""
     all_mapped = [map_player(p) for p in all_players]
 
@@ -519,7 +536,7 @@ def save_data(all_players, total_count):
     log_pull(conn, SERVER, total_count)
 
     # Export JSON files for dashboards
-    export_latest_json(conn, NCC_ALLIANCE_ID)
+    export_latest_json(conn, NCC_ALLIANCE_ID, league=league)
     safe_print(f"Exported {DATA_DIR / 'latest.json'}")
 
     export_history_json(conn, NCC_ALLIANCE_ID)
@@ -532,13 +549,15 @@ def main():
     DATA_DIR.mkdir(exist_ok=True)
     SESSION_DIR.mkdir(exist_ok=True)
 
+    league = ""
+
     if not IS_WINDOWS:
         # Linux/EC2: use Playwright browser to bypass Cloudflare
         if cookies_expired():
             safe_print("FATAL: Cookies expired. Copy fresh session_cookies.json from Windows.")
             sys.exit(1)
 
-        all_players, result = fetch_all_players_browser()
+        all_players, result, league = fetch_all_players_browser()
 
         if all_players is None:
             safe_print(f"FATAL: Browser API returned {result}.")
@@ -573,7 +592,7 @@ def main():
         safe_print(f"ERROR: Only got {len(all_players)} players - something went wrong. Skipping save.")
         sys.exit(1)
 
-    save_data(all_players, result)
+    save_data(all_players, result, league=league)
     safe_print("Done!")
 
 

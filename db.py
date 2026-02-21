@@ -13,6 +13,7 @@ DATA_DIR = BASE_DIR / "data"
 DB_PATH = DATA_DIR / "stfc.db"
 
 NCC_ALLIANCE_ID = 3974286889
+NCC_ALLIANCE_NAME = "Discovery"
 SERVER = 716
 
 TRACKED_FIELDS = [
@@ -174,7 +175,7 @@ def _format_abbr(n):
     return str(n)
 
 
-def export_latest_json(conn, alliance_id=NCC_ALLIANCE_ID):
+def export_latest_json(conn, alliance_id=NCC_ALLIANCE_ID, league=""):
     """Query the most recent snapshot for an alliance and write data/latest.json.
 
     Output format matches what dashboards expect:
@@ -231,14 +232,14 @@ def export_latest_json(conn, alliance_id=NCC_ALLIANCE_ID):
             "helps": _format_abbr(helps),
             "rss_contrib": _format_abbr(rss_c),
             "iso_contrib": _format_abbr(iso_c),
-            "join_date": join_date or "",
+            "join_date": (join_date or "").split("T")[0],
             "id": str(pid),
             "players_killed": _format_abbr(pk),
             "hostiles_killed": _format_abbr(hk),
             "resources_mined": _format_abbr(rm),
             "resources_raided": _format_abbr(rr),
             "alliance_tag": atag or "",
-            "alliance_name": "",
+            "alliance_name": NCC_ALLIANCE_NAME if aid == NCC_ALLIANCE_ID else "",
             "alliance_id": aid or 0,
         })
 
@@ -253,6 +254,8 @@ def export_latest_json(conn, alliance_id=NCC_ALLIANCE_ID):
     record = {
         "pulled_at": pulled_at,
         "alliance_url": f"https://v3.stfc.pro/alliances/{alliance_id}",
+        "alliance_name": NCC_ALLIANCE_NAME if alliance_id == NCC_ALLIANCE_ID else "",
+        "alliance_tag": "NCC" if alliance_id == NCC_ALLIANCE_ID else "",
         "summary": {
             "total_power": _format_abbr(total_power),
             "member_count": str(len(members)),
@@ -260,6 +263,7 @@ def export_latest_json(conn, alliance_id=NCC_ALLIANCE_ID):
             "total_rss": _format_abbr(total_rss),
             "total_iso": _format_abbr(total_iso),
             "avg_level": str(avg_level),
+            "league": league,
         },
         "members": members,
     }
