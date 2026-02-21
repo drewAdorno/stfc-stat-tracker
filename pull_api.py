@@ -391,8 +391,6 @@ def fetch_all_players_browser():
         safe_print("Establishing Cloudflare clearance...")
         page.goto(ALLIANCE_URL, wait_until="domcontentloaded", timeout=60_000)
         time.sleep(5)
-        safe_print(f"Landed on: {page.url}")
-        safe_print(f"Page title: {page.title()}")
 
         # Check if we hit login page
         if "login" in page.url.lower():
