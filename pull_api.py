@@ -408,33 +408,24 @@ def fetch_all_players_browser():
             )
             safe_print(f"Fetching page {page_num} via browser...")
 
-            # Use fetch() inside the browser to avoid download triggers
-            # Request identity encoding to avoid gzip issues
-            result = page.evaluate("""async (url) => {
-                const resp = await fetch(url, {
-                    headers: { 'Accept-Encoding': 'identity' }
-                });
-                if (!resp.ok) {
-                    return { status: resp.status, data: null };
-                }
-                const data = await resp.json();
-                return { status: resp.status, data: data };
-            }""", url)
-
-            status = result["status"]
-            data = result.get("data")
+            # Use Playwright's request API (shares browser cookies/CF clearance)
+            resp = context.request.get(url)
+            status = resp.status
 
             if status in (401, 403):
                 safe_print(f"Browser API request returned {status}")
                 context.close()
                 return None, status
 
-            if status != 200 or data is None:
+            if status != 200:
                 safe_print(f"ERROR: Browser API returned status {status}")
-                if result.get("error"):
-                    safe_print(f"Error: {result['error']}")
                 context.close()
                 sys.exit(1)
+
+            body = resp.body()
+            if body[:2] == b'\x1f\x8b':
+                body = gzip.decompress(body)
+            data = json.loads(body.decode("utf-8"))
 
             if total_count is None:
                 total_count = data.get("count", 0)
