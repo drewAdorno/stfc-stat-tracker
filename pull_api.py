@@ -389,7 +389,9 @@ def fetch_all_players_browser():
         # Visit the site first to establish Cloudflare clearance
         safe_print("Establishing Cloudflare clearance...")
         page.goto(ALLIANCE_URL, wait_until="domcontentloaded", timeout=60_000)
-        time.sleep(3)
+        time.sleep(5)
+        safe_print(f"Landed on: {page.url}")
+        safe_print(f"Page title: {page.title()}")
 
         # Check if we hit login page
         if "login" in page.url.lower():
@@ -413,17 +415,27 @@ def fetch_all_players_browser():
             }""", url)
 
             status = result["status"]
+            body = result["body"]
+            safe_print(f"  Status: {status}, Body length: {len(body)}")
+
             if status in (401, 403):
                 safe_print(f"Browser API request returned {status}")
+                safe_print(f"Body preview: {body[:300]}")
                 context.close()
                 return None, status
 
             if status != 200:
                 safe_print(f"ERROR: Browser API returned status {status}")
+                safe_print(f"Body preview: {body[:300]}")
                 context.close()
                 sys.exit(1)
 
-            data = json.loads(result["body"])
+            if not body or body[0] != '{':
+                safe_print(f"ERROR: Response is not JSON. Preview: {body[:300]}")
+                context.close()
+                return None, 403
+
+            data = json.loads(body)
 
             if total_count is None:
                 total_count = data.get("count", 0)
