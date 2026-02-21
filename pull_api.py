@@ -104,13 +104,46 @@ def _kill_chrome():
         )
 
 
-def refresh_cookies():
-    """Launch Chrome via CDP, navigate to stfc.pro, grab fresh cookies."""
-    safe_print("Refreshing cookies via Chrome CDP...")
+def _refresh_cookies_linux():
+    """Linux: use Playwright's bundled Chromium with persistent context directly."""
+    safe_print("Refreshing cookies via Playwright persistent context...")
     SESSION_DIR.mkdir(exist_ok=True)
-    DATA_DIR.mkdir(exist_ok=True)
 
-    # Kill any lingering Chrome processes first
+    cookies = []
+    with sync_playwright() as pw:
+        context = pw.chromium.launch_persistent_context(
+            user_data_dir=str(SESSION_DIR),
+            headless=True,
+            args=["--no-sandbox", "--disable-gpu"],
+        )
+
+        page = context.pages[0] if context.pages else context.new_page()
+        page.goto(ALLIANCE_URL, wait_until="domcontentloaded", timeout=60_000)
+        safe_print(f"Current URL: {page.url}")
+
+        # Handle login redirect if needed
+        if any(kw in page.url.lower() for kw in ["login", "discord", "authorize", "oauth"]):
+            safe_print("Login page detected - waiting for auto-redirect...")
+            for _ in range(60):
+                time.sleep(2)
+                if not any(kw in page.url.lower() for kw in ["login", "discord", "authorize", "oauth"]):
+                    safe_print(f"Redirected to: {page.url}")
+                    break
+            else:
+                safe_print("ERROR: Stuck on login page. Manual login may be required.")
+                context.close()
+                return []
+
+            time.sleep(5)
+
+        cookies = context.cookies("https://v3.stfc.pro")
+        context.close()
+
+    return cookies
+
+
+def _refresh_cookies_windows():
+    """Windows: launch system Chrome via CDP, connect with Playwright."""
     _kill_chrome()
     time.sleep(2)
 
@@ -123,22 +156,13 @@ def refresh_cookies():
         "--no-default-browser-check",
         ALLIANCE_URL,
     ]
-    # On Linux, run headless and add no-sandbox for running as non-root in some envs
-    if not IS_WINDOWS:
-        cmd.insert(1, "--headless=new")
-        cmd.insert(1, "--no-sandbox")
-        cmd.insert(1, "--disable-gpu")
 
     log_handle = open(stderr_log, "w")
+    startupinfo = subprocess.STARTUPINFO()
+    startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+    startupinfo.wShowWindow = 7  # SW_SHOWMINNOACTIVE
 
-    popen_kwargs = {"stderr": log_handle, "stdout": log_handle}
-    if IS_WINDOWS:
-        startupinfo = subprocess.STARTUPINFO()
-        startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-        startupinfo.wShowWindow = 7  # SW_SHOWMINNOACTIVE
-        popen_kwargs["startupinfo"] = startupinfo
-
-    chrome_proc = subprocess.Popen(cmd, **popen_kwargs)
+    chrome_proc = subprocess.Popen(cmd, stderr=log_handle, stdout=log_handle, startupinfo=startupinfo)
 
     # Wait for Chrome to expose the debug websocket
     ws_url = None
@@ -158,7 +182,7 @@ def refresh_cookies():
         safe_print("ERROR: Could not get Chrome debug websocket URL")
         log_handle.close()
         chrome_proc.terminate()
-        return False
+        return []
 
     time.sleep(3)
 
@@ -196,9 +220,8 @@ def refresh_cookies():
                         break
                 else:
                     safe_print("ERROR: Stuck on login page. Manual login may be required.")
-                    safe_print("Run extract_cookies.py manually to re-authenticate.")
                     browser.close()
-                    return False
+                    return []
 
                 time.sleep(5)
 
@@ -213,6 +236,20 @@ def refresh_cookies():
     finally:
         chrome_proc.terminate()
         _kill_chrome()
+
+    return cookies
+
+
+def refresh_cookies():
+    """Refresh stfc.pro session cookies via browser automation."""
+    safe_print("Refreshing cookies via Chrome CDP...")
+    SESSION_DIR.mkdir(exist_ok=True)
+    DATA_DIR.mkdir(exist_ok=True)
+
+    if IS_WINDOWS:
+        cookies = _refresh_cookies_windows()
+    else:
+        cookies = _refresh_cookies_linux()
 
     if not cookies:
         safe_print("ERROR: No cookies extracted from Chrome")
