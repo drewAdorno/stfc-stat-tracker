@@ -12,8 +12,8 @@ cd "$APP_DIR"
 
 logger -t "$LOG_TAG" "Starting pull..."
 
-# Run the API puller
-"$VENV/python" pull_api.py
+# Run the API puller (xvfb provides virtual display for non-headless Chromium)
+xvfb-run --auto-servernum "$VENV/python" pull_api.py
 logger -t "$LOG_TAG" "Pull complete"
 
 # Hourly alerts (joins/leaves/level-ups)

@@ -113,7 +113,7 @@ def _refresh_cookies_linux():
     with sync_playwright() as pw:
         context = pw.chromium.launch_persistent_context(
             user_data_dir=str(SESSION_DIR),
-            headless=True,
+            headless=False,
             args=["--no-sandbox", "--disable-gpu"],
         )
 
