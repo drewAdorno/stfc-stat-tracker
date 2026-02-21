@@ -411,31 +411,32 @@ def fetch_all_players_browser():
             # Use fetch() inside the browser to avoid download triggers
             result = page.evaluate("""async (url) => {
                 const resp = await fetch(url);
-                return { status: resp.status, body: await resp.text() };
+                if (!resp.ok) {
+                    return { status: resp.status, data: null };
+                }
+                try {
+                    const data = await resp.json();
+                    return { status: resp.status, data: data };
+                } catch (e) {
+                    const text = await resp.text();
+                    return { status: resp.status, data: null, error: text.substring(0, 300) };
+                }
             }""", url)
 
             status = result["status"]
-            body = result["body"]
-            safe_print(f"  Status: {status}, Body length: {len(body)}")
+            data = result.get("data")
 
             if status in (401, 403):
                 safe_print(f"Browser API request returned {status}")
-                safe_print(f"Body preview: {body[:300]}")
                 context.close()
                 return None, status
 
-            if status != 200:
+            if status != 200 or data is None:
                 safe_print(f"ERROR: Browser API returned status {status}")
-                safe_print(f"Body preview: {body[:300]}")
+                if result.get("error"):
+                    safe_print(f"Error: {result['error']}")
                 context.close()
                 sys.exit(1)
-
-            if not body or body[0] != '{':
-                safe_print(f"ERROR: Response is not JSON. Preview: {body[:300]}")
-                context.close()
-                return None, 403
-
-            data = json.loads(body)
 
             if total_count is None:
                 total_count = data.get("count", 0)
