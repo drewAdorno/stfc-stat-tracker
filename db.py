@@ -153,6 +153,18 @@ def log_pull(conn, server, total_players, source="api"):
     conn.commit()
 
 
+def _format_date(iso_str):
+    """Convert ISO date/datetime string to MM-DD-YYYY format."""
+    if not iso_str:
+        return ""
+    date_part = iso_str.split("T")[0]
+    try:
+        y, m, d = date_part.split("-")
+        return f"{m}-{d}-{y}"
+    except ValueError:
+        return date_part
+
+
 def _format_abbr(n):
     """Format an integer as an abbreviated string (e.g., 77100000 -> '77.10M').
     Matches the format the dashboards expect."""
@@ -232,7 +244,7 @@ def export_latest_json(conn, alliance_id=NCC_ALLIANCE_ID, league=""):
             "helps": _format_abbr(helps),
             "rss_contrib": _format_abbr(rss_c),
             "iso_contrib": _format_abbr(iso_c),
-            "join_date": (join_date or "").split("T")[0],
+            "join_date": _format_date(join_date),
             "id": str(pid),
             "players_killed": _format_abbr(pk),
             "hostiles_killed": _format_abbr(hk),
