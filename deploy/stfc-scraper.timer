@@ -1,0 +1,10 @@
+[Unit]
+Description=STFC Stat Tracker - Hourly Schedule
+
+[Timer]
+OnCalendar=*-*-* *:01:00
+Persistent=true
+RandomizedDelaySec=60
+
+[Install]
+WantedBy=timers.target

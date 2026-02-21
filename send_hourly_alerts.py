@@ -1,12 +1,9 @@
 """
 Hourly Discord alerts for NCC Alliance: level ups, joins, leaves.
-Compares the 2 most recent alliance_*.json snapshots and posts
+Compares the 2 most recent daily snapshots from the SQLite DB and posts
 separate Discord embeds for each event type detected.
-Stdlib only — no pip installs needed.
 """
 
-import glob
-import json
 import random
 import sys
 from pathlib import Path
@@ -15,6 +12,7 @@ from send_discord_notification import (
     load_webhook_url, post_webhook, safe_print, format_abbr, parse_abbr,
     truncate_field,
 )
+from db import get_db, get_latest_two_dates, get_members_for_date
 
 BASE_DIR = Path(__file__).parent
 DATA_DIR = BASE_DIR / "data"
@@ -30,27 +28,6 @@ LEVEL_UP_MESSAGES = [
     "🏆 Another one bites the dust!",
     "📈 Stonks! Level goes up!",
 ]
-
-
-def get_two_latest_snapshots(data_dir=None):
-    """Return (prev, curr) paths for the 2 most recent alliance_*.json files."""
-    d = data_dir or DATA_DIR
-    files = sorted(glob.glob(str(d / "alliance_*.json")))
-    if len(files) < 2:
-        return None, None
-    return Path(files[-2]), Path(files[-1])
-
-
-def load_members(path):
-    """Load a snapshot and return a dict keyed by member ID."""
-    with open(path, "r", encoding="utf-8") as f:
-        data = json.load(f)
-    members = {}
-    for m in data.get("members", []):
-        mid = m.get("id")
-        if mid:
-            members[mid] = m
-    return members
 
 
 def detect_changes(prev_members, curr_members):
@@ -140,15 +117,18 @@ def has_changes(changes):
 
 
 def main():
-    prev_path, curr_path = get_two_latest_snapshots()
-    if not prev_path or not curr_path:
-        safe_print("Not enough snapshots for hourly alert (need at least 2).")
+    conn = get_db()
+    prev_date, curr_date = get_latest_two_dates(conn)
+    if not prev_date or not curr_date:
+        safe_print("Not enough snapshots for hourly alert (need at least 2 days).")
+        conn.close()
         sys.exit(0)
 
-    safe_print(f"Comparing {prev_path.name} vs {curr_path.name}")
+    safe_print(f"Comparing {prev_date} vs {curr_date}")
 
-    prev_members = load_members(prev_path)
-    curr_members = load_members(curr_path)
+    prev_members = get_members_for_date(conn, prev_date)
+    curr_members = get_members_for_date(conn, curr_date)
+    conn.close()
 
     # Guard against bad scrapes — if either snapshot has very few members,
     # the site was probably down and we'd send false join/leave alerts.

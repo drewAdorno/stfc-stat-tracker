@@ -11,8 +11,8 @@ echo ============================================ >> "%LOG_FILE%"
 
 cd /d "%PROJECT_DIR%"
 
-echo Running scraper... >> "%LOG_FILE%"
-"%PYTHON_EXE%" pull_alliance_data.py >> "%LOG_FILE%" 2>&1
+echo Running API puller... >> "%LOG_FILE%"
+"%PYTHON_EXE%" pull_api.py >> "%LOG_FILE%" 2>&1
 if !ERRORLEVEL! neq 0 (
     echo ERROR: Scraper failed with exit code !ERRORLEVEL! >> "%LOG_FILE%"
     goto :end

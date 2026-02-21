@@ -1,9 +1,11 @@
 """Tests for send_hourly_alerts.py"""
 
 import json
+import sqlite3
 import pytest
 
 import send_hourly_alerts as sha
+import db as db_mod
 
 
 # ---------------------------------------------------------------------------
@@ -30,10 +32,14 @@ def curr_members():
     }
 
 
-def _write_snapshot(path, members_list):
-    """Write a minimal alliance snapshot file."""
-    data = {"pulled_at": "2026-01-01T00:00:00", "members": members_list}
-    path.write_text(json.dumps(data), encoding="utf-8")
+@pytest.fixture
+def test_db(tmp_path, monkeypatch):
+    """Create a temporary SQLite DB for testing."""
+    monkeypatch.setattr(db_mod, "DB_PATH", tmp_path / "test.db")
+    monkeypatch.setattr(db_mod, "DATA_DIR", tmp_path)
+    conn = db_mod.get_db()
+    yield conn
+    conn.close()
 
 
 # ---------------------------------------------------------------------------
@@ -213,65 +219,65 @@ class TestHasChanges:
 
 
 # ---------------------------------------------------------------------------
-# get_two_latest_snapshots
+# DB-backed snapshot queries
 # ---------------------------------------------------------------------------
 
-class TestGetTwoLatestSnapshots:
-    def test_returns_two_paths(self, tmp_path):
-        _write_snapshot(tmp_path / "alliance_2026-02-14_070000.json", [])
-        _write_snapshot(tmp_path / "alliance_2026-02-14_080000.json", [])
-        prev, curr = sha.get_two_latest_snapshots(tmp_path)
-        assert prev.name == "alliance_2026-02-14_070000.json"
-        assert curr.name == "alliance_2026-02-14_080000.json"
+def _insert_snapshot(conn, date, members):
+    """Helper to insert test snapshot data into the DB."""
+    alliance_id = db_mod.NCC_ALLIANCE_ID
+    for mid, m in members.items():
+        pid = int(mid)
+        conn.execute("""
+            INSERT OR REPLACE INTO players (player_id, name, server, alliance_id, alliance_tag, first_seen, last_seen)
+            VALUES (?, ?, 716, ?, 'NCC', ?, ?)
+        """, (pid, m["name"], alliance_id, date, date))
+        conn.execute("""
+            INSERT OR REPLACE INTO daily_snapshots
+                (player_id, date, level, power, alliance_id, alliance_tag)
+            VALUES (?, ?, ?, ?, ?, 'NCC')
+        """, (pid, date, m.get("level", 0), m.get("power", 0), alliance_id))
+    conn.commit()
 
-    def test_returns_none_with_one_file(self, tmp_path):
-        _write_snapshot(tmp_path / "alliance_2026-02-14_070000.json", [])
-        prev, curr = sha.get_two_latest_snapshots(tmp_path)
+
+class TestGetLatestTwoDates:
+    def test_returns_two_dates(self, test_db):
+        _insert_snapshot(test_db, "2026-02-14", {"1": {"name": "A", "level": 10, "power": 1000}})
+        _insert_snapshot(test_db, "2026-02-15", {"1": {"name": "A", "level": 10, "power": 1000}})
+        prev, curr = db_mod.get_latest_two_dates(test_db)
+        assert prev == "2026-02-14"
+        assert curr == "2026-02-15"
+
+    def test_returns_none_with_one_date(self, test_db):
+        _insert_snapshot(test_db, "2026-02-14", {"1": {"name": "A", "level": 10, "power": 1000}})
+        prev, curr = db_mod.get_latest_two_dates(test_db)
         assert prev is None
         assert curr is None
 
-    def test_returns_none_with_no_files(self, tmp_path):
-        prev, curr = sha.get_two_latest_snapshots(tmp_path)
+    def test_returns_none_with_no_data(self, test_db):
+        prev, curr = db_mod.get_latest_two_dates(test_db)
         assert prev is None
         assert curr is None
 
-    def test_picks_last_two_of_many(self, tmp_path):
-        for h in ["06", "07", "08", "09"]:
-            _write_snapshot(tmp_path / f"alliance_2026-02-14_{h}0000.json", [])
-        prev, curr = sha.get_two_latest_snapshots(tmp_path)
-        assert prev.name == "alliance_2026-02-14_080000.json"
-        assert curr.name == "alliance_2026-02-14_090000.json"
-
-    def test_ignores_non_matching_files(self, tmp_path):
-        (tmp_path / "latest.json").write_text("{}", encoding="utf-8")
-        (tmp_path / "history.json").write_text("[]", encoding="utf-8")
-        _write_snapshot(tmp_path / "alliance_2026-02-14_070000.json", [])
-        _write_snapshot(tmp_path / "alliance_2026-02-14_080000.json", [])
-        prev, curr = sha.get_two_latest_snapshots(tmp_path)
-        assert "alliance_" in prev.name
-        assert "alliance_" in curr.name
+    def test_picks_last_two_of_many(self, test_db):
+        for d in ["2026-02-12", "2026-02-13", "2026-02-14", "2026-02-15"]:
+            _insert_snapshot(test_db, d, {"1": {"name": "A", "level": 10, "power": 1000}})
+        prev, curr = db_mod.get_latest_two_dates(test_db)
+        assert prev == "2026-02-14"
+        assert curr == "2026-02-15"
 
 
-# ---------------------------------------------------------------------------
-# load_members
-# ---------------------------------------------------------------------------
-
-class TestLoadMembers:
-    def test_load(self, tmp_path):
-        members_list = [
-            {"id": "1", "name": "A", "level": "10"},
-            {"id": "2", "name": "B", "level": "20"},
-        ]
-        path = tmp_path / "test.json"
-        _write_snapshot(path, members_list)
-        result = sha.load_members(path)
+class TestGetMembersForDate:
+    def test_load(self, test_db):
+        members = {
+            "1": {"name": "A", "level": 10, "power": 5000},
+            "2": {"name": "B", "level": 20, "power": 10000},
+        }
+        _insert_snapshot(test_db, "2026-02-14", members)
+        result = db_mod.get_members_for_date(test_db, "2026-02-14")
         assert "1" in result
         assert "2" in result
         assert result["1"]["name"] == "A"
 
-    def test_skips_members_without_id(self, tmp_path):
-        members_list = [{"name": "NoID", "level": "5"}]
-        path = tmp_path / "test.json"
-        _write_snapshot(path, members_list)
-        result = sha.load_members(path)
+    def test_empty_date(self, test_db):
+        result = db_mod.get_members_for_date(test_db, "2026-02-14")
         assert len(result) == 0

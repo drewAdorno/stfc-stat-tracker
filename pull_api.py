@@ -1,0 +1,392 @@
+"""
+STFC API-Based Data Puller
+Pulls all server 716 player data via the v3.stfc.pro REST API.
+Uses curl_cffi with Chrome TLS impersonation to bypass Cloudflare.
+Auto-refreshes cookies via Chrome CDP when they expire.
+"""
+
+import gzip
+import json
+import platform
+import re
+import shutil
+import subprocess
+import sys
+import time
+from datetime import datetime
+from pathlib import Path
+
+from curl_cffi import requests as cffi_requests
+from playwright.sync_api import sync_playwright
+
+from db import get_db, upsert_players, log_pull, export_latest_json, export_history_json
+
+IS_WINDOWS = platform.system() == "Windows"
+
+BASE_DIR = Path(__file__).parent
+DATA_DIR = BASE_DIR / "data"
+SESSION_DIR = BASE_DIR / "browser_session"
+COOKIE_FILE = DATA_DIR / "session_cookies.json"
+API_BASE = "https://v3.stfc.pro/api/players"
+NCC_ALLIANCE_ID = 3974286889
+SERVER = 716
+PAGE_SIZE = 100
+IMPERSONATE = "chrome131"
+DEBUG_PORT = 9222
+ALLIANCE_URL = "https://v3.stfc.pro/alliances/3974286889"
+
+if IS_WINDOWS:
+    CHROME_PATH = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
+else:
+    # Prefer system chromium, fall back to google-chrome
+    CHROME_PATH = (
+        shutil.which("chromium-browser")
+        or shutil.which("chromium")
+        or shutil.which("google-chrome")
+        or "/usr/bin/chromium-browser"
+    )
+
+
+def safe_print(msg):
+    """Print with fallback for Unicode chars on cp1252 consoles."""
+    try:
+        print(msg)
+    except UnicodeEncodeError:
+        print(msg.encode("ascii", errors="replace").decode("ascii"))
+
+
+# ---------------------------------------------------------------------------
+# Cookie management
+# ---------------------------------------------------------------------------
+
+def cookies_expired():
+    """Check if saved cookies exist and are still valid (not expired)."""
+    if not COOKIE_FILE.exists():
+        return True
+
+    try:
+        with open(COOKIE_FILE, "r", encoding="utf-8") as f:
+            cookies = json.load(f)
+    except (json.JSONDecodeError, ValueError):
+        return True
+
+    now = time.time()
+    for c in cookies:
+        if c["name"] == "__Secure-better-auth.session_token":
+            expires = c.get("expires", 0)
+            if expires and expires < now:
+                safe_print(f"Session token expired at {datetime.fromtimestamp(expires)}")
+                return True
+            return False
+
+    # Missing session token entirely
+    return True
+
+
+def load_cookies():
+    """Load session cookies from file as a dict."""
+    with open(COOKIE_FILE, "r", encoding="utf-8") as f:
+        cookies = json.load(f)
+    return {c["name"]: c["value"] for c in cookies}
+
+
+def _kill_chrome():
+    """Kill lingering Chrome/Chromium processes (cross-platform)."""
+    if IS_WINDOWS:
+        subprocess.run(
+            ["taskkill", "/F", "/IM", "chrome.exe"],
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+        )
+    else:
+        subprocess.run(
+            ["pkill", "-f", "chromium|chrome"],
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+        )
+
+
+def refresh_cookies():
+    """Launch Chrome via CDP, navigate to stfc.pro, grab fresh cookies."""
+    safe_print("Refreshing cookies via Chrome CDP...")
+    SESSION_DIR.mkdir(exist_ok=True)
+    DATA_DIR.mkdir(exist_ok=True)
+
+    # Kill any lingering Chrome processes first
+    _kill_chrome()
+    time.sleep(2)
+
+    stderr_log = BASE_DIR / "chrome_debug.log"
+    cmd = [
+        CHROME_PATH,
+        f"--remote-debugging-port={DEBUG_PORT}",
+        f"--user-data-dir={SESSION_DIR}",
+        "--no-first-run",
+        "--no-default-browser-check",
+        ALLIANCE_URL,
+    ]
+    # On Linux, run headless and add no-sandbox for running as non-root in some envs
+    if not IS_WINDOWS:
+        cmd.insert(1, "--headless=new")
+        cmd.insert(1, "--no-sandbox")
+        cmd.insert(1, "--disable-gpu")
+
+    log_handle = open(stderr_log, "w")
+
+    popen_kwargs = {"stderr": log_handle, "stdout": log_handle}
+    if IS_WINDOWS:
+        startupinfo = subprocess.STARTUPINFO()
+        startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+        startupinfo.wShowWindow = 7  # SW_SHOWMINNOACTIVE
+        popen_kwargs["startupinfo"] = startupinfo
+
+    chrome_proc = subprocess.Popen(cmd, **popen_kwargs)
+
+    # Wait for Chrome to expose the debug websocket
+    ws_url = None
+    for i in range(30):
+        time.sleep(1)
+        try:
+            content = stderr_log.read_text()
+            match = re.search(r"(ws://\S+)", content)
+            if match:
+                ws_url = match.group(1)
+                safe_print(f"Chrome ready (after {i+1}s)")
+                break
+        except Exception:
+            pass
+
+    if not ws_url:
+        safe_print("ERROR: Could not get Chrome debug websocket URL")
+        log_handle.close()
+        chrome_proc.terminate()
+        return False
+
+    time.sleep(3)
+
+    cookies = []
+    try:
+        with sync_playwright() as pw:
+            browser = pw.chromium.connect_over_cdp(ws_url)
+            context = browser.contexts[0]
+
+            page = None
+            for p in context.pages:
+                if "stfc.pro" in p.url or "discord" in p.url:
+                    page = p
+                    break
+            if not page and context.pages:
+                page = context.pages[0]
+
+            safe_print(f"Current URL: {page.url}")
+
+            # Handle login if somehow needed (Discord session should persist)
+            if any(kw in page.url.lower() for kw in ["login", "discord", "authorize", "oauth"]):
+                safe_print("Login page detected - waiting for auto-redirect...")
+                for _ in range(60):
+                    time.sleep(2)
+                    try:
+                        current_url = page.url
+                    except Exception:
+                        for p in context.pages:
+                            if "stfc.pro" in p.url and "login" not in p.url.lower():
+                                page = p
+                                break
+                        current_url = page.url
+                    if not any(kw in current_url.lower() for kw in ["login", "discord", "authorize", "oauth"]):
+                        safe_print(f"Redirected to: {current_url}")
+                        break
+                else:
+                    safe_print("ERROR: Stuck on login page. Manual login may be required.")
+                    safe_print("Run extract_cookies.py manually to re-authenticate.")
+                    browser.close()
+                    return False
+
+                time.sleep(5)
+
+            # Make sure we're on stfc.pro (not a blank page)
+            if "stfc.pro" not in page.url:
+                page.goto(ALLIANCE_URL, wait_until="domcontentloaded", timeout=60_000)
+                time.sleep(5)
+
+            cookies = context.cookies("https://v3.stfc.pro")
+            browser.close()
+
+    finally:
+        chrome_proc.terminate()
+        _kill_chrome()
+
+    if not cookies:
+        safe_print("ERROR: No cookies extracted from Chrome")
+        return False
+
+    # Check we got the required cookies
+    cookie_names = {c["name"] for c in cookies}
+    if "__Secure-better-auth.session_token" not in cookie_names:
+        safe_print("ERROR: Session token not found in extracted cookies")
+        return False
+
+    with open(COOKIE_FILE, "w", encoding="utf-8") as f:
+        json.dump(cookies, f, indent=2)
+
+    safe_print(f"Cookies refreshed ({len(cookies)} cookies saved)")
+    return True
+
+
+# ---------------------------------------------------------------------------
+# API calls
+# ---------------------------------------------------------------------------
+
+def api_get(cookie_dict, page):
+    """Fetch a single page of players. Returns (data_dict, None) on success
+    or (None, status_code) on auth/CF failure."""
+    url = (
+        f"{API_BASE}?server={SERVER}"
+        f"&sortBy=power&sortOrder=desc"
+        f"&page={page}&pageCount={PAGE_SIZE}"
+    )
+    resp = cffi_requests.get(url, cookies=cookie_dict, impersonate=IMPERSONATE)
+
+    if resp.status_code in (401, 403):
+        return None, resp.status_code
+    if resp.status_code != 200:
+        safe_print(f"ERROR: API returned status {resp.status_code}")
+        safe_print(f"Response: {resp.text[:500]}")
+        sys.exit(1)
+
+    body = resp.content
+    if body[:2] == b'\x1f\x8b':
+        body = gzip.decompress(body)
+
+    return json.loads(body.decode("utf-8")), None
+
+
+def fetch_all_players(cookie_dict):
+    """Paginate through all server 716 players."""
+    page = 1
+    all_players = []
+    total_count = None
+
+    while True:
+        safe_print(f"Fetching page {page}...")
+        data, err = api_get(cookie_dict, page)
+
+        if err is not None:
+            return None, err  # signal caller to refresh cookies
+
+        if total_count is None:
+            total_count = data.get("count", 0)
+            total_pages = (total_count + PAGE_SIZE - 1) // PAGE_SIZE
+            safe_print(f"Total players on server {SERVER}: {total_count} ({total_pages} pages)")
+
+        players = data.get("players", [])
+        if not players:
+            break
+
+        all_players.extend(players)
+        safe_print(f"  Page {page}: got {len(players)} players (total so far: {len(all_players)})")
+
+        if len(all_players) >= total_count:
+            break
+
+        page += 1
+        time.sleep(2)  # rate limit: 60 req / 120s
+
+    safe_print(f"Fetched {len(all_players)} players total")
+    return all_players, total_count
+
+
+# ---------------------------------------------------------------------------
+# Data mapping & output
+# ---------------------------------------------------------------------------
+
+def map_player(raw):
+    """Map API player data to our existing field format."""
+    d = raw["data"]
+    return {
+        "name": d.get("owner", ""),
+        "rank": d.get("rankdesc", ""),
+        "level": d.get("level", 0),
+        "power": d.get("power", 0),
+        "helps": d.get("ahelps", 0),
+        "rss_contrib": d.get("acontrib", 0),
+        "iso_contrib": d.get("aisocontrib", 0),
+        "join_date": d.get("ajoined", ""),
+        "id": str(d.get("playerid", "")),
+        "players_killed": d.get("pdestroyed", 0),
+        "hostiles_killed": d.get("hdestroyed", 0),
+        "resources_mined": d.get("rssmined", 0),
+        "resources_raided": d.get("rss", 0),
+        "alliance_tag": d.get("tag", ""),
+        "alliance_name": d.get("name", ""),
+        "alliance_id": d.get("allianceid", 0),
+    }
+
+
+def save_data(all_players, total_count):
+    """Map all players, store in SQLite, and export JSON files for dashboards."""
+    all_mapped = [map_player(p) for p in all_players]
+
+    ncc_members = [m for m in all_mapped if m["alliance_id"] == NCC_ALLIANCE_ID]
+    safe_print(f"NCC members found: {len(ncc_members)}")
+
+    if len(ncc_members) == 0:
+        safe_print("WARNING: No NCC members found in data!")
+
+    today = datetime.now().strftime("%Y-%m-%d")
+    conn = get_db()
+
+    # Store all server players in the DB (NCC members get tagged with alliance_id)
+    upsert_players(conn, all_mapped, today)
+    safe_print(f"Database updated ({len(all_mapped)} players upserted)")
+
+    # Log this pull
+    log_pull(conn, SERVER, total_count)
+
+    # Export JSON files for dashboards
+    export_latest_json(conn, NCC_ALLIANCE_ID)
+    safe_print(f"Exported {DATA_DIR / 'latest.json'}")
+
+    export_history_json(conn, NCC_ALLIANCE_ID)
+    safe_print(f"Exported {DATA_DIR / 'history.json'}")
+
+    conn.close()
+
+
+def main():
+    DATA_DIR.mkdir(exist_ok=True)
+    SESSION_DIR.mkdir(exist_ok=True)
+
+    # Check if cookies need refreshing before we even try
+    if cookies_expired():
+        safe_print("Cookies expired or missing - refreshing automatically...")
+        if not refresh_cookies():
+            safe_print("FATAL: Could not refresh cookies.")
+            sys.exit(1)
+
+    cookie_dict = load_cookies()
+    all_players, result = fetch_all_players(cookie_dict)
+
+    # If auth failed, try refreshing cookies once and retry
+    if all_players is None:
+        safe_print(f"API returned {result} - refreshing cookies and retrying...")
+        if not refresh_cookies():
+            safe_print("FATAL: Could not refresh cookies.")
+            sys.exit(1)
+
+        cookie_dict = load_cookies()
+        all_players, result = fetch_all_players(cookie_dict)
+
+        if all_players is None:
+            safe_print(f"FATAL: API still returning {result} after cookie refresh.")
+            safe_print("Manual intervention required - run extract_cookies.py.")
+            sys.exit(1)
+
+    if len(all_players) < 10:
+        safe_print(f"ERROR: Only got {len(all_players)} players - something went wrong. Skipping save.")
+        sys.exit(1)
+
+    save_data(all_players, result)
+    safe_print("Done!")
+
+
+if __name__ == "__main__":
+    main()
