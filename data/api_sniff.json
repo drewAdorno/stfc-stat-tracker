@@ -1,0 +1,742 @@
+[
+  {
+    "url": "https://v3.stfc.pro/alliances/3974286889",
+    "status": 200,
+    "method": "GET",
+    "content_type": "text/html; charset=utf-8",
+    "request_headers": {
+      "upgrade-insecure-requests": "1",
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+      "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"Google Chrome\";v=\"145\", \"Chromium\";v=\"145\"",
+      "sec-ch-ua-arch": "\"x86\"",
+      "sec-ch-ua-bitness": "\"64\"",
+      "sec-ch-ua-full-version": "\"145.0.7632.76\"",
+      "sec-ch-ua-full-version-list": "\"Not:A-Brand\";v=\"99.0.0.0\", \"Google Chrome\";v=\"145.0.7632.76\", \"Chromium\";v=\"145.0.7632.76\"",
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-model": "\"\"",
+      "sec-ch-ua-platform": "\"Windows\"",
+      "sec-ch-ua-platform-version": "\"19.0.0\""
+    },
+    "body_preview": "<!DOCTYPE html><html lang=\"en\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" as=\"image\" imageSrcSet=\"/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.a4946ac1.png&amp;w=128&amp;q=75 1x, /_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.a4946ac1.png&amp;w=256&amp;q=75 2x\"/><link rel=\"preload\" as=\"image\" imageSrcSet=\"/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.a4946ac1.png&amp;w=64&amp;q=75 1x, /_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.a4946ac1.png&amp;w=128&amp;q=75 2x\"/><link rel=\"stylesheet\" href=\"/_next/static/chunks/4e20891f2fd03463.css\" data-precedence=\"next\"/><link rel=\"stylesheet\" href=\"/_next/static/chunks/22e0edaa104d5c7f.css\" data-precedence=\"next\"/><link rel=\"preload\" as=\"script\" fetchPriority=\"low\" href=\"/_next/static/chunks/80ed0dc4929e0d86.js\"/><script src=\"/_next/static/chunks/d8b37e0d42d630b9.js\" async=\"\"></script><script src=\"/_next/static/chunks/393752ef7748ec37.js\" async=\"\"></script><script src=\"/_next/static/chunks/e5727f185310d6dd.js\" async=\"\"></script><script src=\"/_next/static/chunks/4a83b1debcb13975.js\" async=\"\"></script><script src=\"/_next/static/chunks/turbopack-73281b64af5d867b.js\" async=\"\"></script><script src=\"/_next/static/chunks/d96012bcfc98706a.js\" async=\"\"></script><script src=\"/_next/static/chunks/963c71eec1d89c3f.js\" async=\"\"></script><script src=\"/_next/static/chunks/8863225a429d7110.js\" async=\"\"></script><script src=\"/_next/static/chunks/0a47598f6b0eab23.js\" async=\"\"></script><script src=\"/_next/static/chunks/73df50d271549a1c.js\" async=\"\"></script><script src=\"/_next/static/chunks/fdeda5fad97fb41c.js\" async=\"\"></script><script src=\"/_next/static/chunks/eab1981242165f9c.js\" async=\"\"></script><script src=\"/_next/static/chunks/ab401bce1d3be013.js\" async=\"\"></script><script src=\"/_next/static/chunks/b9da2ce67040e903.js\" async=\"\"></script><script src=\"/_next/static/chunks/b2e14589d349771e.js\" async=\"\"></script><script src=\"/_next/static/chunks/2e4d6709987e68ec.js\" async=\"\"></script><script src=\"/_next/static/chunks/d68b1b441df066b5.js\" async=\"\"></script><script src=\"/_next/static/chunks/25cefa8df4888348.js\" async=\"\"></script><script src=\"/_next/static/chunks/f168a3fc608bf569.js\" async=\"\"></script><script src=\"/_next/static/chunks/99fbb2d842ecf870.js\" async=\"\"></script><script src=\"/_next/static/chunks/d2568252d03a870a.js\" async=\"\"></script><meta name=\"next-size-adjust\" content=\"\"/><title>STFC Statistics - Star Trek Fleet Command Player Rankings &amp; Stats</title><meta name=\"description\" content=\"The #1 website for all global, regional, and server-based statistics for Star Trek Fleet Command. Discover player rankings, alliance data, real-time incursions, and more!\"/><meta name=\"keywords\" content=\"Star Trek Fleet Command, STFC, statistics, player rankings, alliance data, gaming stats\"/><meta name=\"robots\" content=\"index, follow\"/><meta name=\"googlebot\" content=\"index, follow, max-video-preview:-1, max-image-preview:large, max-snippet:-1\"/><link rel=\"canonical\" href=\"https://stfc.pro\"/><meta property=\"og:title\" content=\"STFC Statistics\"/><meta property=\"og:description\" content=\"Track over 253.9K players across 117 servers in Star Trek Fleet Command\"/><meta property=\"og:type\" content=\"website\"/><meta name=\"twitter:card\" content=\"summary\"/><meta name=\"twitter:title\" content=\"STFC Statistics\"/><meta name=\"twitter:description\" content=\"Track over 253.9K players across 117 servers in Star Trek Fleet Command\"/><script src=\"/_next/static/chunks/a6dad97d9634a72d.js\" noModule=\"\"></script></head><body class=\"inter_5972bc34-module__OU16Qa__className antialiased\"><div hidden=\"\"><!--$--><!--/$--></div><div class=\"min-h-screen bg-gray-950 text-white\"><header class=\"fixed top-0 right-0 left-0 z-50 border-gray-700 border-b bg-gray-800/50 backdrop-blur-xs transition-all duration-300 xl:bg-gray-900/95 xl:shadow-lg xl:backdrop-blur-md\"><div class=\"w-full px-4\"><div class=\"hidden min-h-14 w-full items-center xl:flex\"><div class=\"flex shrink-0 items-center\"><a aria-label=\"Home\" class=\"relative flex items-center\" href=\"/\"><img alt=\"STFC Logo\" width=\"123\" height=\"80\" decoding=\"async\" data-nimg=\"1\" class=\"h-16 w-auto rounded-lg\" style=\"color:transparent\" srcSet=\"/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.a4946ac1.png&amp;w=128&amp;q=75 1x, /_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.a4946ac1.png&amp;w=256&amp;q=75 2x\" src=\"/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.a4946ac1.png&amp;w=256&amp;q=75\"/></a></div><div class=\"flex flex-1 justify-center\"><nav aria-label=\"Main\" data-orientation=\"horizontal\" dir=\"ltr\" class=\"group/navigation-menu relative flex max-w-max flex-1 items-center justify-center\" data-slot=\"navigation-menu\" data-viewport=\"false\"><div style=\"position:relative\"><ul data-orientation=\"horizontal\" class=\"group flex list-none items-center flex-1 justify-center gap-1\" data-slot=\"navigation-menu-list\" dir=\"ltr\"><li class=\"relative\" data-slot=\"navigation-menu-item\"><button id=\"radix-_R_ili... (truncated, total 214965 chars)"
+  },
+  {
+    "url": "https://v3.stfc.pro/api/changelog",
+    "status": 200,
+    "method": "GET",
+    "content_type": "application/json;charset=utf-8",
+    "request_headers": {
+      "sec-ch-ua-full-version-list": "\"Not:A-Brand\";v=\"99.0.0.0\", \"Google Chrome\";v=\"145.0.7632.76\", \"Chromium\";v=\"145.0.7632.76\"",
+      "sec-ch-ua-platform": "\"Windows\"",
+      "referer": "https://v3.stfc.pro/alliances/3974286889",
+      "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"Google Chrome\";v=\"145\", \"Chromium\";v=\"145\"",
+      "sec-ch-ua-bitness": "\"64\"",
+      "sec-ch-ua-model": "\"\"",
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-arch": "\"x86\"",
+      "sec-ch-ua-full-version": "\"145.0.7632.76\"",
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+      "sec-ch-ua-platform-version": "\"19.0.0\""
+    },
+    "body_preview": "{\"count\":3,\"version\":\"v3.0.0\",\"content\":[{\"title\":\"Welcome to v3!\",\"date\":\"2025-12-31T00:00:00.000Z\",\"html\":\"<h3>New Account System</h3>\\n<ul>\\n<li>Login via Discord (more identity providers planned)</li>\\n<li>Profiles separated cleanly to reduce sync confusion</li>\\n<li>Clearer session state; fewer edge-case login issues</li>\\n<li>Foundations laid for an upcoming content-creator dashboard</li>\\n</ul>\\n<h3>Mobile Experience</h3>\\n<ul>\\n<li>Navigation rebuilt for small screens</li>\\n<li>Panels, drawers, and modals redesigned to avoid collisions</li>\\n<li>Reduced layout shift and improved load times on mobile networks</li>\\n</ul>\\n<h3>Player Pages</h3>\\n<ul>\\n<li>Dedicated stat pages for individual players</li>\\n<li>Cleaner URLs and faster lookups; no more modal-only views</li>\\n<li>Early groundwork for comparisons and historical tracking</li>\\n</ul>\\n<h3>Creator Partnerships</h3>\\n<ul>\\n<li>Collaboration with the <strong>STFC Officer Tool</strong> Discord</li>\\n<li>In-app visibility for their charts, crew builds, and reference guides</li>\\n<li>Shared effort to centralize resources instead of scattering them</li>\\n</ul>\\n<h3>Platform Rebuild</h3>\\n<ul>\\n<li>Full rewrite; underlying systems replaced instead of patched</li>\\n<li>Unified data layer between web, API, and future services</li>\\n<li>Stability, caching, and error-handling improved for upcoming features</li>\\n</ul>\\n\",\"slug\":\"v3-initial-update\",\"version\":\"v3.0.0\"},{\"title\":\"Septemberrr Updates!\",\"date\":\"2025-09-23T00:00:00.000Z\",\"html\":\"<p class=\\\"mb-4\\\">An update! Yes, again a long-overdue update with some rather small fixes in v1.6.0, however with the announcement that we're currently working hard behind the scenes to make v3 of <a href=\\\"http://stfc.pro\\\">stfc.pro</a> a reality!</p>\\n<h3>A summary of changes:</h3>\\n<hr />\\n<ul>\\n<li><strong>Re-vamped Alliance Lay-out</strong>\\nThe alliance details as well as the tournament alliance details had a different layout in comparison to the rest of the site. To keep things more universal, the layouts have been aligned.</li>\\n<li><strong>STFC Shop!</strong>\\nYes, you read it right! We have a shop where you'll be able to get all kinds of apparel that's made by the community! Go get your mug, t-shirt or mousepad to show your support for the site!</li>\\n</ul>\\n<hr />\\n<ul>\\n<li>lines!</li>\\n</ul>\\n<p class=\\\"mb-4\\\">I'd like to thank all contributors for supporting the site! I've created a special 'contributors' area on <strong>Discord</strong>, where I will discuss various new functions, give a chance for people to beta-test new functions as well as providing datasets (for example, event data). As a contributor, you can ask me for certain datasets!</p>\\n\",\"slug\":\"sept-updates-2025\",\"version\":\"v1.6.0\"},{\"title\":\"June Updates!\",\"date\":\"2025-09-23T00:00:00.000Z\",\"html\":\"<p class=\\\"mb-4\\\">Apologies for the long overdue update report! Many changes have been implemented over the past few months and lots of preparations have been made on the backend to ensure a smooth and stable website. Below is just a small grasp of changes that happened in the past months.</p>\\n<h3>A summary of changes:</h3>\\n<ul>\\n<li><strong>Re-vamped Alliance Lay-out</strong>\\nThe alliance details as well as the tournament alliance details had a different layout in comparison to the rest of the site. To keep things more universal, the layouts have been aligned.</li>\\n<li><strong>New Alliance Metrics</strong>\\nTwo new Alliance metrics have been added: RSS Contribution and ISO contribution. Note that RSS contribution is linked to the current level of the alliance and gets reset after increasing the alliance level.</li>\\n<li><strong>More CC icons!</strong>\\nEven more CCs have applied through Discord and have been added! You can search for \\\"cc:\\\" to get a list of all known content creators.</li>\\n<li><strong>STFC Shop!</strong>\\nYes, you read it right! We have a shop where you'll be able to get all kinds of apparel that's made by the community! Go get your mug, t-shirt or mousepad to show your support for the site!</li>\\n<li><strong>Historical data</strong>\\nAlthough not yet active on the website itself, historical data is now available for players and alliances! If you want to know your progress since 1-1-2025, it is now possible! We're working on getting data available on-site but you can always ask me in the #contributors channel in Discord.</li>\\n</ul>\\n<p class=\\\"mb-4\\\">I'd like to thank all contributors for supporting the site! I've created a special 'contributors' area on <strong>Discord</strong>, where I will discuss various new functions, give a chance for people to beta-test new functions as well as providing datasets (for example, event data). As a contributor, you can ask me for certain datasets!</p>\\n\",\"slug\":\"june-updates-2025\",\"version\":\"1.5.0\"}]}"
+  },
+  {
+    "url": "https://v3.stfc.pro/api/events",
+    "status": 200,
+    "method": "GET",
+    "content_type": "application/json;charset=utf-8",
+    "request_headers": {
+      "sec-ch-ua-full-version-list": "\"Not:A-Brand\";v=\"99.0.0.0\", \"Google Chrome\";v=\"145.0.7632.76\", \"Chromium\";v=\"145.0.7632.76\"",
+      "sec-ch-ua-platform": "\"Windows\"",
+      "referer": "https://v3.stfc.pro/alliances/3974286889",
+      "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"Google Chrome\";v=\"145\", \"Chromium\";v=\"145\"",
+      "sec-ch-ua-bitness": "\"64\"",
+      "sec-ch-ua-model": "\"\"",
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-arch": "\"x86\"",
+      "sec-ch-ua-full-version": "\"145.0.7632.76\"",
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+      "sec-ch-ua-platform-version": "\"19.0.0\""
+    },
+    "body_preview": "[{\"event_group\":\"alliance_tournaments\",\"event_start\":\"2026-02-18T17:00:00Z\",\"event_end\":\"2026-02-23T17:00:00Z\",\"active\":1},{\"event_group\":\"incursions\",\"event_start\":\"2026-01-31T16:00:00Z\",\"event_end\":\"2026-02-01T16:00:00Z\",\"active\":0},{\"event_group\":\"sarris_invasions\",\"event_start\":\"2025-09-29T18:00:00Z\",\"event_end\":\"2025-10-02T18:00:00Z\",\"active\":0},{\"event_group\":\"flashpoint\",\"event_start\":\"2025-08-28T18:00:00Z\",\"event_end\":\"2025-09-01T18:00:00Z\",\"active\":0}]"
+  },
+  {
+    "url": "https://v3.stfc.pro/api/auth/get-session",
+    "status": 200,
+    "method": "GET",
+    "content_type": "application/json",
+    "request_headers": {
+      "sec-ch-ua-full-version-list": "\"Not:A-Brand\";v=\"99.0.0.0\", \"Google Chrome\";v=\"145.0.7632.76\", \"Chromium\";v=\"145.0.7632.76\"",
+      "sec-ch-ua-platform": "\"Windows\"",
+      "referer": "https://v3.stfc.pro/alliances/3974286889",
+      "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"Google Chrome\";v=\"145\", \"Chromium\";v=\"145\"",
+      "sec-ch-ua-bitness": "\"64\"",
+      "sec-ch-ua-model": "\"\"",
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-arch": "\"x86\"",
+      "sec-ch-ua-full-version": "\"145.0.7632.76\"",
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+      "sec-ch-ua-platform-version": "\"19.0.0\""
+    },
+    "body_preview": "{\"session\":{\"expiresAt\":\"2026-02-27T16:00:02.792Z\",\"token\":\"NmYkoOPf3DJiCvRMnQtUZNN0DYjtS2Yq\",\"createdAt\":\"2026-02-15T13:00:14.705Z\",\"updatedAt\":\"2026-02-20T16:00:02.792Z\",\"ipAddress\":\"2600:4040:5a36:bd00:41b9:bf5a:a68b:9c86\",\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36\",\"userId\":\"MCZASkZOgy4rCBCZsdChVGVhO38rMfq0\",\"id\":\"qtDVlf2wI2KAbkLItJFyeDeSQucSjzsJ\"},\"user\":{\"name\":\"Drew\",\"email\":\"drew.adorno@gmail.com\",\"emailVerified\":true,\"image\":\"https://cdn.discordapp.com/avatars/261308431879766027/d165f63452c671142e232ea696fb65d0.png\",\"createdAt\":\"2026-02-07T12:58:02.756Z\",\"updatedAt\":\"2026-02-07T12:58:02.756Z\",\"role\":\"user\",\"id\":\"MCZASkZOgy4rCBCZsdChVGVhO38rMfq0\"}}"
+  },
+  {
+    "url": "https://v3.stfc.pro/api/suffixes",
+    "status": 200,
+    "method": "GET",
+    "content_type": "application/json;charset=utf-8",
+    "request_headers": {
+      "sec-ch-ua-full-version-list": "\"Not:A-Brand\";v=\"99.0.0.0\", \"Google Chrome\";v=\"145.0.7632.76\", \"Chromium\";v=\"145.0.7632.76\"",
+      "sec-ch-ua-platform": "\"Windows\"",
+      "referer": "https://v3.stfc.pro/alliances/3974286889",
+      "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"Google Chrome\";v=\"145\", \"Chromium\";v=\"145\"",
+      "sec-ch-ua-bitness": "\"64\"",
+      "sec-ch-ua-model": "\"\"",
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-arch": "\"x86\"",
+      "sec-ch-ua-full-version": "\"145.0.7632.76\"",
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+      "sec-ch-ua-platform-version": "\"19.0.0\""
+    },
+    "body_preview": "[{\"id\":54,\"key\":\"bluemando\",\"text\":\"bluemandalorian\",\"pngBlob\":\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAMAAABrrFhUAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAMAUExURRoQDgEBAQEFGQQSHDIYDCQLBScUCyUZFTMdFC0hGDgkGRUdMwEFKAMXKgIDNwMaNigdIwIhLQQjORclOjEvMjoqJEEoGks4MkMsJUozLFY8M1pCN2RHPBIdTgIHSQEbSAELVAIWWBEtUgUnSBUqSBg0SgMoWAY1Whg3WCk2TgAbcgIcZRQvYwMoaAM5aRY6ZgEsdAI5dhM7dyM8ZBFCWy5EWARFaxhFaQNFdxdIdwdTexpWezBObyZJaChWeThXeDVjd1NOUmxWTmlMQnpmXElZcFlZaGNcalVkdXFtdGhpd4lqXZB0bZd2aaJ+c5mCerSOfKqHeQMuhwI1hBRLlwNLhhdKhARViRdXiAJOkwNXmBdali1ajiZZhxNkjQRjmxhlmjNrkChnlwldrQJbpiFeoBVuswNmqRdopgNzrRl0qgJotgR0uhd1uDFsqihppyZ2qDd2qSh4tzZ6uEVeg0xvjlhrh1l2lWNtlGVrhWl1iXZ4imh6lXZ8lUl5rAJuwQJ3xxV8xAJ+0Sl8w4N8gD6AmQeIuxmEuzKOtSeGuTqFulKFmW+GlHiFmFGQs0iIuW+Pq1ejum+ouBORzwOFyhiIyAKI2QOV2xiY2DKJyyeJxymWyziXySeY1jaa1hSn2zSv1iam2Tin2AOM4QOa6Beb4wOe8Sub4hGw7wKj7Bel6AOo8wKy9zG07yen6Dao50yRy0eWyFiYx0ea1WabyE+s1VmoyEeo2Vi12G2rz2a413i32UWd4U+x7keo5Ui35la55Va69W287DbE81bB2mvE2nfG2lHJ8VjH6HPV82nI53fJ5njV6WnE+HjI+Fro+nTm+Y2JjYSHl7CTjLqZiLmjl4mYrJWotaqtscKdjMOkk8eyppC0zoW426y5x4u85I/I2q/H1ZbR8YfG6JjI54fX54fK9ojW95nX+anQ6bfX66bb+bbc9I7p9pjl+rLm7ark+rjn+qv1/Lj6/cjR2Mfc6cnj69jl68Xq+dfr9sn3/Nn4++Tt8Ob6+vr9/AAAAItg0G0AAAEAdFJOU////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////wBT9wclAAAACXBIWXMAAA7CAAAOwgEVKEqAAAAAGXRFWHRTb2Z0d2FyZQBQYWludC5ORVQgNS4xLjExiggWzgAAALhlWElmSUkqAAgAAAAFABoBBQABAAAASgAAABsBBQABAAAAUgAAACgBAwABAAAAAgAAADEBAgARAAAAWgAAAGmHBAABAAAAbAAAAAAAAADydgEA6AMAAPJ2AQDoAwAAUGFpbnQuTkVUIDUuMS4xMQAAAwAAkAcABAAAADAyMzABoAMAAQAAAAEAAAAFoAQAAQAAAJYAAAAAAAAAAgABAAIABAAAAFI5OAACAAcABAAAADAxMDAAAAAAXO1h+gnoqrsAAE0TSURBVHhe7Z0JWFNn9v9NbK2jASouXWWLJigkkKAhBHFrtdZ2plM1BIIQBCRBghuKdSVgxaoVF0KiAgISkIAbbhU3qlWLik5rZ+y0U2vrbkEK0oVFyv855703CREoq/N/nvmdIFrUyvnc71ne8773plfT/7j1sv7C/5r9HwDrL/yv2f8BsP7C/5r9HwDrL/yv2X8HwJO6uroGfNXXgTU2Wv+JZ2b/FQB1tbW1FRXV5eXl5Q/hU0VFRXVtXZ31H3sm9t8A8Ft1xYNbt27du3Xv3r17t+/dhp9u3bpT96v1H3wW9l8A8Hv1nVv37l29evUKZWevnD179faJH3/8bxB4xgCe/F5XW1txG9w+c+bMKcrOnDlz5njxnR9//vW3355Y/5UetmcI4Pe6utq66oqHVQ/OnjlzendGxjadTqdN1GlTMjJ2nzx1/LvN3915WF1b+2vd79Z/tQftWQFohCv/8NatO/fuPXj0SZpOp9fl5OTocvQ5upwcnS5Ru+PI4SXFN2/evH3n4cOK2rq6Z6WEZwKgrq6utqL8Fkb+lSuflqbo9Hp9jj4nBz7pc3Jy9Hpd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... (truncated, total 655207 chars)"
+  },
+  {
+    "url": "https://v3.stfc.pro/players-killed",
+    "status": 200,
+    "method": "GET",
+    "content_type": "text/html; charset=utf-8",
+    "request_headers": {
+      "upgrade-insecure-requests": "1",
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+      "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"Google Chrome\";v=\"145\", \"Chromium\";v=\"145\"",
+      "sec-ch-ua-arch": "\"x86\"",
+      "sec-ch-ua-bitness": "\"64\"",
+      "sec-ch-ua-full-version": "\"145.0.7632.76\"",
+      "sec-ch-ua-full-version-list": "\"Not:A-Brand\";v=\"99.0.0.0\", \"Google Chrome\";v=\"145.0.7632.76\", \"Chromium\";v=\"145.0.7632.76\"",
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-model": "\"\"",
+      "sec-ch-ua-platform": "\"Windows\"",
+      "sec-ch-ua-platform-version": "\"19.0.0\""
+    },
+    "body_preview": "<!DOCTYPE html><html lang=\"en\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" href=\"/_next/static/media/83afe278b6a6bb3c-s.p.3a6ba036.woff2\" as=\"font\" crossorigin=\"\" type=\"font/woff2\"/><link rel=\"preload\" as=\"image\" imageSrcSet=\"/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.a4946ac1.png&amp;w=128&amp;q=75 1x, /_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.a4946ac1.png&amp;w=256&amp;q=75 2x\"/><link rel=\"preload\" as=\"image\" imageSrcSet=\"/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.a4946ac1.png&amp;w=64&amp;q=75 1x, /_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.a4946ac1.png&amp;w=128&amp;q=75 2x\"/><link rel=\"stylesheet\" href=\"/_next/static/chunks/4e20891f2fd03463.css\" data-precedence=\"next\"/><link rel=\"stylesheet\" href=\"/_next/static/chunks/22e0edaa104d5c7f.css\" data-precedence=\"next\"/><link rel=\"preload\" as=\"script\" fetchPriority=\"low\" href=\"/_next/static/chunks/80ed0dc4929e0d86.js\"/><script src=\"/_next/static/chunks/d8b37e0d42d630b9.js\" async=\"\"></script><script src=\"/_next/static/chunks/393752ef7748ec37.js\" async=\"\"></script><script src=\"/_next/static/chunks/e5727f185310d6dd.js\" async=\"\"></script><script src=\"/_next/static/chunks/4a83b1debcb13975.js\" async=\"\"></script><script src=\"/_next/static/chunks/turbopack-73281b64af5d867b.js\" async=\"\"></script><script src=\"/_next/static/chunks/d96012bcfc98706a.js\" async=\"\"></script><script src=\"/_next/static/chunks/963c71eec1d89c3f.js\" async=\"\"></script><script src=\"/_next/static/chunks/8863225a429d7110.js\" async=\"\"></script><script src=\"/_next/static/chunks/0a47598f6b0eab23.js\" async=\"\"></script><script src=\"/_next/static/chunks/73df50d271549a1c.js\" async=\"\"></script><script src=\"/_next/static/chunks/fdeda5fad97fb41c.js\" async=\"\"></script><script src=\"/_next/static/chunks/eab1981242165f9c.js\" async=\"\"></script><script src=\"/_next/static/chunks/ab401bce1d3be013.js\" async=\"\"></script><script src=\"/_next/static/chunks/b9da2ce67040e903.js\" async=\"\"></script><script src=\"/_next/static/chunks/b2e14589d349771e.js\" async=\"\"></script><script src=\"/_next/static/chunks/2e4d6709987e68ec.js\" async=\"\"></script><script src=\"/_next/static/chunks/d68b1b441df066b5.js\" async=\"\"></script><script src=\"/_next/static/chunks/af7a29e60ea96a4b.js\" async=\"\"></script><script src=\"/_next/static/chunks/a586c44f50dcab6d.js\" async=\"\"></script><script src=\"/_next/static/chunks/bdab23d3355aad6e.js\" async=\"\"></script><script src=\"/_next/static/chunks/f329e1e5b5df214d.js\" async=\"\"></script><script src=\"/_next/static/chunks/0ab4be25e4bfd849.js\" async=\"\"></script><meta name=\"next-size-adjust\" content=\"\"/><title>STFC Statistics - Star Trek Fleet Command Player Rankings &amp; Stats</title><meta name=\"description\" content=\"The #1 website for all global, regional, and server-based statistics for Star Trek Fleet Command. Discover player rankings, alliance data, real-time incursions, and more!\"/><meta name=\"keywords\" content=\"Star Trek Fleet Command, STFC, statistics, player rankings, alliance data, gaming stats\"/><meta name=\"robots\" content=\"index, follow\"/><meta name=\"googlebot\" content=\"index, follow, max-video-preview:-1, max-image-preview:large, max-snippet:-1\"/><link rel=\"canonical\" href=\"https://stfc.pro\"/><meta property=\"og:title\" content=\"STFC Statistics\"/><meta property=\"og:description\" content=\"Track over 253.9K players across 117 servers in Star Trek Fleet Command\"/><meta property=\"og:type\" content=\"website\"/><meta name=\"twitter:card\" content=\"summary\"/><meta name=\"twitter:title\" content=\"STFC Statistics\"/><meta name=\"twitter:description\" content=\"Track over 253.9K players across 117 servers in Star Trek Fleet Command\"/><script src=\"/_next/static/chunks/a6dad97d9634a72d.js\" noModule=\"\"></script></head><body class=\"inter_5972bc34-module__OU16Qa__className antialiased\"><div hidden=\"\"><!--$--><!--/$--></div><div class=\"min-h-screen bg-gray-950 text-white\"><header class=\"fixed top-0 right-0 left-0 z-50 border-gray-700 border-b bg-gray-800/50 backdrop-blur-xs transition-all duration-300 xl:bg-gray-900/95 xl:shadow-lg xl:backdrop-blur-md\"><div class=\"w-full px-4\"><div class=\"hidden min-h-14 w-full items-center xl:flex\"><div class=\"flex shrink-0 items-center\"><a aria-label=\"Home\" class=\"relative flex items-center\" href=\"/\"><img alt=\"STFC Logo\" width=\"123\" height=\"80\" decoding=\"async\" data-nimg=\"1\" class=\"h-16 w-auto rounded-lg\" style=\"color:transparent\" srcSet=\"/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.a4946ac1.png&amp;w=128&amp;q=75 1x, /_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.a4946ac1.png&amp;w=256&amp;q=75 2x\" src=\"/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.a4946ac1.png&amp;w=256&amp;q=75\"/></a></div><div class=\"flex flex-1 justify-center\"><nav aria-label=\"Main\" data-orientation=\"horizontal\" dir=\"ltr\" class=\"group/navigation-menu relative flex max-w-max flex-1 items-center justify-center\" data-slot=\"navigation-menu\" data-viewport=\"false\"><div style=\"position:relative\"><ul data-orientation=\"hor... (truncated, total 83709 chars)"
+  },
+  {
+    "url": "https://v3.stfc.pro/api/players?sortBy=pdestroyed&sortOrder=desc&page=1&pageCount=100&reRank=false",
+    "status": 200,
+    "method": "GET",
+    "content_type": "application/octet-stream",
+    "request_headers": {
+      "sec-ch-ua-full-version-list": "\"Not:A-Brand\";v=\"99.0.0.0\", \"Google Chrome\";v=\"145.0.7632.76\", \"Chromium\";v=\"145.0.7632.76\"",
+      "sec-ch-ua-platform": "\"Windows\"",
+      "referer": "https://v3.stfc.pro/players-killed",
+      "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"Google Chrome\";v=\"145\", \"Chromium\";v=\"145\"",
+      "sec-ch-ua-bitness": "\"64\"",
+      "sec-ch-ua-model": "\"\"",
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-arch": "\"x86\"",
+      "sec-ch-ua-full-version": "\"145.0.7632.76\"",
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+      "sec-ch-ua-platform-version": "\"19.0.0\""
+    },
+    "body_preview": null
+  },
+  {
+    "url": "https://v3.stfc.pro/api/changelog",
+    "status": 200,
+    "method": "GET",
+    "content_type": "application/json;charset=utf-8",
+    "request_headers": {
+      "sec-ch-ua-full-version-list": "\"Not:A-Brand\";v=\"99.0.0.0\", \"Google Chrome\";v=\"145.0.7632.76\", \"Chromium\";v=\"145.0.7632.76\"",
+      "sec-ch-ua-platform": "\"Windows\"",
+      "referer": "https://v3.stfc.pro/players-killed",
+      "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"Google Chrome\";v=\"145\", \"Chromium\";v=\"145\"",
+      "sec-ch-ua-bitness": "\"64\"",
+      "sec-ch-ua-model": "\"\"",
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-arch": "\"x86\"",
+      "sec-ch-ua-full-version": "\"145.0.7632.76\"",
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+      "sec-ch-ua-platform-version": "\"19.0.0\""
+    },
+    "body_preview": "{\"count\":3,\"version\":\"v3.0.0\",\"content\":[{\"title\":\"Welcome to v3!\",\"date\":\"2025-12-31T00:00:00.000Z\",\"html\":\"<h3>New Account System</h3>\\n<ul>\\n<li>Login via Discord (more identity providers planned)</li>\\n<li>Profiles separated cleanly to reduce sync confusion</li>\\n<li>Clearer session state; fewer edge-case login issues</li>\\n<li>Foundations laid for an upcoming content-creator dashboard</li>\\n</ul>\\n<h3>Mobile Experience</h3>\\n<ul>\\n<li>Navigation rebuilt for small screens</li>\\n<li>Panels, drawers, and modals redesigned to avoid collisions</li>\\n<li>Reduced layout shift and improved load times on mobile networks</li>\\n</ul>\\n<h3>Player Pages</h3>\\n<ul>\\n<li>Dedicated stat pages for individual players</li>\\n<li>Cleaner URLs and faster lookups; no more modal-only views</li>\\n<li>Early groundwork for comparisons and historical tracking</li>\\n</ul>\\n<h3>Creator Partnerships</h3>\\n<ul>\\n<li>Collaboration with the <strong>STFC Officer Tool</strong> Discord</li>\\n<li>In-app visibility for their charts, crew builds, and reference guides</li>\\n<li>Shared effort to centralize resources instead of scattering them</li>\\n</ul>\\n<h3>Platform Rebuild</h3>\\n<ul>\\n<li>Full rewrite; underlying systems replaced instead of patched</li>\\n<li>Unified data layer between web, API, and future services</li>\\n<li>Stability, caching, and error-handling improved for upcoming features</li>\\n</ul>\\n\",\"slug\":\"v3-initial-update\",\"version\":\"v3.0.0\"},{\"title\":\"Septemberrr Updates!\",\"date\":\"2025-09-23T00:00:00.000Z\",\"html\":\"<p class=\\\"mb-4\\\">An update! Yes, again a long-overdue update with some rather small fixes in v1.6.0, however with the announcement that we're currently working hard behind the scenes to make v3 of <a href=\\\"http://stfc.pro\\\">stfc.pro</a> a reality!</p>\\n<h3>A summary of changes:</h3>\\n<hr />\\n<ul>\\n<li><strong>Re-vamped Alliance Lay-out</strong>\\nThe alliance details as well as the tournament alliance details had a different layout in comparison to the rest of the site. To keep things more universal, the layouts have been aligned.</li>\\n<li><strong>STFC Shop!</strong>\\nYes, you read it right! We have a shop where you'll be able to get all kinds of apparel that's made by the community! Go get your mug, t-shirt or mousepad to show your support for the site!</li>\\n</ul>\\n<hr />\\n<ul>\\n<li>lines!</li>\\n</ul>\\n<p class=\\\"mb-4\\\">I'd like to thank all contributors for supporting the site! I've created a special 'contributors' area on <strong>Discord</strong>, where I will discuss various new functions, give a chance for people to beta-test new functions as well as providing datasets (for example, event data). As a contributor, you can ask me for certain datasets!</p>\\n\",\"slug\":\"sept-updates-2025\",\"version\":\"v1.6.0\"},{\"title\":\"June Updates!\",\"date\":\"2025-09-23T00:00:00.000Z\",\"html\":\"<p class=\\\"mb-4\\\">Apologies for the long overdue update report! Many changes have been implemented over the past few months and lots of preparations have been made on the backend to ensure a smooth and stable website. Below is just a small grasp of changes that happened in the past months.</p>\\n<h3>A summary of changes:</h3>\\n<ul>\\n<li><strong>Re-vamped Alliance Lay-out</strong>\\nThe alliance details as well as the tournament alliance details had a different layout in comparison to the rest of the site. To keep things more universal, the layouts have been aligned.</li>\\n<li><strong>New Alliance Metrics</strong>\\nTwo new Alliance metrics have been added: RSS Contribution and ISO contribution. Note that RSS contribution is linked to the current level of the alliance and gets reset after increasing the alliance level.</li>\\n<li><strong>More CC icons!</strong>\\nEven more CCs have applied through Discord and have been added! You can search for \\\"cc:\\\" to get a list of all known content creators.</li>\\n<li><strong>STFC Shop!</strong>\\nYes, you read it right! We have a shop where you'll be able to get all kinds of apparel that's made by the community! Go get your mug, t-shirt or mousepad to show your support for the site!</li>\\n<li><strong>Historical data</strong>\\nAlthough not yet active on the website itself, historical data is now available for players and alliances! If you want to know your progress since 1-1-2025, it is now possible! We're working on getting data available on-site but you can always ask me in the #contributors channel in Discord.</li>\\n</ul>\\n<p class=\\\"mb-4\\\">I'd like to thank all contributors for supporting the site! I've created a special 'contributors' area on <strong>Discord</strong>, where I will discuss various new functions, give a chance for people to beta-test new functions as well as providing datasets (for example, event data). As a contributor, you can ask me for certain datasets!</p>\\n\",\"slug\":\"june-updates-2025\",\"version\":\"1.5.0\"}]}"
+  },
+  {
+    "url": "https://v3.stfc.pro/api/events",
+    "status": 200,
+    "method": "GET",
+    "content_type": "application/json;charset=utf-8",
+    "request_headers": {
+      "sec-ch-ua-full-version-list": "\"Not:A-Brand\";v=\"99.0.0.0\", \"Google Chrome\";v=\"145.0.7632.76\", \"Chromium\";v=\"145.0.7632.76\"",
+      "sec-ch-ua-platform": "\"Windows\"",
+      "referer": "https://v3.stfc.pro/players-killed",
+      "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"Google Chrome\";v=\"145\", \"Chromium\";v=\"145\"",
+      "sec-ch-ua-bitness": "\"64\"",
+      "sec-ch-ua-model": "\"\"",
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-arch": "\"x86\"",
+      "sec-ch-ua-full-version": "\"145.0.7632.76\"",
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+      "sec-ch-ua-platform-version": "\"19.0.0\""
+    },
+    "body_preview": "[{\"event_group\":\"alliance_tournaments\",\"event_start\":\"2026-02-18T17:00:00Z\",\"event_end\":\"2026-02-23T17:00:00Z\",\"active\":1},{\"event_group\":\"incursions\",\"event_start\":\"2026-01-31T16:00:00Z\",\"event_end\":\"2026-02-01T16:00:00Z\",\"active\":0},{\"event_group\":\"sarris_invasions\",\"event_start\":\"2025-09-29T18:00:00Z\",\"event_end\":\"2025-10-02T18:00:00Z\",\"active\":0},{\"event_group\":\"flashpoint\",\"event_start\":\"2025-08-28T18:00:00Z\",\"event_end\":\"2025-09-01T18:00:00Z\",\"active\":0}]"
+  },
+  {
+    "url": "https://v3.stfc.pro/api/auth/get-session",
+    "status": 200,
+    "method": "GET",
+    "content_type": "application/json",
+    "request_headers": {
+      "sec-ch-ua-full-version-list": "\"Not:A-Brand\";v=\"99.0.0.0\", \"Google Chrome\";v=\"145.0.7632.76\", \"Chromium\";v=\"145.0.7632.76\"",
+      "sec-ch-ua-platform": "\"Windows\"",
+      "referer": "https://v3.stfc.pro/players-killed",
+      "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"Google Chrome\";v=\"145\", \"Chromium\";v=\"145\"",
+      "sec-ch-ua-bitness": "\"64\"",
+      "sec-ch-ua-model": "\"\"",
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-arch": "\"x86\"",
+      "sec-ch-ua-full-version": "\"145.0.7632.76\"",
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+      "sec-ch-ua-platform-version": "\"19.0.0\""
+    },
+    "body_preview": "{\"session\":{\"expiresAt\":\"2026-02-27T16:00:02.792Z\",\"token\":\"NmYkoOPf3DJiCvRMnQtUZNN0DYjtS2Yq\",\"createdAt\":\"2026-02-15T13:00:14.705Z\",\"updatedAt\":\"2026-02-20T16:00:02.792Z\",\"ipAddress\":\"2600:4040:5a36:bd00:41b9:bf5a:a68b:9c86\",\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36\",\"userId\":\"MCZASkZOgy4rCBCZsdChVGVhO38rMfq0\",\"id\":\"qtDVlf2wI2KAbkLItJFyeDeSQucSjzsJ\"},\"user\":{\"name\":\"Drew\",\"email\":\"drew.adorno@gmail.com\",\"emailVerified\":true,\"image\":\"https://cdn.discordapp.com/avatars/261308431879766027/d165f63452c671142e232ea696fb65d0.png\",\"createdAt\":\"2026-02-07T12:58:02.756Z\",\"updatedAt\":\"2026-02-07T12:58:02.756Z\",\"role\":\"user\",\"id\":\"MCZASkZOgy4rCBCZsdChVGVhO38rMfq0\"}}"
+  },
+  {
+    "url": "https://v3.stfc.pro/api/suffixes",
+    "status": 200,
+    "method": "GET",
+    "content_type": "application/json;charset=utf-8",
+    "request_headers": {
+      "sec-ch-ua-full-version-list": "\"Not:A-Brand\";v=\"99.0.0.0\", \"Google Chrome\";v=\"145.0.7632.76\", \"Chromium\";v=\"145.0.7632.76\"",
+      "sec-ch-ua-platform": "\"Windows\"",
+      "referer": "https://v3.stfc.pro/players-killed",
+      "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"Google Chrome\";v=\"145\", \"Chromium\";v=\"145\"",
+      "sec-ch-ua-bitness": "\"64\"",
+      "sec-ch-ua-model": "\"\"",
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-arch": "\"x86\"",
+      "sec-ch-ua-full-version": "\"145.0.7632.76\"",
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+      "sec-ch-ua-platform-version": "\"19.0.0\""
+    },
+    "body_preview": "[{\"id\":54,\"key\":\"bluemando\",\"text\":\"bluemandalorian\",\"pngBlob\":\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAMAAABrrFhUAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAMAUExURRoQDgEBAQEFGQQSHDIYDCQLBScUCyUZFTMdFC0hGDgkGRUdMwEFKAMXKgIDNwMaNigdIwIhLQQjORclOjEvMjoqJEEoGks4MkMsJUozLFY8M1pCN2RHPBIdTgIHSQEbSAELVAIWWBEtUgUnSBUqSBg0SgMoWAY1Whg3WCk2TgAbcgIcZRQvYwMoaAM5aRY6ZgEsdAI5dhM7dyM8ZBFCWy5EWARFaxhFaQNFdxdIdwdTexpWezBObyZJaChWeThXeDVjd1NOUmxWTmlMQnpmXElZcFlZaGNcalVkdXFtdGhpd4lqXZB0bZd2aaJ+c5mCerSOfKqHeQMuhwI1hBRLlwNLhhdKhARViRdXiAJOkwNXmBdali1ajiZZhxNkjQRjmxhlmjNrkChnlwldrQJbpiFeoBVuswNmqRdopgNzrRl0qgJotgR0uhd1uDFsqihppyZ2qDd2qSh4tzZ6uEVeg0xvjlhrh1l2lWNtlGVrhWl1iXZ4imh6lXZ8lUl5rAJuwQJ3xxV8xAJ+0Sl8w4N8gD6AmQeIuxmEuzKOtSeGuTqFulKFmW+GlHiFmFGQs0iIuW+Pq1ejum+ouBORzwOFyhiIyAKI2QOV2xiY2DKJyyeJxymWyziXySeY1jaa1hSn2zSv1iam2Tin2AOM4QOa6Beb4wOe8Sub4hGw7wKj7Bel6AOo8wKy9zG07yen6Dao50yRy0eWyFiYx0ea1WabyE+s1VmoyEeo2Vi12G2rz2a413i32UWd4U+x7keo5Ui35la55Va69W287DbE81bB2mvE2nfG2lHJ8VjH6HPV82nI53fJ5njV6WnE+HjI+Fro+nTm+Y2JjYSHl7CTjLqZiLmjl4mYrJWotaqtscKdjMOkk8eyppC0zoW426y5x4u85I/I2q/H1ZbR8YfG6JjI54fX54fK9ojW95nX+anQ6bfX66bb+bbc9I7p9pjl+rLm7ark+rjn+qv1/Lj6/cjR2Mfc6cnj69jl68Xq+dfr9sn3/Nn4++Tt8Ob6+vr9/AAAAItg0G0AAAEAdFJOU////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////wBT9wclAAAACXBIWXMAAA7CAAAOwgEVKEqAAAAAGXRFWHRTb2Z0d2FyZQBQYWludC5ORVQgNS4xLjExiggWzgAAALhlWElmSUkqAAgAAAAFABoBBQABAAAASgAAABsBBQABAAAAUgAAACgBAwABAAAAAgAAADEBAgARAAAAWgAAAGmHBAABAAAAbAAAAAAAAADydgEA6AMAAPJ2AQDoAwAAUGFpbnQuTkVUIDUuMS4xMQAAAwAAkAcABAAAADAyMzABoAMAAQAAAAEAAAAFoAQAAQAAAJYAAAAAAAAAAgABAAIABAAAAFI5OAACAAcABAAAADAxMDAAAAAAXO1h+gnoqrsAAE0TSURBVHhe7Z0JWFNn9v9NbK2jASouXWWLJigkkKAhBHFrtdZ2plM1BIIQBCRBghuKdSVgxaoVF0KiAgISkIAbbhU3qlWLik5rZ+y0U2vrbkEK0oVFyv855703CREoq/N/nvmdIFrUyvnc71ne8773plfT/7j1sv7C/5r9HwDrL/yv2f8BsP7C/5r9HwDrL/yv2X8HwJO6uroGfNXXgTU2Wv+JZ2b/FQB1tbW1FRXV5eXl5Q/hU0VFRXVtXZ31H3sm9t8A8Ft1xYNbt27du3Xv3r17t+/dhp9u3bpT96v1H3wW9l8A8Hv1nVv37l29evUKZWevnD179faJH3/8bxB4xgCe/F5XW1txG9w+c+bMKcrOnDlz5njxnR9//vW3355Y/5UetmcI4Pe6utq66oqHVQ/OnjlzendGxjadTqdN1GlTMjJ2nzx1/LvN3915WF1b+2vd79Z/tQftWQFohCv/8NatO/fuPXj0SZpOp9fl5OTocvQ5upwcnS5Ru+PI4SXFN2/evH3n4cOK2rq6Z6WEZwKgrq6utqL8Fkb+lSuflqbo9Hp9jj4nBz7pc3Jy9Hpd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... (truncated, total 655207 chars)"
+  },
+  {
+    "url": "https://v3.stfc.pro/api/players?server=716&sortBy=pdestroyed&sortOrder=desc&page=1&pageCount=100&reRank=false",
+    "status": 200,
+    "method": "GET",
+    "content_type": "application/octet-stream",
+    "request_headers": {
+      "sec-ch-ua-full-version-list": "\"Not:A-Brand\";v=\"99.0.0.0\", \"Google Chrome\";v=\"145.0.7632.76\", \"Chromium\";v=\"145.0.7632.76\"",
+      "sec-ch-ua-platform": "\"Windows\"",
+      "referer": "https://v3.stfc.pro/players-killed",
+      "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"Google Chrome\";v=\"145\", \"Chromium\";v=\"145\"",
+      "sec-ch-ua-bitness": "\"64\"",
+      "sec-ch-ua-model": "\"\"",
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-arch": "\"x86\"",
+      "sec-ch-ua-full-version": "\"145.0.7632.76\"",
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+      "sec-ch-ua-platform-version": "\"19.0.0\""
+    },
+    "body_preview": null
+  },
+  {
+    "url": "https://v3.stfc.pro/api/players?server=716&alliance=3974286889&sortBy=pdestroyed&sortOrder=desc&page=1&pageCount=100&reRank=false",
+    "status": 200,
+    "method": "GET",
+    "content_type": "application/octet-stream",
+    "request_headers": {
+      "sec-ch-ua-full-version-list": "\"Not:A-Brand\";v=\"99.0.0.0\", \"Google Chrome\";v=\"145.0.7632.76\", \"Chromium\";v=\"145.0.7632.76\"",
+      "sec-ch-ua-platform": "\"Windows\"",
+      "referer": "https://v3.stfc.pro/players-killed?server=716",
+      "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"Google Chrome\";v=\"145\", \"Chromium\";v=\"145\"",
+      "sec-ch-ua-bitness": "\"64\"",
+      "sec-ch-ua-model": "\"\"",
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-arch": "\"x86\"",
+      "sec-ch-ua-full-version": "\"145.0.7632.76\"",
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+      "sec-ch-ua-platform-version": "\"19.0.0\""
+    },
+    "body_preview": null
+  },
+  {
+    "url": "https://v3.stfc.pro/resources-mined",
+    "status": 200,
+    "method": "GET",
+    "content_type": "text/html; charset=utf-8",
+    "request_headers": {
+      "upgrade-insecure-requests": "1",
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+      "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"Google Chrome\";v=\"145\", \"Chromium\";v=\"145\"",
+      "sec-ch-ua-arch": "\"x86\"",
+      "sec-ch-ua-bitness": "\"64\"",
+      "sec-ch-ua-full-version": "\"145.0.7632.76\"",
+      "sec-ch-ua-full-version-list": "\"Not:A-Brand\";v=\"99.0.0.0\", \"Google Chrome\";v=\"145.0.7632.76\", \"Chromium\";v=\"145.0.7632.76\"",
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-model": "\"\"",
+      "sec-ch-ua-platform": "\"Windows\"",
+      "sec-ch-ua-platform-version": "\"19.0.0\""
+    },
+    "body_preview": "<!DOCTYPE html><html lang=\"en\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" href=\"/_next/static/media/83afe278b6a6bb3c-s.p.3a6ba036.woff2\" as=\"font\" crossorigin=\"\" type=\"font/woff2\"/><link rel=\"preload\" as=\"image\" imageSrcSet=\"/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.a4946ac1.png&amp;w=128&amp;q=75 1x, /_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.a4946ac1.png&amp;w=256&amp;q=75 2x\"/><link rel=\"preload\" as=\"image\" imageSrcSet=\"/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.a4946ac1.png&amp;w=64&amp;q=75 1x, /_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.a4946ac1.png&amp;w=128&amp;q=75 2x\"/><link rel=\"stylesheet\" href=\"/_next/static/chunks/4e20891f2fd03463.css\" data-precedence=\"next\"/><link rel=\"stylesheet\" href=\"/_next/static/chunks/22e0edaa104d5c7f.css\" data-precedence=\"next\"/><link rel=\"preload\" as=\"script\" fetchPriority=\"low\" href=\"/_next/static/chunks/80ed0dc4929e0d86.js\"/><script src=\"/_next/static/chunks/d8b37e0d42d630b9.js\" async=\"\"></script><script src=\"/_next/static/chunks/393752ef7748ec37.js\" async=\"\"></script><script src=\"/_next/static/chunks/e5727f185310d6dd.js\" async=\"\"></script><script src=\"/_next/static/chunks/4a83b1debcb13975.js\" async=\"\"></script><script src=\"/_next/static/chunks/turbopack-73281b64af5d867b.js\" async=\"\"></script><script src=\"/_next/static/chunks/d96012bcfc98706a.js\" async=\"\"></script><script src=\"/_next/static/chunks/963c71eec1d89c3f.js\" async=\"\"></script><script src=\"/_next/static/chunks/8863225a429d7110.js\" async=\"\"></script><script src=\"/_next/static/chunks/0a47598f6b0eab23.js\" async=\"\"></script><script src=\"/_next/static/chunks/73df50d271549a1c.js\" async=\"\"></script><script src=\"/_next/static/chunks/fdeda5fad97fb41c.js\" async=\"\"></script><script src=\"/_next/static/chunks/eab1981242165f9c.js\" async=\"\"></script><script src=\"/_next/static/chunks/ab401bce1d3be013.js\" async=\"\"></script><script src=\"/_next/static/chunks/b9da2ce67040e903.js\" async=\"\"></script><script src=\"/_next/static/chunks/b2e14589d349771e.js\" async=\"\"></script><script src=\"/_next/static/chunks/2e4d6709987e68ec.js\" async=\"\"></script><script src=\"/_next/static/chunks/d68b1b441df066b5.js\" async=\"\"></script><script src=\"/_next/static/chunks/af7a29e60ea96a4b.js\" async=\"\"></script><script src=\"/_next/static/chunks/a586c44f50dcab6d.js\" async=\"\"></script><script src=\"/_next/static/chunks/bdab23d3355aad6e.js\" async=\"\"></script><script src=\"/_next/static/chunks/f329e1e5b5df214d.js\" async=\"\"></script><script src=\"/_next/static/chunks/0ab4be25e4bfd849.js\" async=\"\"></script><meta name=\"next-size-adjust\" content=\"\"/><title>STFC Statistics - Star Trek Fleet Command Player Rankings &amp; Stats</title><meta name=\"description\" content=\"The #1 website for all global, regional, and server-based statistics for Star Trek Fleet Command. Discover player rankings, alliance data, real-time incursions, and more!\"/><meta name=\"keywords\" content=\"Star Trek Fleet Command, STFC, statistics, player rankings, alliance data, gaming stats\"/><meta name=\"robots\" content=\"index, follow\"/><meta name=\"googlebot\" content=\"index, follow, max-video-preview:-1, max-image-preview:large, max-snippet:-1\"/><link rel=\"canonical\" href=\"https://stfc.pro\"/><meta property=\"og:title\" content=\"STFC Statistics\"/><meta property=\"og:description\" content=\"Track over 253.9K players across 117 servers in Star Trek Fleet Command\"/><meta property=\"og:type\" content=\"website\"/><meta name=\"twitter:card\" content=\"summary\"/><meta name=\"twitter:title\" content=\"STFC Statistics\"/><meta name=\"twitter:description\" content=\"Track over 253.9K players across 117 servers in Star Trek Fleet Command\"/><script src=\"/_next/static/chunks/a6dad97d9634a72d.js\" noModule=\"\"></script></head><body class=\"inter_5972bc34-module__OU16Qa__className antialiased\"><div hidden=\"\"><!--$--><!--/$--></div><div class=\"min-h-screen bg-gray-950 text-white\"><header class=\"fixed top-0 right-0 left-0 z-50 border-gray-700 border-b bg-gray-800/50 backdrop-blur-xs transition-all duration-300 xl:bg-gray-900/95 xl:shadow-lg xl:backdrop-blur-md\"><div class=\"w-full px-4\"><div class=\"hidden min-h-14 w-full items-center xl:flex\"><div class=\"flex shrink-0 items-center\"><a aria-label=\"Home\" class=\"relative flex items-center\" href=\"/\"><img alt=\"STFC Logo\" width=\"123\" height=\"80\" decoding=\"async\" data-nimg=\"1\" class=\"h-16 w-auto rounded-lg\" style=\"color:transparent\" srcSet=\"/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.a4946ac1.png&amp;w=128&amp;q=75 1x, /_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.a4946ac1.png&amp;w=256&amp;q=75 2x\" src=\"/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.a4946ac1.png&amp;w=256&amp;q=75\"/></a></div><div class=\"flex flex-1 justify-center\"><nav aria-label=\"Main\" data-orientation=\"horizontal\" dir=\"ltr\" class=\"group/navigation-menu relative flex max-w-max flex-1 items-center justify-center\" data-slot=\"navigation-menu\" data-viewport=\"false\"><div style=\"position:relative\"><ul data-orientation=\"hor... (truncated, total 83910 chars)"
+  },
+  {
+    "url": "https://v3.stfc.pro/api/players?sortBy=rssmined&sortOrder=desc&page=1&pageCount=100&reRank=false",
+    "status": 200,
+    "method": "GET",
+    "content_type": "application/octet-stream",
+    "request_headers": {
+      "sec-ch-ua-full-version-list": "\"Not:A-Brand\";v=\"99.0.0.0\", \"Google Chrome\";v=\"145.0.7632.76\", \"Chromium\";v=\"145.0.7632.76\"",
+      "sec-ch-ua-platform": "\"Windows\"",
+      "referer": "https://v3.stfc.pro/resources-mined",
+      "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"Google Chrome\";v=\"145\", \"Chromium\";v=\"145\"",
+      "sec-ch-ua-bitness": "\"64\"",
+      "sec-ch-ua-model": "\"\"",
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-arch": "\"x86\"",
+      "sec-ch-ua-full-version": "\"145.0.7632.76\"",
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+      "sec-ch-ua-platform-version": "\"19.0.0\""
+    },
+    "body_preview": null
+  },
+  {
+    "url": "https://v3.stfc.pro/api/changelog",
+    "status": 200,
+    "method": "GET",
+    "content_type": "application/json;charset=utf-8",
+    "request_headers": {
+      "sec-ch-ua-full-version-list": "\"Not:A-Brand\";v=\"99.0.0.0\", \"Google Chrome\";v=\"145.0.7632.76\", \"Chromium\";v=\"145.0.7632.76\"",
+      "sec-ch-ua-platform": "\"Windows\"",
+      "referer": "https://v3.stfc.pro/resources-mined",
+      "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"Google Chrome\";v=\"145\", \"Chromium\";v=\"145\"",
+      "sec-ch-ua-bitness": "\"64\"",
+      "sec-ch-ua-model": "\"\"",
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-arch": "\"x86\"",
+      "sec-ch-ua-full-version": "\"145.0.7632.76\"",
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+      "sec-ch-ua-platform-version": "\"19.0.0\""
+    },
+    "body_preview": "{\"count\":3,\"version\":\"v3.0.0\",\"content\":[{\"title\":\"Welcome to v3!\",\"date\":\"2025-12-31T00:00:00.000Z\",\"html\":\"<h3>New Account System</h3>\\n<ul>\\n<li>Login via Discord (more identity providers planned)</li>\\n<li>Profiles separated cleanly to reduce sync confusion</li>\\n<li>Clearer session state; fewer edge-case login issues</li>\\n<li>Foundations laid for an upcoming content-creator dashboard</li>\\n</ul>\\n<h3>Mobile Experience</h3>\\n<ul>\\n<li>Navigation rebuilt for small screens</li>\\n<li>Panels, drawers, and modals redesigned to avoid collisions</li>\\n<li>Reduced layout shift and improved load times on mobile networks</li>\\n</ul>\\n<h3>Player Pages</h3>\\n<ul>\\n<li>Dedicated stat pages for individual players</li>\\n<li>Cleaner URLs and faster lookups; no more modal-only views</li>\\n<li>Early groundwork for comparisons and historical tracking</li>\\n</ul>\\n<h3>Creator Partnerships</h3>\\n<ul>\\n<li>Collaboration with the <strong>STFC Officer Tool</strong> Discord</li>\\n<li>In-app visibility for their charts, crew builds, and reference guides</li>\\n<li>Shared effort to centralize resources instead of scattering them</li>\\n</ul>\\n<h3>Platform Rebuild</h3>\\n<ul>\\n<li>Full rewrite; underlying systems replaced instead of patched</li>\\n<li>Unified data layer between web, API, and future services</li>\\n<li>Stability, caching, and error-handling improved for upcoming features</li>\\n</ul>\\n\",\"slug\":\"v3-initial-update\",\"version\":\"v3.0.0\"},{\"title\":\"Septemberrr Updates!\",\"date\":\"2025-09-23T00:00:00.000Z\",\"html\":\"<p class=\\\"mb-4\\\">An update! Yes, again a long-overdue update with some rather small fixes in v1.6.0, however with the announcement that we're currently working hard behind the scenes to make v3 of <a href=\\\"http://stfc.pro\\\">stfc.pro</a> a reality!</p>\\n<h3>A summary of changes:</h3>\\n<hr />\\n<ul>\\n<li><strong>Re-vamped Alliance Lay-out</strong>\\nThe alliance details as well as the tournament alliance details had a different layout in comparison to the rest of the site. To keep things more universal, the layouts have been aligned.</li>\\n<li><strong>STFC Shop!</strong>\\nYes, you read it right! We have a shop where you'll be able to get all kinds of apparel that's made by the community! Go get your mug, t-shirt or mousepad to show your support for the site!</li>\\n</ul>\\n<hr />\\n<ul>\\n<li>lines!</li>\\n</ul>\\n<p class=\\\"mb-4\\\">I'd like to thank all contributors for supporting the site! I've created a special 'contributors' area on <strong>Discord</strong>, where I will discuss various new functions, give a chance for people to beta-test new functions as well as providing datasets (for example, event data). As a contributor, you can ask me for certain datasets!</p>\\n\",\"slug\":\"sept-updates-2025\",\"version\":\"v1.6.0\"},{\"title\":\"June Updates!\",\"date\":\"2025-09-23T00:00:00.000Z\",\"html\":\"<p class=\\\"mb-4\\\">Apologies for the long overdue update report! Many changes have been implemented over the past few months and lots of preparations have been made on the backend to ensure a smooth and stable website. Below is just a small grasp of changes that happened in the past months.</p>\\n<h3>A summary of changes:</h3>\\n<ul>\\n<li><strong>Re-vamped Alliance Lay-out</strong>\\nThe alliance details as well as the tournament alliance details had a different layout in comparison to the rest of the site. To keep things more universal, the layouts have been aligned.</li>\\n<li><strong>New Alliance Metrics</strong>\\nTwo new Alliance metrics have been added: RSS Contribution and ISO contribution. Note that RSS contribution is linked to the current level of the alliance and gets reset after increasing the alliance level.</li>\\n<li><strong>More CC icons!</strong>\\nEven more CCs have applied through Discord and have been added! You can search for \\\"cc:\\\" to get a list of all known content creators.</li>\\n<li><strong>STFC Shop!</strong>\\nYes, you read it right! We have a shop where you'll be able to get all kinds of apparel that's made by the community! Go get your mug, t-shirt or mousepad to show your support for the site!</li>\\n<li><strong>Historical data</strong>\\nAlthough not yet active on the website itself, historical data is now available for players and alliances! If you want to know your progress since 1-1-2025, it is now possible! We're working on getting data available on-site but you can always ask me in the #contributors channel in Discord.</li>\\n</ul>\\n<p class=\\\"mb-4\\\">I'd like to thank all contributors for supporting the site! I've created a special 'contributors' area on <strong>Discord</strong>, where I will discuss various new functions, give a chance for people to beta-test new functions as well as providing datasets (for example, event data). As a contributor, you can ask me for certain datasets!</p>\\n\",\"slug\":\"june-updates-2025\",\"version\":\"1.5.0\"}]}"
+  },
+  {
+    "url": "https://v3.stfc.pro/api/events",
+    "status": 200,
+    "method": "GET",
+    "content_type": "application/json;charset=utf-8",
+    "request_headers": {
+      "sec-ch-ua-full-version-list": "\"Not:A-Brand\";v=\"99.0.0.0\", \"Google Chrome\";v=\"145.0.7632.76\", \"Chromium\";v=\"145.0.7632.76\"",
+      "sec-ch-ua-platform": "\"Windows\"",
+      "referer": "https://v3.stfc.pro/resources-mined",
+      "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"Google Chrome\";v=\"145\", \"Chromium\";v=\"145\"",
+      "sec-ch-ua-bitness": "\"64\"",
+      "sec-ch-ua-model": "\"\"",
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-arch": "\"x86\"",
+      "sec-ch-ua-full-version": "\"145.0.7632.76\"",
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+      "sec-ch-ua-platform-version": "\"19.0.0\""
+    },
+    "body_preview": "[{\"event_group\":\"alliance_tournaments\",\"event_start\":\"2026-02-18T17:00:00Z\",\"event_end\":\"2026-02-23T17:00:00Z\",\"active\":1},{\"event_group\":\"incursions\",\"event_start\":\"2026-01-31T16:00:00Z\",\"event_end\":\"2026-02-01T16:00:00Z\",\"active\":0},{\"event_group\":\"sarris_invasions\",\"event_start\":\"2025-09-29T18:00:00Z\",\"event_end\":\"2025-10-02T18:00:00Z\",\"active\":0},{\"event_group\":\"flashpoint\",\"event_start\":\"2025-08-28T18:00:00Z\",\"event_end\":\"2025-09-01T18:00:00Z\",\"active\":0}]"
+  },
+  {
+    "url": "https://v3.stfc.pro/api/auth/get-session",
+    "status": 200,
+    "method": "GET",
+    "content_type": "application/json",
+    "request_headers": {
+      "sec-ch-ua-full-version-list": "\"Not:A-Brand\";v=\"99.0.0.0\", \"Google Chrome\";v=\"145.0.7632.76\", \"Chromium\";v=\"145.0.7632.76\"",
+      "sec-ch-ua-platform": "\"Windows\"",
+      "referer": "https://v3.stfc.pro/resources-mined",
+      "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"Google Chrome\";v=\"145\", \"Chromium\";v=\"145\"",
+      "sec-ch-ua-bitness": "\"64\"",
+      "sec-ch-ua-model": "\"\"",
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-arch": "\"x86\"",
+      "sec-ch-ua-full-version": "\"145.0.7632.76\"",
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+      "sec-ch-ua-platform-version": "\"19.0.0\""
+    },
+    "body_preview": "{\"session\":{\"expiresAt\":\"2026-02-27T16:00:02.792Z\",\"token\":\"NmYkoOPf3DJiCvRMnQtUZNN0DYjtS2Yq\",\"createdAt\":\"2026-02-15T13:00:14.705Z\",\"updatedAt\":\"2026-02-20T16:00:02.792Z\",\"ipAddress\":\"2600:4040:5a36:bd00:41b9:bf5a:a68b:9c86\",\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36\",\"userId\":\"MCZASkZOgy4rCBCZsdChVGVhO38rMfq0\",\"id\":\"qtDVlf2wI2KAbkLItJFyeDeSQucSjzsJ\"},\"user\":{\"name\":\"Drew\",\"email\":\"drew.adorno@gmail.com\",\"emailVerified\":true,\"image\":\"https://cdn.discordapp.com/avatars/261308431879766027/d165f63452c671142e232ea696fb65d0.png\",\"createdAt\":\"2026-02-07T12:58:02.756Z\",\"updatedAt\":\"2026-02-07T12:58:02.756Z\",\"role\":\"user\",\"id\":\"MCZASkZOgy4rCBCZsdChVGVhO38rMfq0\"}}"
+  },
+  {
+    "url": "https://v3.stfc.pro/api/suffixes",
+    "status": 200,
+    "method": "GET",
+    "content_type": "application/json;charset=utf-8",
+    "request_headers": {
+      "sec-ch-ua-full-version-list": "\"Not:A-Brand\";v=\"99.0.0.0\", \"Google Chrome\";v=\"145.0.7632.76\", \"Chromium\";v=\"145.0.7632.76\"",
+      "sec-ch-ua-platform": "\"Windows\"",
+      "referer": "https://v3.stfc.pro/resources-mined",
+      "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"Google Chrome\";v=\"145\", \"Chromium\";v=\"145\"",
+      "sec-ch-ua-bitness": "\"64\"",
+      "sec-ch-ua-model": "\"\"",
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-arch": "\"x86\"",
+      "sec-ch-ua-full-version": "\"145.0.7632.76\"",
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+      "sec-ch-ua-platform-version": "\"19.0.0\""
+    },
+    "body_preview": "[{\"id\":54,\"key\":\"bluemando\",\"text\":\"bluemandalorian\",\"pngBlob\":\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAMAAABrrFhUAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAMAUExURRoQDgEBAQEFGQQSHDIYDCQLBScUCyUZFTMdFC0hGDgkGRUdMwEFKAMXKgIDNwMaNigdIwIhLQQjORclOjEvMjoqJEEoGks4MkMsJUozLFY8M1pCN2RHPBIdTgIHSQEbSAELVAIWWBEtUgUnSBUqSBg0SgMoWAY1Whg3WCk2TgAbcgIcZRQvYwMoaAM5aRY6ZgEsdAI5dhM7dyM8ZBFCWy5EWARFaxhFaQNFdxdIdwdTexpWezBObyZJaChWeThXeDVjd1NOUmxWTmlMQnpmXElZcFlZaGNcalVkdXFtdGhpd4lqXZB0bZd2aaJ+c5mCerSOfKqHeQMuhwI1hBRLlwNLhhdKhARViRdXiAJOkwNXmBdali1ajiZZhxNkjQRjmxhlmjNrkChnlwldrQJbpiFeoBVuswNmqRdopgNzrRl0qgJotgR0uhd1uDFsqihppyZ2qDd2qSh4tzZ6uEVeg0xvjlhrh1l2lWNtlGVrhWl1iXZ4imh6lXZ8lUl5rAJuwQJ3xxV8xAJ+0Sl8w4N8gD6AmQeIuxmEuzKOtSeGuTqFulKFmW+GlHiFmFGQs0iIuW+Pq1ejum+ouBORzwOFyhiIyAKI2QOV2xiY2DKJyyeJxymWyziXySeY1jaa1hSn2zSv1iam2Tin2AOM4QOa6Beb4wOe8Sub4hGw7wKj7Bel6AOo8wKy9zG07yen6Dao50yRy0eWyFiYx0ea1WabyE+s1VmoyEeo2Vi12G2rz2a413i32UWd4U+x7keo5Ui35la55Va69W287DbE81bB2mvE2nfG2lHJ8VjH6HPV82nI53fJ5njV6WnE+HjI+Fro+nTm+Y2JjYSHl7CTjLqZiLmjl4mYrJWotaqtscKdjMOkk8eyppC0zoW426y5x4u85I/I2q/H1ZbR8YfG6JjI54fX54fK9ojW95nX+anQ6bfX66bb+bbc9I7p9pjl+rLm7ark+rjn+qv1/Lj6/cjR2Mfc6cnj69jl68Xq+dfr9sn3/Nn4++Tt8Ob6+vr9/AAAAItg0G0AAAEAdFJOU////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////wBT9wclAAAACXBIWXMAAA7CAAAOwgEVKEqAAAAAGXRFWHRTb2Z0d2FyZQBQYWludC5ORVQgNS4xLjExiggWzgAAALhlWElmSUkqAAgAAAAFABoBBQABAAAASgAAABsBBQABAAAAUgAAACgBAwABAAAAAgAAADEBAgARAAAAWgAAAGmHBAABAAAAbAAAAAAAAADydgEA6AMAAPJ2AQDoAwAAUGFpbnQuTkVUIDUuMS4xMQAAAwAAkAcABAAAADAyMzABoAMAAQAAAAEAAAAFoAQAAQAAAJYAAAAAAAAAAgABAAIABAAAAFI5OAACAAcABAAAADAxMDAAAAAAXO1h+gnoqrsAAE0TSURBVHhe7Z0JWFNn9v9NbK2jASouXWWLJigkkKAhBHFrtdZ2plM1BIIQBCRBghuKdSVgxaoVF0KiAgISkIAbbhU3qlWLik5rZ+y0U2vrbkEK0oVFyv855703CREoq/N/nvmdIFrUyvnc71ne8773plfT/7j1sv7C/5r9HwDrL/yv2f8BsP7C/5r9HwDrL/yv2X8HwJO6uroGfNXXgTU2Wv+JZ2b/FQB1tbW1FRXV5eXl5Q/hU0VFRXVtXZ31H3sm9t8A8Ft1xYNbt27du3Xv3r17t+/dhp9u3bpT96v1H3wW9l8A8Hv1nVv37l29evUKZWevnD179faJH3/8bxB4xgCe/F5XW1txG9w+c+bMKcrOnDlz5njxnR9//vW3355Y/5UetmcI4Pe6utq66oqHVQ/OnjlzendGxjadTqdN1GlTMjJ2nzx1/LvN3915WF1b+2vd79Z/tQftWQFohCv/8NatO/fuPXj0SZpOp9fl5OTocvQ5upwcnS5Ru+PI4SXFN2/evH3n4cOK2rq6Z6WEZwKgrq6utqL8Fkb+lSuflqbo9Hp9jj4nBz7pc3Jy9Hpd6qHFYw+eOnX2ypWr9+7ceghl4ZnUxp4HADXvp3KS965cObM/I+3zbcR/8kmHrxTtobHOYTt27Nh9+syVK1ev3rt152FF3TMojT0NgCifcv7k7lSdTpv9mR4MLjuaXguvhANj7Oes1eq02sQdO0+eOnsWhPBTbV1PZ8WeBVBXW13x4N49KHin9qeCszl6PQBA1efoIRWgaVO0RV72c5K0ep0uRafValN3njp79erNm3cgH1j/b7vTehJAXV11BVx88H5bSg5ed71Bvw8UAIGfQykAPrTa9d6OqiSdVos0UnTapNTtp85euXrvVkVtT5aFngNQV1+N2r9yZn8KRDmJ+By9PnMvyYCY/ykIOp12+yg7VapWBwDgpdVqNUmpO09eOXsbskGPIegpAE/qah/eun/v6pVTGVrwPkefY6DyfsFevSEH/bdwX6dd7+qoSgC/KffR1Jodp89evn3rpx6Lgx4CUFdbfuv+/atnTqck4rWnCh7GfgGlAPScfAaX17k6qkyOW5h6xydnz96+VdFDCHoEQN1v1eW37l05k6HVQeTn5BiAAPgKnxEA/Bd9/RPhR+pCFztVgkabCK9ErQZCgBBIUicUnTp7+2FtjxDoCQB1tRUP7l8F7WO5w1KfAz+g7UMFYP0H/00xoNMuZNupEhI1iYmaRI1Wo9Xgp0REoFGvPXT23q2HPSGC7gfwpLa6/MHFI6mU+/ABjuInrHr5oACSAOg8kKjTaheyHWcnJGrBfRMB+FmrSdImqdVrT9+797Ci+wl0O4C6uqoHFz9N0eoNKHx0n672YHoSAkQAZtNq54ACNImJWpCABt3XaDRJGm2SRgMEoorO3r5dUdvd5aC7AdTVlldeTNPqDXqDwUCyH159lDv+TJIg9VVaAIm61DlsWwAA3lMINBqNGj+S1JokdVLUukNnb5d3dyboZgB1tZWPPk3Sg/dY6rDcNTdt/l5MB81/U6udz7YLTYD0h1nAZGr6pVaro9LP3r7VzRroVgBP6mory3ZB8Bsw9VPZHs30C+1eVAAsh2nv4aupKrZtKCRBeNEIwHN0Pgk+omKiYo6cvdO9GuhOAE/qqysvp+kNRggAq1IHq3+q5ud/RhpBogDqDyQmzGHbqBISwXezAuKpSw9XHz6iouYcudm9BLoRQF1DdeUlrV4P/uuh7SMXmUqAJlf1e3ExZAoBCkuCis0K1SQiAToJqOM18fHx8Wp1NDqPH8qi7tVA9wF4Ul9VeVyL4Q+tLiQ/nPhgltNiDOQk5ugStXtRARQDuhdITFXZowKwCJgUEK8G96PV0dHR0VFgSVHKTd1KoNsAPGmoBv8h+0ECgCBH2efodJrUkpJULZEB5ABQAKZI/HNEF9oElT3kADQQAhUBQACchxdqICoqav2Jm91HoLsANDZUV56H6w/5j6rzZOynXXvs4hcXr5xGBDk6rfazf0CE0EsjOjZSVfYsVAARQAKlAE28OhoQKKOVyugoJQJQxJ7oPg10G4CfH19OMhSA/0CAXFa4supdFx/dv3f16sUruzSJqICsf2TqjUYjVkosB0BAmxoKALR0FqRyACWAaHBfCUYIrL/dbQS6CUBDbdXdtZnY+4BX9MxXl7T20v3K+2BXr149pU0ECXz2RVamkRjplTBXpirsWBgCWosqoI6Pj4+Oj46OotxXKhXKKGWUUnng5p3a7pmVdQ+AJ7VVj9bqIfthBwCzHozupPT7lQ8ePHhwH3a/rl45BVMx7blH/zizvyC3wGAAFaBgAECoHSRBkIAJAWSAeMyAJvfB+yilUn705sPumZx3C4DGuurKIn0m+k9VdzCt5tD9ysry8nJgcO/+1atXdibm6LQXH9+/cuXzM5/t3VtAQcCxOKUA4n0iJgG1hg4BUEBERAQigEBQhJ698bBbgqA7AGABSMoEQWP5pwAkJh17VPkAdn+BwD0gcCZVp0u6XPMAYJwBBPlEAwZQwABMglQnQHIghgARQESEMkIRoYhQKhRAQbHgxM2K7pBAdwBoqK06n6Q3GA1k2IlJHarfcbz8FABAcPVqhk6XVFZTfgvG5GdO7d2bbyR/Ta9LCbUjVcAcAmpTFYxWhhMCCoUiAgFEySENdIMGugFAY23Vo5SUArL6I1tdUAU05ysrH5RXlVdV0EFw797Vk4n6pPv1FQ8ewLD0zGd78wsMRuwcdakh9hACkANICaByoJrkAACgiIiQy4GBQgmfDt/sjglJ1wE8qauu/IRuAKmcnpOToj7+CORfVV5VVVVFR8HVUo026VZ9NaTFq1cIAL0RFKAFBYSi99rEBIoASABiIDIaEgC4HyGXyxUIAYPgp/8fADRCAGD9s9B/Crn+QKCqGgGUg9P3r6RqkyobqssJgDN79+YZjUhAlxJiZ2NSAIyEqBwAnTAkgYgIBbpvIqCQH7xx59cuE+gygMa6qvspZPqBNQDyX0qK5tgjiH+4/hXVFdUQBg8e3L9/74tDSWt/rq8tLwc5nDlzam9eLoZADgAgfQBMRUkKhE6Q9A... (truncated, total 655207 chars)"
+  },
+  {
+    "url": "https://v3.stfc.pro/api/players?server=716&sortBy=rssmined&sortOrder=desc&page=1&pageCount=100&reRank=false",
+    "status": 200,
+    "method": "GET",
+    "content_type": "application/octet-stream",
+    "request_headers": {
+      "sec-ch-ua-full-version-list": "\"Not:A-Brand\";v=\"99.0.0.0\", \"Google Chrome\";v=\"145.0.7632.76\", \"Chromium\";v=\"145.0.7632.76\"",
+      "sec-ch-ua-platform": "\"Windows\"",
+      "referer": "https://v3.stfc.pro/resources-mined",
+      "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"Google Chrome\";v=\"145\", \"Chromium\";v=\"145\"",
+      "sec-ch-ua-bitness": "\"64\"",
+      "sec-ch-ua-model": "\"\"",
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-arch": "\"x86\"",
+      "sec-ch-ua-full-version": "\"145.0.7632.76\"",
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+      "sec-ch-ua-platform-version": "\"19.0.0\""
+    },
+    "body_preview": null
+  },
+  {
+    "url": "https://v3.stfc.pro/api/players?server=716&alliance=3974286889&sortBy=rssmined&sortOrder=desc&page=1&pageCount=100&reRank=false",
+    "status": 200,
+    "method": "GET",
+    "content_type": "application/octet-stream",
+    "request_headers": {
+      "sec-ch-ua-full-version-list": "\"Not:A-Brand\";v=\"99.0.0.0\", \"Google Chrome\";v=\"145.0.7632.76\", \"Chromium\";v=\"145.0.7632.76\"",
+      "sec-ch-ua-platform": "\"Windows\"",
+      "referer": "https://v3.stfc.pro/resources-mined?server=716",
+      "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"Google Chrome\";v=\"145\", \"Chromium\";v=\"145\"",
+      "sec-ch-ua-bitness": "\"64\"",
+      "sec-ch-ua-model": "\"\"",
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-arch": "\"x86\"",
+      "sec-ch-ua-full-version": "\"145.0.7632.76\"",
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+      "sec-ch-ua-platform-version": "\"19.0.0\""
+    },
+    "body_preview": null
+  },
+  {
+    "url": "https://v3.stfc.pro/hostiles-killed",
+    "status": 200,
+    "method": "GET",
+    "content_type": "text/html; charset=utf-8",
+    "request_headers": {
+      "upgrade-insecure-requests": "1",
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+      "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"Google Chrome\";v=\"145\", \"Chromium\";v=\"145\"",
+      "sec-ch-ua-arch": "\"x86\"",
+      "sec-ch-ua-bitness": "\"64\"",
+      "sec-ch-ua-full-version": "\"145.0.7632.76\"",
+      "sec-ch-ua-full-version-list": "\"Not:A-Brand\";v=\"99.0.0.0\", \"Google Chrome\";v=\"145.0.7632.76\", \"Chromium\";v=\"145.0.7632.76\"",
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-model": "\"\"",
+      "sec-ch-ua-platform": "\"Windows\"",
+      "sec-ch-ua-platform-version": "\"19.0.0\""
+    },
+    "body_preview": "<!DOCTYPE html><html lang=\"en\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" href=\"/_next/static/media/83afe278b6a6bb3c-s.p.3a6ba036.woff2\" as=\"font\" crossorigin=\"\" type=\"font/woff2\"/><link rel=\"preload\" as=\"image\" imageSrcSet=\"/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.a4946ac1.png&amp;w=128&amp;q=75 1x, /_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.a4946ac1.png&amp;w=256&amp;q=75 2x\"/><link rel=\"preload\" as=\"image\" imageSrcSet=\"/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.a4946ac1.png&amp;w=64&amp;q=75 1x, /_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.a4946ac1.png&amp;w=128&amp;q=75 2x\"/><link rel=\"stylesheet\" href=\"/_next/static/chunks/4e20891f2fd03463.css\" data-precedence=\"next\"/><link rel=\"stylesheet\" href=\"/_next/static/chunks/22e0edaa104d5c7f.css\" data-precedence=\"next\"/><link rel=\"preload\" as=\"script\" fetchPriority=\"low\" href=\"/_next/static/chunks/80ed0dc4929e0d86.js\"/><script src=\"/_next/static/chunks/d8b37e0d42d630b9.js\" async=\"\"></script><script src=\"/_next/static/chunks/393752ef7748ec37.js\" async=\"\"></script><script src=\"/_next/static/chunks/e5727f185310d6dd.js\" async=\"\"></script><script src=\"/_next/static/chunks/4a83b1debcb13975.js\" async=\"\"></script><script src=\"/_next/static/chunks/turbopack-73281b64af5d867b.js\" async=\"\"></script><script src=\"/_next/static/chunks/d96012bcfc98706a.js\" async=\"\"></script><script src=\"/_next/static/chunks/963c71eec1d89c3f.js\" async=\"\"></script><script src=\"/_next/static/chunks/8863225a429d7110.js\" async=\"\"></script><script src=\"/_next/static/chunks/0a47598f6b0eab23.js\" async=\"\"></script><script src=\"/_next/static/chunks/73df50d271549a1c.js\" async=\"\"></script><script src=\"/_next/static/chunks/fdeda5fad97fb41c.js\" async=\"\"></script><script src=\"/_next/static/chunks/eab1981242165f9c.js\" async=\"\"></script><script src=\"/_next/static/chunks/ab401bce1d3be013.js\" async=\"\"></script><script src=\"/_next/static/chunks/b9da2ce67040e903.js\" async=\"\"></script><script src=\"/_next/static/chunks/b2e14589d349771e.js\" async=\"\"></script><script src=\"/_next/static/chunks/2e4d6709987e68ec.js\" async=\"\"></script><script src=\"/_next/static/chunks/d68b1b441df066b5.js\" async=\"\"></script><script src=\"/_next/static/chunks/af7a29e60ea96a4b.js\" async=\"\"></script><script src=\"/_next/static/chunks/a586c44f50dcab6d.js\" async=\"\"></script><script src=\"/_next/static/chunks/bdab23d3355aad6e.js\" async=\"\"></script><script src=\"/_next/static/chunks/f329e1e5b5df214d.js\" async=\"\"></script><script src=\"/_next/static/chunks/0ab4be25e4bfd849.js\" async=\"\"></script><meta name=\"next-size-adjust\" content=\"\"/><title>STFC Statistics - Star Trek Fleet Command Player Rankings &amp; Stats</title><meta name=\"description\" content=\"The #1 website for all global, regional, and server-based statistics for Star Trek Fleet Command. Discover player rankings, alliance data, real-time incursions, and more!\"/><meta name=\"keywords\" content=\"Star Trek Fleet Command, STFC, statistics, player rankings, alliance data, gaming stats\"/><meta name=\"robots\" content=\"index, follow\"/><meta name=\"googlebot\" content=\"index, follow, max-video-preview:-1, max-image-preview:large, max-snippet:-1\"/><link rel=\"canonical\" href=\"https://stfc.pro\"/><meta property=\"og:title\" content=\"STFC Statistics\"/><meta property=\"og:description\" content=\"Track over 253.9K players across 117 servers in Star Trek Fleet Command\"/><meta property=\"og:type\" content=\"website\"/><meta name=\"twitter:card\" content=\"summary\"/><meta name=\"twitter:title\" content=\"STFC Statistics\"/><meta name=\"twitter:description\" content=\"Track over 253.9K players across 117 servers in Star Trek Fleet Command\"/><script src=\"/_next/static/chunks/a6dad97d9634a72d.js\" noModule=\"\"></script></head><body class=\"inter_5972bc34-module__OU16Qa__className antialiased\"><div hidden=\"\"><!--$--><!--/$--></div><div class=\"min-h-screen bg-gray-950 text-white\"><header class=\"fixed top-0 right-0 left-0 z-50 border-gray-700 border-b bg-gray-800/50 backdrop-blur-xs transition-all duration-300 xl:bg-gray-900/95 xl:shadow-lg xl:backdrop-blur-md\"><div class=\"w-full px-4\"><div class=\"hidden min-h-14 w-full items-center xl:flex\"><div class=\"flex shrink-0 items-center\"><a aria-label=\"Home\" class=\"relative flex items-center\" href=\"/\"><img alt=\"STFC Logo\" width=\"123\" height=\"80\" decoding=\"async\" data-nimg=\"1\" class=\"h-16 w-auto rounded-lg\" style=\"color:transparent\" srcSet=\"/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.a4946ac1.png&amp;w=128&amp;q=75 1x, /_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.a4946ac1.png&amp;w=256&amp;q=75 2x\" src=\"/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.a4946ac1.png&amp;w=256&amp;q=75\"/></a></div><div class=\"flex flex-1 justify-center\"><nav aria-label=\"Main\" data-orientation=\"horizontal\" dir=\"ltr\" class=\"group/navigation-menu relative flex max-w-max flex-1 items-center justify-center\" data-slot=\"navigation-menu\" data-viewport=\"false\"><div style=\"position:relative\"><ul data-orientation=\"hor... (truncated, total 83742 chars)"
+  },
+  {
+    "url": "https://v3.stfc.pro/api/players?sortBy=hdestroyed&sortOrder=desc&page=1&pageCount=100&reRank=false",
+    "status": 200,
+    "method": "GET",
+    "content_type": "application/octet-stream",
+    "request_headers": {
+      "sec-ch-ua-full-version-list": "\"Not:A-Brand\";v=\"99.0.0.0\", \"Google Chrome\";v=\"145.0.7632.76\", \"Chromium\";v=\"145.0.7632.76\"",
+      "sec-ch-ua-platform": "\"Windows\"",
+      "referer": "https://v3.stfc.pro/hostiles-killed",
+      "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"Google Chrome\";v=\"145\", \"Chromium\";v=\"145\"",
+      "sec-ch-ua-bitness": "\"64\"",
+      "sec-ch-ua-model": "\"\"",
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-arch": "\"x86\"",
+      "sec-ch-ua-full-version": "\"145.0.7632.76\"",
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+      "sec-ch-ua-platform-version": "\"19.0.0\""
+    },
+    "body_preview": null
+  },
+  {
+    "url": "https://v3.stfc.pro/api/changelog",
+    "status": 200,
+    "method": "GET",
+    "content_type": "application/json;charset=utf-8",
+    "request_headers": {
+      "sec-ch-ua-full-version-list": "\"Not:A-Brand\";v=\"99.0.0.0\", \"Google Chrome\";v=\"145.0.7632.76\", \"Chromium\";v=\"145.0.7632.76\"",
+      "sec-ch-ua-platform": "\"Windows\"",
+      "referer": "https://v3.stfc.pro/hostiles-killed",
+      "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"Google Chrome\";v=\"145\", \"Chromium\";v=\"145\"",
+      "sec-ch-ua-bitness": "\"64\"",
+      "sec-ch-ua-model": "\"\"",
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-arch": "\"x86\"",
+      "sec-ch-ua-full-version": "\"145.0.7632.76\"",
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+      "sec-ch-ua-platform-version": "\"19.0.0\""
+    },
+    "body_preview": "{\"count\":3,\"version\":\"v3.0.0\",\"content\":[{\"title\":\"Welcome to v3!\",\"date\":\"2025-12-31T00:00:00.000Z\",\"html\":\"<h3>New Account System</h3>\\n<ul>\\n<li>Login via Discord (more identity providers planned)</li>\\n<li>Profiles separated cleanly to reduce sync confusion</li>\\n<li>Clearer session state; fewer edge-case login issues</li>\\n<li>Foundations laid for an upcoming content-creator dashboard</li>\\n</ul>\\n<h3>Mobile Experience</h3>\\n<ul>\\n<li>Navigation rebuilt for small screens</li>\\n<li>Panels, drawers, and modals redesigned to avoid collisions</li>\\n<li>Reduced layout shift and improved load times on mobile networks</li>\\n</ul>\\n<h3>Player Pages</h3>\\n<ul>\\n<li>Dedicated stat pages for individual players</li>\\n<li>Cleaner URLs and faster lookups; no more modal-only views</li>\\n<li>Early groundwork for comparisons and historical tracking</li>\\n</ul>\\n<h3>Creator Partnerships</h3>\\n<ul>\\n<li>Collaboration with the <strong>STFC Officer Tool</strong> Discord</li>\\n<li>In-app visibility for their charts, crew builds, and reference guides</li>\\n<li>Shared effort to centralize resources instead of scattering them</li>\\n</ul>\\n<h3>Platform Rebuild</h3>\\n<ul>\\n<li>Full rewrite; underlying systems replaced instead of patched</li>\\n<li>Unified data layer between web, API, and future services</li>\\n<li>Stability, caching, and error-handling improved for upcoming features</li>\\n</ul>\\n\",\"slug\":\"v3-initial-update\",\"version\":\"v3.0.0\"},{\"title\":\"Septemberrr Updates!\",\"date\":\"2025-09-23T00:00:00.000Z\",\"html\":\"<p class=\\\"mb-4\\\">An update! Yes, again a long-overdue update with some rather small fixes in v1.6.0, however with the announcement that we're currently working hard behind the scenes to make v3 of <a href=\\\"http://stfc.pro\\\">stfc.pro</a> a reality!</p>\\n<h3>A summary of changes:</h3>\\n<hr />\\n<ul>\\n<li><strong>Re-vamped Alliance Lay-out</strong>\\nThe alliance details as well as the tournament alliance details had a different layout in comparison to the rest of the site. To keep things more universal, the layouts have been aligned.</li>\\n<li><strong>STFC Shop!</strong>\\nYes, you read it right! We have a shop where you'll be able to get all kinds of apparel that's made by the community! Go get your mug, t-shirt or mousepad to show your support for the site!</li>\\n</ul>\\n<hr />\\n<ul>\\n<li>lines!</li>\\n</ul>\\n<p class=\\\"mb-4\\\">I'd like to thank all contributors for supporting the site! I've created a special 'contributors' area on <strong>Discord</strong>, where I will discuss various new functions, give a chance for people to beta-test new functions as well as providing datasets (for example, event data). As a contributor, you can ask me for certain datasets!</p>\\n\",\"slug\":\"sept-updates-2025\",\"version\":\"v1.6.0\"},{\"title\":\"June Updates!\",\"date\":\"2025-09-23T00:00:00.000Z\",\"html\":\"<p class=\\\"mb-4\\\">Apologies for the long overdue update report! Many changes have been implemented over the past few months and lots of preparations have been made on the backend to ensure a smooth and stable website. Below is just a small grasp of changes that happened in the past months.</p>\\n<h3>A summary of changes:</h3>\\n<ul>\\n<li><strong>Re-vamped Alliance Lay-out</strong>\\nThe alliance details as well as the tournament alliance details had a different layout in comparison to the rest of the site. To keep things more universal, the layouts have been aligned.</li>\\n<li><strong>New Alliance Metrics</strong>\\nTwo new Alliance metrics have been added: RSS Contribution and ISO contribution. Note that RSS contribution is linked to the current level of the alliance and gets reset after increasing the alliance level.</li>\\n<li><strong>More CC icons!</strong>\\nEven more CCs have applied through Discord and have been added! You can search for \\\"cc:\\\" to get a list of all known content creators.</li>\\n<li><strong>STFC Shop!</strong>\\nYes, you read it right! We have a shop where you'll be able to get all kinds of apparel that's made by the community! Go get your mug, t-shirt or mousepad to show your support for the site!</li>\\n<li><strong>Historical data</strong>\\nAlthough not yet active on the website itself, historical data is now available for players and alliances! If you want to know your progress since 1-1-2025, it is now possible! We're working on getting data available on-site but you can always ask me in the #contributors channel in Discord.</li>\\n</ul>\\n<p class=\\\"mb-4\\\">I'd like to thank all contributors for supporting the site! I've created a special 'contributors' area on <strong>Discord</strong>, where I will discuss various new functions, give a chance for people to beta-test new functions as well as providing datasets (for example, event data). As a contributor, you can ask me for certain datasets!</p>\\n\",\"slug\":\"june-updates-2025\",\"version\":\"1.5.0\"}]}"
+  },
+  {
+    "url": "https://v3.stfc.pro/api/events",
+    "status": 200,
+    "method": "GET",
+    "content_type": "application/json;charset=utf-8",
+    "request_headers": {
+      "sec-ch-ua-full-version-list": "\"Not:A-Brand\";v=\"99.0.0.0\", \"Google Chrome\";v=\"145.0.7632.76\", \"Chromium\";v=\"145.0.7632.76\"",
+      "sec-ch-ua-platform": "\"Windows\"",
+      "referer": "https://v3.stfc.pro/hostiles-killed",
+      "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"Google Chrome\";v=\"145\", \"Chromium\";v=\"145\"",
+      "sec-ch-ua-bitness": "\"64\"",
+      "sec-ch-ua-model": "\"\"",
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-arch": "\"x86\"",
+      "sec-ch-ua-full-version": "\"145.0.7632.76\"",
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+      "sec-ch-ua-platform-version": "\"19.0.0\""
+    },
+    "body_preview": "[{\"event_group\":\"alliance_tournaments\",\"event_start\":\"2026-02-18T17:00:00Z\",\"event_end\":\"2026-02-23T17:00:00Z\",\"active\":1},{\"event_group\":\"incursions\",\"event_start\":\"2026-01-31T16:00:00Z\",\"event_end\":\"2026-02-01T16:00:00Z\",\"active\":0},{\"event_group\":\"sarris_invasions\",\"event_start\":\"2025-09-29T18:00:00Z\",\"event_end\":\"2025-10-02T18:00:00Z\",\"active\":0},{\"event_group\":\"flashpoint\",\"event_start\":\"2025-08-28T18:00:00Z\",\"event_end\":\"2025-09-01T18:00:00Z\",\"active\":0}]"
+  },
+  {
+    "url": "https://v3.stfc.pro/api/auth/get-session",
+    "status": 200,
+    "method": "GET",
+    "content_type": "application/json",
+    "request_headers": {
+      "sec-ch-ua-full-version-list": "\"Not:A-Brand\";v=\"99.0.0.0\", \"Google Chrome\";v=\"145.0.7632.76\", \"Chromium\";v=\"145.0.7632.76\"",
+      "sec-ch-ua-platform": "\"Windows\"",
+      "referer": "https://v3.stfc.pro/hostiles-killed",
+      "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"Google Chrome\";v=\"145\", \"Chromium\";v=\"145\"",
+      "sec-ch-ua-bitness": "\"64\"",
+      "sec-ch-ua-model": "\"\"",
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-arch": "\"x86\"",
+      "sec-ch-ua-full-version": "\"145.0.7632.76\"",
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+      "sec-ch-ua-platform-version": "\"19.0.0\""
+    },
+    "body_preview": "{\"session\":{\"expiresAt\":\"2026-02-27T16:00:02.792Z\",\"token\":\"NmYkoOPf3DJiCvRMnQtUZNN0DYjtS2Yq\",\"createdAt\":\"2026-02-15T13:00:14.705Z\",\"updatedAt\":\"2026-02-20T16:00:02.792Z\",\"ipAddress\":\"2600:4040:5a36:bd00:41b9:bf5a:a68b:9c86\",\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36\",\"userId\":\"MCZASkZOgy4rCBCZsdChVGVhO38rMfq0\",\"id\":\"qtDVlf2wI2KAbkLItJFyeDeSQucSjzsJ\"},\"user\":{\"name\":\"Drew\",\"email\":\"drew.adorno@gmail.com\",\"emailVerified\":true,\"image\":\"https://cdn.discordapp.com/avatars/261308431879766027/d165f63452c671142e232ea696fb65d0.png\",\"createdAt\":\"2026-02-07T12:58:02.756Z\",\"updatedAt\":\"2026-02-07T12:58:02.756Z\",\"role\":\"user\",\"id\":\"MCZASkZOgy4rCBCZsdChVGVhO38rMfq0\"}}"
+  },
+  {
+    "url": "https://v3.stfc.pro/api/suffixes",
+    "status": 200,
+    "method": "GET",
+    "content_type": "application/json;charset=utf-8",
+    "request_headers": {
+      "sec-ch-ua-full-version-list": "\"Not:A-Brand\";v=\"99.0.0.0\", \"Google Chrome\";v=\"145.0.7632.76\", \"Chromium\";v=\"145.0.7632.76\"",
+      "sec-ch-ua-platform": "\"Windows\"",
+      "referer": "https://v3.stfc.pro/hostiles-killed",
+      "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"Google Chrome\";v=\"145\", \"Chromium\";v=\"145\"",
+      "sec-ch-ua-bitness": "\"64\"",
+      "sec-ch-ua-model": "\"\"",
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-arch": "\"x86\"",
+      "sec-ch-ua-full-version": "\"145.0.7632.76\"",
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+      "sec-ch-ua-platform-version": "\"19.0.0\""
+    },
+    "body_preview": "[{\"id\":54,\"key\":\"bluemando\",\"text\":\"bluemandalorian\",\"pngBlob\":\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAMAAABrrFhUAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAMAUExURRoQDgEBAQEFGQQSHDIYDCQLBScUCyUZFTMdFC0hGDgkGRUdMwEFKAMXKgIDNwMaNigdIwIhLQQjORclOjEvMjoqJEEoGks4MkMsJUozLFY8M1pCN2RHPBIdTgIHSQEbSAELVAIWWBEtUgUnSBUqSBg0SgMoWAY1Whg3WCk2TgAbcgIcZRQvYwMoaAM5aRY6ZgEsdAI5dhM7dyM8ZBFCWy5EWARFaxhFaQNFdxdIdwdTexpWezBObyZJaChWeThXeDVjd1NOUmxWTmlMQnpmXElZcFlZaGNcalVkdXFtdGhpd4lqXZB0bZd2aaJ+c5mCerSOfKqHeQMuhwI1hBRLlwNLhhdKhARViRdXiAJOkwNXmBdali1ajiZZhxNkjQRjmxhlmjNrkChnlwldrQJbpiFeoBVuswNmqRdopgNzrRl0qgJotgR0uhd1uDFsqihppyZ2qDd2qSh4tzZ6uEVeg0xvjlhrh1l2lWNtlGVrhWl1iXZ4imh6lXZ8lUl5rAJuwQJ3xxV8xAJ+0Sl8w4N8gD6AmQeIuxmEuzKOtSeGuTqFulKFmW+GlHiFmFGQs0iIuW+Pq1ejum+ouBORzwOFyhiIyAKI2QOV2xiY2DKJyyeJxymWyziXySeY1jaa1hSn2zSv1iam2Tin2AOM4QOa6Beb4wOe8Sub4hGw7wKj7Bel6AOo8wKy9zG07yen6Dao50yRy0eWyFiYx0ea1WabyE+s1VmoyEeo2Vi12G2rz2a413i32UWd4U+x7keo5Ui35la55Va69W287DbE81bB2mvE2nfG2lHJ8VjH6HPV82nI53fJ5njV6WnE+HjI+Fro+nTm+Y2JjYSHl7CTjLqZiLmjl4mYrJWotaqtscKdjMOkk8eyppC0zoW426y5x4u85I/I2q/H1ZbR8YfG6JjI54fX54fK9ojW95nX+anQ6bfX66bb+bbc9I7p9pjl+rLm7ark+rjn+qv1/Lj6/cjR2Mfc6cnj69jl68Xq+dfr9sn3/Nn4++Tt8Ob6+vr9/AAAAItg0G0AAAEAdFJOU////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////wBT9wclAAAACXBIWXMAAA7CAAAOwgEVKEqAAAAAGXRFWHRTb2Z0d2FyZQBQYWludC5ORVQgNS4xLjExiggWzgAAALhlWElmSUkqAAgAAAAFABoBBQABAAAASgAAABsBBQABAAAAUgAAACgBAwABAAAAAgAAADEBAgARAAAAWgAAAGmHBAABAAAAbAAAAAAAAADydgEA6AMAAPJ2AQDoAwAAUGFpbnQuTkVUIDUuMS4xMQAAAwAAkAcABAAAADAyMzABoAMAAQAAAAEAAAAFoAQAAQAAAJYAAAAAAAAAAgABAAIABAAAAFI5OAACAAcABAAAADAxMDAAAAAAXO1h+gnoqrsAAE0TSURBVHhe7Z0JWFNn9v9NbK2jASouXWWLJigkkKAhBHFrtdZ2plM1BIIQBCRBghuKdSVgxaoVF0KiAgISkIAbbhU3qlWLik5rZ+y0U2vrbkEK0oVFyv855703CREoq/N/nvmdIFrUyvnc71ne8773plfT/7j1sv7C/5r9HwDrL/yv2f8BsP7C/5r9HwDrL/yv2X8HwJO6uroGfNXXgTU2Wv+JZ2b/FQB1tbW1FRXV5eXl5Q/hU0VFRXVtXZ31H3sm9t8A8Ft1xYNbt27du3Xv3r17t+/dhp9u3bpT96v1H3wW9l8A8Hv1nVv37l29evUKZWevnD179faJH3/8bxB4xgCe/F5XW1txG9w+c+bMKcrOnDlz5njxnR9//vW3355Y/5UetmcI4Pe6utq66oqHVQ/OnjlzendGxjadTqdN1GlTMjJ2nzx1/LvN3915WF1b+2vd79Z/tQftWQFohCv/8NatO/fuPXj0SZpOp9fl5OTocvQ5upwcnS5Ru+PI4SXFN2/evH3n4cOK2rq6Z6WEZwKgrq6utqL8Fkb+lSuflqbo9Hp9jj4nBz7pc3Jy9Hpd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... (truncated, total 655207 chars)"
+  },
+  {
+    "url": "https://v3.stfc.pro/api/players?server=716&sortBy=hdestroyed&sortOrder=desc&page=1&pageCount=100&reRank=false",
+    "status": 200,
+    "method": "GET",
+    "content_type": "application/octet-stream",
+    "request_headers": {
+      "sec-ch-ua-full-version-list": "\"Not:A-Brand\";v=\"99.0.0.0\", \"Google Chrome\";v=\"145.0.7632.76\", \"Chromium\";v=\"145.0.7632.76\"",
+      "sec-ch-ua-platform": "\"Windows\"",
+      "referer": "https://v3.stfc.pro/hostiles-killed",
+      "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"Google Chrome\";v=\"145\", \"Chromium\";v=\"145\"",
+      "sec-ch-ua-bitness": "\"64\"",
+      "sec-ch-ua-model": "\"\"",
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-arch": "\"x86\"",
+      "sec-ch-ua-full-version": "\"145.0.7632.76\"",
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+      "sec-ch-ua-platform-version": "\"19.0.0\""
+    },
+    "body_preview": null
+  },
+  {
+    "url": "https://v3.stfc.pro/api/players?server=716&alliance=3974286889&sortBy=hdestroyed&sortOrder=desc&page=1&pageCount=100&reRank=false",
+    "status": 200,
+    "method": "GET",
+    "content_type": "application/octet-stream",
+    "request_headers": {
+      "sec-ch-ua-full-version-list": "\"Not:A-Brand\";v=\"99.0.0.0\", \"Google Chrome\";v=\"145.0.7632.76\", \"Chromium\";v=\"145.0.7632.76\"",
+      "sec-ch-ua-platform": "\"Windows\"",
+      "referer": "https://v3.stfc.pro/hostiles-killed?server=716",
+      "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"Google Chrome\";v=\"145\", \"Chromium\";v=\"145\"",
+      "sec-ch-ua-bitness": "\"64\"",
+      "sec-ch-ua-model": "\"\"",
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-arch": "\"x86\"",
+      "sec-ch-ua-full-version": "\"145.0.7632.76\"",
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+      "sec-ch-ua-platform-version": "\"19.0.0\""
+    },
+    "body_preview": null
+  },
+  {
+    "url": "https://v3.stfc.pro/resources-raided",
+    "status": 200,
+    "method": "GET",
+    "content_type": "text/html; charset=utf-8",
+    "request_headers": {
+      "upgrade-insecure-requests": "1",
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+      "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"Google Chrome\";v=\"145\", \"Chromium\";v=\"145\"",
+      "sec-ch-ua-arch": "\"x86\"",
+      "sec-ch-ua-bitness": "\"64\"",
+      "sec-ch-ua-full-version": "\"145.0.7632.76\"",
+      "sec-ch-ua-full-version-list": "\"Not:A-Brand\";v=\"99.0.0.0\", \"Google Chrome\";v=\"145.0.7632.76\", \"Chromium\";v=\"145.0.7632.76\"",
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-model": "\"\"",
+      "sec-ch-ua-platform": "\"Windows\"",
+      "sec-ch-ua-platform-version": "\"19.0.0\""
+    },
+    "body_preview": "<!DOCTYPE html><html lang=\"en\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" href=\"/_next/static/media/83afe278b6a6bb3c-s.p.3a6ba036.woff2\" as=\"font\" crossorigin=\"\" type=\"font/woff2\"/><link rel=\"preload\" as=\"image\" imageSrcSet=\"/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.a4946ac1.png&amp;w=128&amp;q=75 1x, /_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.a4946ac1.png&amp;w=256&amp;q=75 2x\"/><link rel=\"preload\" as=\"image\" imageSrcSet=\"/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.a4946ac1.png&amp;w=64&amp;q=75 1x, /_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.a4946ac1.png&amp;w=128&amp;q=75 2x\"/><link rel=\"stylesheet\" href=\"/_next/static/chunks/4e20891f2fd03463.css\" data-precedence=\"next\"/><link rel=\"stylesheet\" href=\"/_next/static/chunks/22e0edaa104d5c7f.css\" data-precedence=\"next\"/><link rel=\"preload\" as=\"script\" fetchPriority=\"low\" href=\"/_next/static/chunks/80ed0dc4929e0d86.js\"/><script src=\"/_next/static/chunks/d8b37e0d42d630b9.js\" async=\"\"></script><script src=\"/_next/static/chunks/393752ef7748ec37.js\" async=\"\"></script><script src=\"/_next/static/chunks/e5727f185310d6dd.js\" async=\"\"></script><script src=\"/_next/static/chunks/4a83b1debcb13975.js\" async=\"\"></script><script src=\"/_next/static/chunks/turbopack-73281b64af5d867b.js\" async=\"\"></script><script src=\"/_next/static/chunks/d96012bcfc98706a.js\" async=\"\"></script><script src=\"/_next/static/chunks/963c71eec1d89c3f.js\" async=\"\"></script><script src=\"/_next/static/chunks/8863225a429d7110.js\" async=\"\"></script><script src=\"/_next/static/chunks/0a47598f6b0eab23.js\" async=\"\"></script><script src=\"/_next/static/chunks/73df50d271549a1c.js\" async=\"\"></script><script src=\"/_next/static/chunks/fdeda5fad97fb41c.js\" async=\"\"></script><script src=\"/_next/static/chunks/eab1981242165f9c.js\" async=\"\"></script><script src=\"/_next/static/chunks/ab401bce1d3be013.js\" async=\"\"></script><script src=\"/_next/static/chunks/b9da2ce67040e903.js\" async=\"\"></script><script src=\"/_next/static/chunks/b2e14589d349771e.js\" async=\"\"></script><script src=\"/_next/static/chunks/2e4d6709987e68ec.js\" async=\"\"></script><script src=\"/_next/static/chunks/d68b1b441df066b5.js\" async=\"\"></script><script src=\"/_next/static/chunks/af7a29e60ea96a4b.js\" async=\"\"></script><script src=\"/_next/static/chunks/a586c44f50dcab6d.js\" async=\"\"></script><script src=\"/_next/static/chunks/bdab23d3355aad6e.js\" async=\"\"></script><script src=\"/_next/static/chunks/f329e1e5b5df214d.js\" async=\"\"></script><script src=\"/_next/static/chunks/0ab4be25e4bfd849.js\" async=\"\"></script><meta name=\"next-size-adjust\" content=\"\"/><title>STFC Statistics - Star Trek Fleet Command Player Rankings &amp; Stats</title><meta name=\"description\" content=\"The #1 website for all global, regional, and server-based statistics for Star Trek Fleet Command. Discover player rankings, alliance data, real-time incursions, and more!\"/><meta name=\"keywords\" content=\"Star Trek Fleet Command, STFC, statistics, player rankings, alliance data, gaming stats\"/><meta name=\"robots\" content=\"index, follow\"/><meta name=\"googlebot\" content=\"index, follow, max-video-preview:-1, max-image-preview:large, max-snippet:-1\"/><link rel=\"canonical\" href=\"https://stfc.pro\"/><meta property=\"og:title\" content=\"STFC Statistics\"/><meta property=\"og:description\" content=\"Track over 253.9K players across 117 servers in Star Trek Fleet Command\"/><meta property=\"og:type\" content=\"website\"/><meta name=\"twitter:card\" content=\"summary\"/><meta name=\"twitter:title\" content=\"STFC Statistics\"/><meta name=\"twitter:description\" content=\"Track over 253.9K players across 117 servers in Star Trek Fleet Command\"/><script src=\"/_next/static/chunks/a6dad97d9634a72d.js\" noModule=\"\"></script></head><body class=\"inter_5972bc34-module__OU16Qa__className antialiased\"><div hidden=\"\"><!--$--><!--/$--></div><div class=\"min-h-screen bg-gray-950 text-white\"><header class=\"fixed top-0 right-0 left-0 z-50 border-gray-700 border-b bg-gray-800/50 backdrop-blur-xs transition-all duration-300 xl:bg-gray-900/95 xl:shadow-lg xl:backdrop-blur-md\"><div class=\"w-full px-4\"><div class=\"hidden min-h-14 w-full items-center xl:flex\"><div class=\"flex shrink-0 items-center\"><a aria-label=\"Home\" class=\"relative flex items-center\" href=\"/\"><img alt=\"STFC Logo\" width=\"123\" height=\"80\" decoding=\"async\" data-nimg=\"1\" class=\"h-16 w-auto rounded-lg\" style=\"color:transparent\" srcSet=\"/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.a4946ac1.png&amp;w=128&amp;q=75 1x, /_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.a4946ac1.png&amp;w=256&amp;q=75 2x\" src=\"/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.a4946ac1.png&amp;w=256&amp;q=75\"/></a></div><div class=\"flex flex-1 justify-center\"><nav aria-label=\"Main\" data-orientation=\"horizontal\" dir=\"ltr\" class=\"group/navigation-menu relative flex max-w-max flex-1 items-center justify-center\" data-slot=\"navigation-menu\" data-viewport=\"false\"><div style=\"position:relative\"><ul data-orientation=\"hor... (truncated, total 83674 chars)"
+  },
+  {
+    "url": "https://v3.stfc.pro/api/players?sortBy=rss&sortOrder=desc&page=1&pageCount=100&reRank=false",
+    "status": 200,
+    "method": "GET",
+    "content_type": "application/octet-stream",
+    "request_headers": {
+      "sec-ch-ua-full-version-list": "\"Not:A-Brand\";v=\"99.0.0.0\", \"Google Chrome\";v=\"145.0.7632.76\", \"Chromium\";v=\"145.0.7632.76\"",
+      "sec-ch-ua-platform": "\"Windows\"",
+      "referer": "https://v3.stfc.pro/resources-raided",
+      "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"Google Chrome\";v=\"145\", \"Chromium\";v=\"145\"",
+      "sec-ch-ua-bitness": "\"64\"",
+      "sec-ch-ua-model": "\"\"",
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-arch": "\"x86\"",
+      "sec-ch-ua-full-version": "\"145.0.7632.76\"",
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+      "sec-ch-ua-platform-version": "\"19.0.0\""
+    },
+    "body_preview": null
+  },
+  {
+    "url": "https://v3.stfc.pro/api/changelog",
+    "status": 200,
+    "method": "GET",
+    "content_type": "application/json;charset=utf-8",
+    "request_headers": {
+      "sec-ch-ua-full-version-list": "\"Not:A-Brand\";v=\"99.0.0.0\", \"Google Chrome\";v=\"145.0.7632.76\", \"Chromium\";v=\"145.0.7632.76\"",
+      "sec-ch-ua-platform": "\"Windows\"",
+      "referer": "https://v3.stfc.pro/resources-raided",
+      "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"Google Chrome\";v=\"145\", \"Chromium\";v=\"145\"",
+      "sec-ch-ua-bitness": "\"64\"",
+      "sec-ch-ua-model": "\"\"",
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-arch": "\"x86\"",
+      "sec-ch-ua-full-version": "\"145.0.7632.76\"",
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+      "sec-ch-ua-platform-version": "\"19.0.0\""
+    },
+    "body_preview": "{\"count\":3,\"version\":\"v3.0.0\",\"content\":[{\"title\":\"Welcome to v3!\",\"date\":\"2025-12-31T00:00:00.000Z\",\"html\":\"<h3>New Account System</h3>\\n<ul>\\n<li>Login via Discord (more identity providers planned)</li>\\n<li>Profiles separated cleanly to reduce sync confusion</li>\\n<li>Clearer session state; fewer edge-case login issues</li>\\n<li>Foundations laid for an upcoming content-creator dashboard</li>\\n</ul>\\n<h3>Mobile Experience</h3>\\n<ul>\\n<li>Navigation rebuilt for small screens</li>\\n<li>Panels, drawers, and modals redesigned to avoid collisions</li>\\n<li>Reduced layout shift and improved load times on mobile networks</li>\\n</ul>\\n<h3>Player Pages</h3>\\n<ul>\\n<li>Dedicated stat pages for individual players</li>\\n<li>Cleaner URLs and faster lookups; no more modal-only views</li>\\n<li>Early groundwork for comparisons and historical tracking</li>\\n</ul>\\n<h3>Creator Partnerships</h3>\\n<ul>\\n<li>Collaboration with the <strong>STFC Officer Tool</strong> Discord</li>\\n<li>In-app visibility for their charts, crew builds, and reference guides</li>\\n<li>Shared effort to centralize resources instead of scattering them</li>\\n</ul>\\n<h3>Platform Rebuild</h3>\\n<ul>\\n<li>Full rewrite; underlying systems replaced instead of patched</li>\\n<li>Unified data layer between web, API, and future services</li>\\n<li>Stability, caching, and error-handling improved for upcoming features</li>\\n</ul>\\n\",\"slug\":\"v3-initial-update\",\"version\":\"v3.0.0\"},{\"title\":\"Septemberrr Updates!\",\"date\":\"2025-09-23T00:00:00.000Z\",\"html\":\"<p class=\\\"mb-4\\\">An update! Yes, again a long-overdue update with some rather small fixes in v1.6.0, however with the announcement that we're currently working hard behind the scenes to make v3 of <a href=\\\"http://stfc.pro\\\">stfc.pro</a> a reality!</p>\\n<h3>A summary of changes:</h3>\\n<hr />\\n<ul>\\n<li><strong>Re-vamped Alliance Lay-out</strong>\\nThe alliance details as well as the tournament alliance details had a different layout in comparison to the rest of the site. To keep things more universal, the layouts have been aligned.</li>\\n<li><strong>STFC Shop!</strong>\\nYes, you read it right! We have a shop where you'll be able to get all kinds of apparel that's made by the community! Go get your mug, t-shirt or mousepad to show your support for the site!</li>\\n</ul>\\n<hr />\\n<ul>\\n<li>lines!</li>\\n</ul>\\n<p class=\\\"mb-4\\\">I'd like to thank all contributors for supporting the site! I've created a special 'contributors' area on <strong>Discord</strong>, where I will discuss various new functions, give a chance for people to beta-test new functions as well as providing datasets (for example, event data). As a contributor, you can ask me for certain datasets!</p>\\n\",\"slug\":\"sept-updates-2025\",\"version\":\"v1.6.0\"},{\"title\":\"June Updates!\",\"date\":\"2025-09-23T00:00:00.000Z\",\"html\":\"<p class=\\\"mb-4\\\">Apologies for the long overdue update report! Many changes have been implemented over the past few months and lots of preparations have been made on the backend to ensure a smooth and stable website. Below is just a small grasp of changes that happened in the past months.</p>\\n<h3>A summary of changes:</h3>\\n<ul>\\n<li><strong>Re-vamped Alliance Lay-out</strong>\\nThe alliance details as well as the tournament alliance details had a different layout in comparison to the rest of the site. To keep things more universal, the layouts have been aligned.</li>\\n<li><strong>New Alliance Metrics</strong>\\nTwo new Alliance metrics have been added: RSS Contribution and ISO contribution. Note that RSS contribution is linked to the current level of the alliance and gets reset after increasing the alliance level.</li>\\n<li><strong>More CC icons!</strong>\\nEven more CCs have applied through Discord and have been added! You can search for \\\"cc:\\\" to get a list of all known content creators.</li>\\n<li><strong>STFC Shop!</strong>\\nYes, you read it right! We have a shop where you'll be able to get all kinds of apparel that's made by the community! Go get your mug, t-shirt or mousepad to show your support for the site!</li>\\n<li><strong>Historical data</strong>\\nAlthough not yet active on the website itself, historical data is now available for players and alliances! If you want to know your progress since 1-1-2025, it is now possible! We're working on getting data available on-site but you can always ask me in the #contributors channel in Discord.</li>\\n</ul>\\n<p class=\\\"mb-4\\\">I'd like to thank all contributors for supporting the site! I've created a special 'contributors' area on <strong>Discord</strong>, where I will discuss various new functions, give a chance for people to beta-test new functions as well as providing datasets (for example, event data). As a contributor, you can ask me for certain datasets!</p>\\n\",\"slug\":\"june-updates-2025\",\"version\":\"1.5.0\"}]}"
+  },
+  {
+    "url": "https://v3.stfc.pro/api/auth/get-session",
+    "status": 200,
+    "method": "GET",
+    "content_type": "application/json",
+    "request_headers": {
+      "sec-ch-ua-full-version-list": "\"Not:A-Brand\";v=\"99.0.0.0\", \"Google Chrome\";v=\"145.0.7632.76\", \"Chromium\";v=\"145.0.7632.76\"",
+      "sec-ch-ua-platform": "\"Windows\"",
+      "referer": "https://v3.stfc.pro/resources-raided",
+      "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"Google Chrome\";v=\"145\", \"Chromium\";v=\"145\"",
+      "sec-ch-ua-bitness": "\"64\"",
+      "sec-ch-ua-model": "\"\"",
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-arch": "\"x86\"",
+      "sec-ch-ua-full-version": "\"145.0.7632.76\"",
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+      "sec-ch-ua-platform-version": "\"19.0.0\""
+    },
+    "body_preview": "{\"session\":{\"expiresAt\":\"2026-02-27T16:00:02.792Z\",\"token\":\"NmYkoOPf3DJiCvRMnQtUZNN0DYjtS2Yq\",\"createdAt\":\"2026-02-15T13:00:14.705Z\",\"updatedAt\":\"2026-02-20T16:00:02.792Z\",\"ipAddress\":\"2600:4040:5a36:bd00:41b9:bf5a:a68b:9c86\",\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36\",\"userId\":\"MCZASkZOgy4rCBCZsdChVGVhO38rMfq0\",\"id\":\"qtDVlf2wI2KAbkLItJFyeDeSQucSjzsJ\"},\"user\":{\"name\":\"Drew\",\"email\":\"drew.adorno@gmail.com\",\"emailVerified\":true,\"image\":\"https://cdn.discordapp.com/avatars/261308431879766027/d165f63452c671142e232ea696fb65d0.png\",\"createdAt\":\"2026-02-07T12:58:02.756Z\",\"updatedAt\":\"2026-02-07T12:58:02.756Z\",\"role\":\"user\",\"id\":\"MCZASkZOgy4rCBCZsdChVGVhO38rMfq0\"}}"
+  },
+  {
+    "url": "https://v3.stfc.pro/api/events",
+    "status": 200,
+    "method": "GET",
+    "content_type": "application/json;charset=utf-8",
+    "request_headers": {
+      "sec-ch-ua-full-version-list": "\"Not:A-Brand\";v=\"99.0.0.0\", \"Google Chrome\";v=\"145.0.7632.76\", \"Chromium\";v=\"145.0.7632.76\"",
+      "sec-ch-ua-platform": "\"Windows\"",
+      "referer": "https://v3.stfc.pro/resources-raided",
+      "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"Google Chrome\";v=\"145\", \"Chromium\";v=\"145\"",
+      "sec-ch-ua-bitness": "\"64\"",
+      "sec-ch-ua-model": "\"\"",
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-arch": "\"x86\"",
+      "sec-ch-ua-full-version": "\"145.0.7632.76\"",
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+      "sec-ch-ua-platform-version": "\"19.0.0\""
+    },
+    "body_preview": "[{\"event_group\":\"alliance_tournaments\",\"event_start\":\"2026-02-18T17:00:00Z\",\"event_end\":\"2026-02-23T17:00:00Z\",\"active\":1},{\"event_group\":\"incursions\",\"event_start\":\"2026-01-31T16:00:00Z\",\"event_end\":\"2026-02-01T16:00:00Z\",\"active\":0},{\"event_group\":\"sarris_invasions\",\"event_start\":\"2025-09-29T18:00:00Z\",\"event_end\":\"2025-10-02T18:00:00Z\",\"active\":0},{\"event_group\":\"flashpoint\",\"event_start\":\"2025-08-28T18:00:00Z\",\"event_end\":\"2025-09-01T18:00:00Z\",\"active\":0}]"
+  },
+  {
+    "url": "https://v3.stfc.pro/api/suffixes",
+    "status": 200,
+    "method": "GET",
+    "content_type": "application/json;charset=utf-8",
+    "request_headers": {
+      "sec-ch-ua-full-version-list": "\"Not:A-Brand\";v=\"99.0.0.0\", \"Google Chrome\";v=\"145.0.7632.76\", \"Chromium\";v=\"145.0.7632.76\"",
+      "sec-ch-ua-platform": "\"Windows\"",
+      "referer": "https://v3.stfc.pro/resources-raided",
+      "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"Google Chrome\";v=\"145\", \"Chromium\";v=\"145\"",
+      "sec-ch-ua-bitness": "\"64\"",
+      "sec-ch-ua-model": "\"\"",
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-arch": "\"x86\"",
+      "sec-ch-ua-full-version": "\"145.0.7632.76\"",
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+      "sec-ch-ua-platform-version": "\"19.0.0\""
+    },
+    "body_preview": "[{\"id\":54,\"key\":\"bluemando\",\"text\":\"bluemandalorian\",\"pngBlob\":\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAMAAABrrFhUAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAMAUExURRoQDgEBAQEFGQQSHDIYDCQLBScUCyUZFTMdFC0hGDgkGRUdMwEFKAMXKgIDNwMaNigdIwIhLQQjORclOjEvMjoqJEEoGks4MkMsJUozLFY8M1pCN2RHPBIdTgIHSQEbSAELVAIWWBEtUgUnSBUqSBg0SgMoWAY1Whg3WCk2TgAbcgIcZRQvYwMoaAM5aRY6ZgEsdAI5dhM7dyM8ZBFCWy5EWARFaxhFaQNFdxdIdwdTexpWezBObyZJaChWeThXeDVjd1NOUmxWTmlMQnpmXElZcFlZaGNcalVkdXFtdGhpd4lqXZB0bZd2aaJ+c5mCerSOfKqHeQMuhwI1hBRLlwNLhhdKhARViRdXiAJOkwNXmBdali1ajiZZhxNkjQRjmxhlmjNrkChnlwldrQJbpiFeoBVuswNmqRdopgNzrRl0qgJotgR0uhd1uDFsqihppyZ2qDd2qSh4tzZ6uEVeg0xvjlhrh1l2lWNtlGVrhWl1iXZ4imh6lXZ8lUl5rAJuwQJ3xxV8xAJ+0Sl8w4N8gD6AmQeIuxmEuzKOtSeGuTqFulKFmW+GlHiFmFGQs0iIuW+Pq1ejum+ouBORzwOFyhiIyAKI2QOV2xiY2DKJyyeJxymWyziXySeY1jaa1hSn2zSv1iam2Tin2AOM4QOa6Beb4wOe8Sub4hGw7wKj7Bel6AOo8wKy9zG07yen6Dao50yRy0eWyFiYx0ea1WabyE+s1VmoyEeo2Vi12G2rz2a413i32UWd4U+x7keo5Ui35la55Va69W287DbE81bB2mvE2nfG2lHJ8VjH6HPV82nI53fJ5njV6WnE+HjI+Fro+nTm+Y2JjYSHl7CTjLqZiLmjl4mYrJWotaqtscKdjMOkk8eyppC0zoW426y5x4u85I/I2q/H1ZbR8YfG6JjI54fX54fK9ojW95nX+anQ6bfX66bb+bbc9I7p9pjl+rLm7ark+rjn+qv1/Lj6/cjR2Mfc6cnj69jl68Xq+dfr9sn3/Nn4++Tt8Ob6+vr9/AAAAItg0G0AAAEAdFJOU////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////wBT9wclAAAACXBIWXMAAA7CAAAOwgEVKEqAAAAAGXRFWHRTb2Z0d2FyZQBQYWludC5ORVQgNS4xLjExiggWzgAAALhlWElmSUkqAAgAAAAFABoBBQABAAAASgAAABsBBQABAAAAUgAAACgBAwABAAAAAgAAADEBAgARAAAAWgAAAGmHBAABAAAAbAAAAAAAAADydgEA6AMAAPJ2AQDoAwAAUGFpbnQuTkVUIDUuMS4xMQAAAwAAkAcABAAAADAyMzABoAMAAQAAAAEAAAAFoAQAAQAAAJYAAAAAAAAAAgABAAIABAAAAFI5OAACAAcABAAAADAxMDAAAAAAXO1h+gnoqrsAAE0TSURBVHhe7Z0JWFNn9v9NbK2jASouXWWLJigkkKAhBHFrtdZ2plM1BIIQBCRBghuKdSVgxaoVF0KiAgISkIAbbhU3qlWLik5rZ+y0U2vrbkEK0oVFyv855703CREoq/N/nvmdIFrUyvnc71ne8773plfT/7j1sv7C/5r9HwDrL/yv2f8BsP7C/5r9HwDrL/yv2X8HwJO6uroGfNXXgTU2Wv+JZ2b/FQB1tbW1FRXV5eXl5Q/hU0VFRXVtXZ31H3sm9t8A8Ft1xYNbt27du3Xv3r17t+/dhp9u3bpT96v1H3wW9l8A8Hv1nVv37l29evUKZWevnD179faJH3/8bxB4xgCe/F5XW1txG9w+c+bMKcrOnDlz5njxnR9//vW3355Y/5UetmcI4Pe6utq66oqHVQ/OnjlzendGxjadTqdN1GlTMjJ2nzx1/LvN3915WF1b+2vd79Z/tQftWQFohCv/8NatO/fuPXj0SZpOp9fl5OTocvQ5upwcnS5Ru+PI4SXFN2/evH3n4cOK2rq6Z6WEZwKgrq6utqL8Fkb+lSuflqbo9Hp9jj4nBz7pc3Jy9Hpd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... (truncated, total 655207 chars)"
+  },
+  {
+    "url": "https://v3.stfc.pro/api/players?server=716&sortBy=rss&sortOrder=desc&page=1&pageCount=100&reRank=false",
+    "status": 200,
+    "method": "GET",
+    "content_type": "application/octet-stream",
+    "request_headers": {
+      "sec-ch-ua-full-version-list": "\"Not:A-Brand\";v=\"99.0.0.0\", \"Google Chrome\";v=\"145.0.7632.76\", \"Chromium\";v=\"145.0.7632.76\"",
+      "sec-ch-ua-platform": "\"Windows\"",
+      "referer": "https://v3.stfc.pro/resources-raided",
+      "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"Google Chrome\";v=\"145\", \"Chromium\";v=\"145\"",
+      "sec-ch-ua-bitness": "\"64\"",
+      "sec-ch-ua-model": "\"\"",
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-arch": "\"x86\"",
+      "sec-ch-ua-full-version": "\"145.0.7632.76\"",
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+      "sec-ch-ua-platform-version": "\"19.0.0\""
+    },
+    "body_preview": null
+  },
+  {
+    "url": "https://v3.stfc.pro/api/players?server=716&alliance=3974286889&sortBy=rss&sortOrder=desc&page=1&pageCount=100&reRank=false",
+    "status": 200,
+    "method": "GET",
+    "content_type": "application/octet-stream",
+    "request_headers": {
+      "sec-ch-ua-full-version-list": "\"Not:A-Brand\";v=\"99.0.0.0\", \"Google Chrome\";v=\"145.0.7632.76\", \"Chromium\";v=\"145.0.7632.76\"",
+      "sec-ch-ua-platform": "\"Windows\"",
+      "referer": "https://v3.stfc.pro/resources-raided?server=716",
+      "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"Google Chrome\";v=\"145\", \"Chromium\";v=\"145\"",
+      "sec-ch-ua-bitness": "\"64\"",
+      "sec-ch-ua-model": "\"\"",
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-arch": "\"x86\"",
+      "sec-ch-ua-full-version": "\"145.0.7632.76\"",
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+      "sec-ch-ua-platform-version": "\"19.0.0\""
+    },
+    "body_preview": null
+  }
+]

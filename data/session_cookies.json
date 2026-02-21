@@ -1,0 +1,34 @@
+[
+  {
+    "name": "__Secure-better-auth.session_token",
+    "value": "NmYkoOPf3DJiCvRMnQtUZNN0DYjtS2Yq.dSgkUEKQbub3rYV%2BYKlwJaw5%2FWp%2FateIsf6tB7Mdkbg%3D",
+    "domain": "v3.stfc.pro",
+    "path": "/",
+    "expires": 1772118003.553068,
+    "httpOnly": true,
+    "secure": true,
+    "sameSite": "Lax"
+  },
+  {
+    "name": "cf_clearance",
+    "value": "BfBCWKNm3ehMUnf.T_ShY0xOsAjrVx1FKgyPF27Cpd4-1771679906-1.2.1.1-sI2hAs5alr07fUXT6z7C_.qPRL8BdHQ.dQmedBP_dMYGGVbHcfV3326naDzN3JaXVffx6ZWzR_PGgRNX46PnQ3ToupvHSEAqUWrYvybnxDW0RPge.AKCyL7IiZgtXP5vU7_t0LQnfHgzOK3daDywgFJhGAUjq_AvsTnnF5wqQDDsCmkQljm6WraqD8DGshtsJpTINQuV631GlWRJtTqLW3ng3VlyJLqepD26.7rqjHg",
+    "domain": ".stfc.pro",
+    "path": "/",
+    "expires": 1803215907.085165,
+    "httpOnly": true,
+    "secure": true,
+    "sameSite": "None",
+    "partitionKey": "https://stfc.pro",
+    "_crHasCrossSiteAncestor": false
+  },
+  {
+    "name": "__Secure-better-auth.session_data",
+    "value": "eyJzZXNzaW9uIjp7InNlc3Npb24iOnsiZXhwaXJlc0F0IjoiMjAyNi0wMi0yN1QxNjowMDowMi43OTJaIiwidG9rZW4iOiJObVlrb09QZjNESmlDdlJNblF0VVpOTjBEWWp0UzJZcSIsImNyZWF0ZWRBdCI6IjIwMjYtMDItMTVUMTM6MDA6MTQuNzA1WiIsInVwZGF0ZWRBdCI6IjIwMjYtMDItMjBUMTY6MDA6MDIuNzkyWiIsImlwQWRkcmVzcyI6IjI2MDA6NDA0MDo1YTM2OmJkMDA6NDFiOTpiZjVhOmE2OGI6OWM4NiIsInVzZXJBZ2VudCI6Ik1vemlsbGEvNS4wIChXaW5kb3dzIE5UIDEwLjA7IFdpbjY0OyB4NjQpIEFwcGxlV2ViS2l0LzUzNy4zNiAoS0hUTUwsIGxpa2UgR2Vja28pIENocm9tZS8xNDQuMC4wLjAgU2FmYXJpLzUzNy4zNiIsInVzZXJJZCI6Ik1DWkFTa1pPZ3k0ckNCQ1pzZENoVkdWaE8zOHJNZnEwIiwiaWQiOiJxdERWbGYyd0kyS0Fia0xJdEpGeWVEZVNRdWNTanpzSiJ9LCJ1c2VyIjp7Im5hbWUiOiJEcmV3IiwiZW1haWwiOiJkcmV3LmFkb3Jub0BnbWFpbC5jb20iLCJlbWFpbFZlcmlmaWVkIjp0cnVlLCJpbWFnZSI6Imh0dHBzOi8vY2RuLmRpc2NvcmRhcHAuY29tL2F2YXRhcnMvMjYxMzA4NDMxODc5NzY2MDI3L2QxNjVmNjM0NTJjNjcxMTQyZTIzMmVhNjk2ZmI2NWQwLnBuZyIsImNyZWF0ZWRBdCI6IjIwMjYtMDItMDdUMTI6NTg6MDIuNzU2WiIsInVwZGF0ZWRBdCI6IjIwMjYtMDItMDdUMTI6NTg6MDIuNzU2WiIsInJvbGUiOiJ1c2VyIiwiaWQiOiJNQ1pBU2taT2d5NHJDQkNac2RDaFZHVmhPMzhyTWZxMCJ9LCJ1cGRhdGVkQXQiOjE3NzE2ODAzOTA0MjQsInZlcnNpb24iOiIxIn0sImV4cGlyZXNBdCI6MTc3MTY4MDY5MDQyNCwic2lnbmF0dXJlIjoiai1LU3VEbW55MnA1S2w4OS1oLXUwSVdzUGpBQVZFZk1jVTcxb2dLVkt0OCJ9",
+    "domain": "v3.stfc.pro",
+    "path": "/",
+    "expires": 1771680690.609605,
+    "httpOnly": true,
+    "secure": true,
+    "sameSite": "Lax"
+  }
+]
