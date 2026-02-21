@@ -5739,9 +5739,9 @@
   {
     "date": "2026-02-21",
     "summary": {
-      "total_power": "339.45M",
-      "member_count": "33",
-      "total_helps": "320.34K",
+      "total_power": "320.30M",
+      "member_count": "32",
+      "total_helps": "276.45K",
       "total_rss": "99.02K",
       "total_iso": "323.26M",
       "avg_level": "26"
@@ -5749,7 +5749,7 @@
     "members": {
       "1231726616": {
         "level": "48",
-        "power": "77.10M",
+        "power": "77.07M",
         "helps": "21.48K",
         "rss_contrib": "36.09K",
         "iso_contrib": "204.20M",
@@ -5761,7 +5761,7 @@
       },
       "2644617547": {
         "level": "26",
-        "power": "3.62M",
+        "power": "3.58M",
         "helps": "33.76K",
         "rss_contrib": "24",
         "iso_contrib": "10.50M",
@@ -5821,7 +5821,7 @@
       },
       "4150803274": {
         "level": "46",
-        "power": "54.70M",
+        "power": "54.78M",
         "helps": "9.82K",
         "rss_contrib": "600",
         "iso_contrib": "80.53M",
@@ -5833,7 +5833,7 @@
       },
       "891890017": {
         "level": "24",
-        "power": "2.11M",
+        "power": "2.12M",
         "helps": "7.94K",
         "rss_contrib": "0",
         "iso_contrib": "0",
@@ -5845,7 +5845,7 @@
       },
       "1468722486": {
         "level": "19",
-        "power": "301.64K",
+        "power": "324.08K",
         "helps": "4.95K",
         "rss_contrib": "0",
         "iso_contrib": "0",
@@ -5869,7 +5869,7 @@
       },
       "1995189823": {
         "level": "17",
-        "power": "314.22K",
+        "power": "314.75K",
         "helps": "2.95K",
         "rss_contrib": "0",
         "iso_contrib": "0",
@@ -5903,28 +5903,16 @@
         "resources_raided": "877",
         "name": "Officer Gar8434310"
       },
-      "3970527992": {
-        "level": "39",
-        "power": "19.25M",
-        "helps": "43.89K",
-        "rss_contrib": "0",
-        "iso_contrib": "0",
-        "players_killed": "22",
-        "hostiles_killed": "12.50K",
-        "resources_mined": "10.04M",
-        "resources_raided": "54.67K",
-        "name": "AZTreeFella"
-      },
       "3971545627": {
         "level": "33",
-        "power": "7.76M",
+        "power": "7.77M",
         "helps": "19.25K",
         "rss_contrib": "684",
         "iso_contrib": "0",
         "players_killed": "57",
         "hostiles_killed": "39.75K",
         "resources_mined": "6.69M",
-        "resources_raided": "5.90M",
+        "resources_raided": "5.92M",
         "name": "NianderWallace"
       },
       "426305808": {
@@ -5965,7 +5953,7 @@
       },
       "181224344": {
         "level": "28",
-        "power": "2.36M",
+        "power": "2.37M",
         "helps": "5.70K",
         "rss_contrib": "144",
         "iso_contrib": "325.20K",
@@ -5977,19 +5965,19 @@
       },
       "1696653671": {
         "level": "18",
-        "power": "465.74K",
+        "power": "474.25K",
         "helps": "5.61K",
         "rss_contrib": "726",
         "iso_contrib": "0",
         "players_killed": "232",
         "hostiles_killed": "3.10K",
         "resources_mined": "1.55M",
-        "resources_raided": "71.61M",
+        "resources_raided": "71.62M",
         "name": "HadrianMarlow3"
       },
       "924969815": {
         "level": "16",
-        "power": "249.62K",
+        "power": "250.66K",
         "helps": "5.33K",
         "rss_contrib": "0",
         "iso_contrib": "0",
@@ -6001,7 +5989,7 @@
       },
       "3247539895": {
         "level": "26",
-        "power": "2.39M",
+        "power": "2.41M",
         "helps": "5.21K",
         "rss_contrib": "0",
         "iso_contrib": "0",
@@ -6025,7 +6013,7 @@
       },
       "454434908": {
         "level": "18",
-        "power": "336.76K",
+        "power": "337.36K",
         "helps": "4.65K",
         "rss_contrib": "0",
         "iso_contrib": "0",
@@ -6061,7 +6049,7 @@
       },
       "3394175627": {
         "level": "21",
-        "power": "810.10K",
+        "power": "811.40K",
         "helps": "3.64K",
         "rss_contrib": "384",
         "iso_contrib": "0",
@@ -6073,7 +6061,7 @@
       },
       "1331036012": {
         "level": "19",
-        "power": "375.58K",
+        "power": "385.14K",
         "helps": "3.52K",
         "rss_contrib": "0",
         "iso_contrib": "0",
@@ -6109,7 +6097,7 @@
       },
       "646297596": {
         "level": "19",
-        "power": "357.69K",
+        "power": "371.18K",
         "helps": "1.48K",
         "rss_contrib": "0",
         "iso_contrib": "0",
