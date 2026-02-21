@@ -5739,7 +5739,7 @@
   {
     "date": "2026-02-21",
     "summary": {
-      "total_power": "320.30M",
+      "total_power": "324.20M",
       "member_count": "32",
       "total_helps": "276.45K",
       "total_rss": "99.48K",
@@ -5785,7 +5785,7 @@
       },
       "4172478581": {
         "level": "28",
-        "power": "4.55M",
+        "power": "4.45M",
         "helps": "10.42K",
         "rss_contrib": "0",
         "iso_contrib": "17.24M",
@@ -5797,7 +5797,7 @@
       },
       "1225166314": {
         "level": "44",
-        "power": "37.19M",
+        "power": "38.86M",
         "helps": "14.36K",
         "rss_contrib": "27.00K",
         "iso_contrib": "3.50M",
@@ -5820,8 +5820,8 @@
         "name": "colewchambers"
       },
       "4150803274": {
-        "level": "46",
-        "power": "54.78M",
+        "level": "47",
+        "power": "56.89M",
         "helps": "9.82K",
         "rss_contrib": "600",
         "iso_contrib": "83.56M",
@@ -5832,8 +5832,8 @@
         "name": "AdmiralStorie"
       },
       "891890017": {
-        "level": "24",
-        "power": "2.12M",
+        "level": "25",
+        "power": "2.13M",
         "helps": "7.94K",
         "rss_contrib": "0",
         "iso_contrib": "0",
@@ -5856,8 +5856,8 @@
         "name": "Toaster8675309"
       },
       "3062609042": {
-        "level": "28",
-        "power": "3.16M",
+        "level": "29",
+        "power": "3.28M",
         "helps": "4.27K",
         "rss_contrib": "1.08K",
         "iso_contrib": "0",
@@ -5869,7 +5869,7 @@
       },
       "1995189823": {
         "level": "17",
-        "power": "314.75K",
+        "power": "314.81K",
         "helps": "2.95K",
         "rss_contrib": "0",
         "iso_contrib": "0",
@@ -5905,7 +5905,7 @@
       },
       "3971545627": {
         "level": "33",
-        "power": "7.77M",
+        "power": "7.81M",
         "helps": "19.25K",
         "rss_contrib": "1.15K",
         "iso_contrib": "0",
@@ -5929,7 +5929,7 @@
       },
       "634840318": {
         "level": "19",
-        "power": "530.72K",
+        "power": "533.07K",
         "helps": "6.29K",
         "rss_contrib": "0",
         "iso_contrib": "0",
@@ -5965,19 +5965,19 @@
       },
       "1696653671": {
         "level": "18",
-        "power": "474.25K",
+        "power": "474.64K",
         "helps": "5.61K",
         "rss_contrib": "726",
         "iso_contrib": "0",
         "players_killed": "232",
         "hostiles_killed": "3.10K",
         "resources_mined": "1.55M",
-        "resources_raided": "71.62M",
+        "resources_raided": "82.66M",
         "name": "HadrianMarlow3"
       },
       "924969815": {
         "level": "16",
-        "power": "250.66K",
+        "power": "250.71K",
         "helps": "5.33K",
         "rss_contrib": "0",
         "iso_contrib": "0",
@@ -6013,19 +6013,19 @@
       },
       "454434908": {
         "level": "18",
-        "power": "337.36K",
+        "power": "334.48K",
         "helps": "4.65K",
         "rss_contrib": "0",
         "iso_contrib": "0",
         "players_killed": "82",
         "hostiles_killed": "1.25K",
         "resources_mined": "230.67K",
-        "resources_raided": "12.59K",
+        "resources_raided": "15.69K",
         "name": "Smoothie81"
       },
       "4232573353": {
         "level": "28",
-        "power": "3.01M",
+        "power": "3.04M",
         "helps": "4.57K",
         "rss_contrib": "0",
         "iso_contrib": "2.09M",
@@ -6036,8 +6036,8 @@
         "name": "LadyLain"
       },
       "3559543003": {
-        "level": "21",
-        "power": "877.48K",
+        "level": "22",
+        "power": "856.08K",
         "helps": "4.48K",
         "rss_contrib": "0",
         "iso_contrib": "0",
@@ -6073,7 +6073,7 @@
       },
       "1323131230": {
         "level": "16",
-        "power": "235.36K",
+        "power": "243.45K",
         "helps": "3.29K",
         "rss_contrib": "0",
         "iso_contrib": "0",
@@ -6085,7 +6085,7 @@
       },
       "3179608653": {
         "level": "20",
-        "power": "454.79K",
+        "power": "482.22K",
         "helps": "2.81K",
         "rss_contrib": "0",
         "iso_contrib": "0",
@@ -6097,7 +6097,7 @@
       },
       "646297596": {
         "level": "19",
-        "power": "371.18K",
+        "power": "375.41K",
         "helps": "1.48K",
         "rss_contrib": "0",
         "iso_contrib": "0",
