@@ -405,20 +405,25 @@ def fetch_all_players_browser():
                 f"&page={page_num}&pageCount={PAGE_SIZE}"
             )
             safe_print(f"Fetching page {page_num} via browser...")
-            resp = page.goto(url, wait_until="domcontentloaded", timeout=60_000)
 
-            if resp.status in (401, 403):
-                safe_print(f"Browser API request returned {resp.status}")
+            # Use fetch() inside the browser to avoid download triggers
+            result = page.evaluate("""async (url) => {
+                const resp = await fetch(url);
+                return { status: resp.status, body: await resp.text() };
+            }""", url)
+
+            status = result["status"]
+            if status in (401, 403):
+                safe_print(f"Browser API request returned {status}")
                 context.close()
-                return None, resp.status
+                return None, status
 
-            if resp.status != 200:
-                safe_print(f"ERROR: Browser API returned status {resp.status}")
+            if status != 200:
+                safe_print(f"ERROR: Browser API returned status {status}")
                 context.close()
                 sys.exit(1)
 
-            body_text = page.inner_text("body")
-            data = json.loads(body_text)
+            data = json.loads(result["body"])
 
             if total_count is None:
                 total_count = data.get("count", 0)
