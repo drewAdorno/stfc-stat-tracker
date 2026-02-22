@@ -444,6 +444,180 @@ def import_history_json(conn):
     print(f"Import complete: {players} players, {total} snapshot rows.")
 
 
+def export_server_alliances_json(conn):
+    """Query all alliances on the server and write data/server_alliances.json.
+
+    Aggregates player data by alliance for the most recent date, with 7-day deltas.
+    """
+    # Find the most recent date with data
+    row = conn.execute("SELECT MAX(date) FROM daily_snapshots").fetchone()
+    if not row or not row[0]:
+        return
+    latest_date = row[0]
+
+    # Find a date ~7 days ago for deltas
+    delta_row = conn.execute("""
+        SELECT MAX(date) FROM daily_snapshots
+        WHERE date <= date(?, '-7 days')
+    """, (latest_date,)).fetchone()
+    delta_date = delta_row[0] if delta_row and delta_row[0] else None
+
+    # Get pull timestamp
+    pull_row = conn.execute(
+        "SELECT pulled_at FROM pull_log ORDER BY id DESC LIMIT 1"
+    ).fetchone()
+    pulled_at = pull_row[0] if pull_row else datetime.now().isoformat()
+
+    # Aggregate current data by alliance
+    rows = conn.execute("""
+        SELECT alliance_id, alliance_tag,
+               COUNT(*) as member_count,
+               SUM(power) as total_power,
+               AVG(level) as avg_level,
+               MAX(level) as max_level,
+               SUM(players_killed) as total_pvp,
+               SUM(hostiles_killed) as total_hk,
+               SUM(resources_mined) as total_mined,
+               SUM(resources_raided) as total_raided
+        FROM daily_snapshots
+        WHERE date = ? AND alliance_id IS NOT NULL AND alliance_id != 0
+        GROUP BY alliance_id
+        ORDER BY total_power DESC
+    """, (latest_date,)).fetchall()
+
+    # Get 7-day-ago power by alliance for deltas
+    past_power = {}
+    if delta_date:
+        past_rows = conn.execute("""
+            SELECT alliance_id, SUM(power) as total_power
+            FROM daily_snapshots
+            WHERE date = ? AND alliance_id IS NOT NULL AND alliance_id != 0
+            GROUP BY alliance_id
+        """, (delta_date,)).fetchall()
+        past_power = {r[0]: r[1] or 0 for r in past_rows}
+
+    alliances = []
+    for rank, r in enumerate(rows, 1):
+        aid, atag, count, power, avg_lvl, max_lvl, pvp, hk, mined, raided = r
+        past_p = past_power.get(aid, 0)
+        alliances.append({
+            "alliance_id": aid,
+            "alliance_tag": atag or "",
+            "rank": rank,
+            "member_count": count or 0,
+            "total_power": power or 0,
+            "avg_level": round(avg_lvl) if avg_lvl else 0,
+            "max_level": max_lvl or 0,
+            "total_pvp": pvp or 0,
+            "total_hk": hk or 0,
+            "total_mined": mined or 0,
+            "total_raided": raided or 0,
+            "power_delta_7d": (power or 0) - past_p,
+        })
+
+    record = {
+        "pulled_at": pulled_at,
+        "as_of_date": latest_date,
+        "delta_base_date": delta_date or latest_date,
+        "alliance_count": len(alliances),
+        "alliances": alliances,
+    }
+
+    out_file = DATA_DIR / "server_alliances.json"
+    with open(out_file, "w", encoding="utf-8") as f:
+        json.dump(record, f, indent=2, ensure_ascii=False)
+
+
+def export_server_players_json(conn):
+    """Query all server players and write data/server_players.json.
+
+    Includes current snapshot values and 7-day power delta + alliance movement.
+    """
+    # Find the most recent date with data
+    row = conn.execute("SELECT MAX(date) FROM daily_snapshots").fetchone()
+    if not row or not row[0]:
+        return
+    latest_date = row[0]
+
+    # Find a date ~7 days ago for deltas/movement
+    delta_row = conn.execute("""
+        SELECT MAX(date) FROM daily_snapshots
+        WHERE date <= date(?, '-7 days')
+    """, (latest_date,)).fetchone()
+    delta_date = delta_row[0] if delta_row and delta_row[0] else None
+
+    # Get pull timestamp
+    pull_row = conn.execute(
+        "SELECT pulled_at FROM pull_log ORDER BY id DESC LIMIT 1"
+    ).fetchone()
+    pulled_at = pull_row[0] if pull_row else datetime.now().isoformat()
+
+    # Get all current players
+    rows = conn.execute("""
+        SELECT ds.player_id, p.name, ds.alliance_id, ds.alliance_tag,
+               ds.level, ds.power, ds.helps, ds.rss_contrib, ds.iso_contrib,
+               ds.players_killed, ds.hostiles_killed, ds.resources_mined,
+               ds.resources_raided
+        FROM daily_snapshots ds
+        JOIN players p ON p.player_id = ds.player_id
+        WHERE ds.date = ?
+        ORDER BY ds.power DESC
+    """, (latest_date,)).fetchall()
+
+    # Get 7-day-ago data for deltas and movement detection
+    past_data = {}
+    if delta_date:
+        past_rows = conn.execute("""
+            SELECT player_id, power, alliance_id, alliance_tag
+            FROM daily_snapshots
+            WHERE date = ?
+        """, (delta_date,)).fetchall()
+        past_data = {r[0]: {"power": r[1] or 0, "alliance_id": r[2], "alliance_tag": r[3] or ""} for r in past_rows}
+
+    players = []
+    for r in rows:
+        (pid, name, aid, atag, level, power, helps, rss_c, iso_c,
+         pk, hk, rm, rr) = r
+
+        past = past_data.get(pid)
+        power_delta = (power or 0) - past["power"] if past else 0
+        moved = False
+        prev_tag = None
+        if past and past["alliance_id"] != aid:
+            moved = True
+            prev_tag = past["alliance_tag"]
+
+        players.append({
+            "id": str(pid),
+            "name": name or "",
+            "alliance_id": aid or 0,
+            "alliance_tag": atag or "",
+            "level": level or 0,
+            "power": power or 0,
+            "helps": helps or 0,
+            "rss_contrib": rss_c or 0,
+            "iso_contrib": iso_c or 0,
+            "players_killed": pk or 0,
+            "hostiles_killed": hk or 0,
+            "resources_mined": rm or 0,
+            "resources_raided": rr or 0,
+            "power_delta_7d": power_delta,
+            "moved": moved,
+            "prev_alliance_tag": prev_tag,
+        })
+
+    record = {
+        "pulled_at": pulled_at,
+        "as_of_date": latest_date,
+        "player_count": len(players),
+        "players": players,
+    }
+
+    out_file = DATA_DIR / "server_players.json"
+    with open(out_file, "w", encoding="utf-8") as f:
+        json.dump(record, f, indent=2, ensure_ascii=False)
+
+
 def get_latest_two_dates(conn, alliance_id=NCC_ALLIANCE_ID):
     """Return (prev_date, curr_date) for the two most recent snapshot dates,
     or (None, None) if fewer than 2 exist. Used by send_hourly_alerts."""
