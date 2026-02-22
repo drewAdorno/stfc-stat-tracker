@@ -35,6 +35,7 @@ CREATE TABLE IF NOT EXISTS players (
 CREATE TABLE IF NOT EXISTS daily_snapshots (
     player_id       INTEGER NOT NULL,
     date            TEXT NOT NULL,
+    name            TEXT,
     level           INTEGER,
     power           INTEGER,
     helps           INTEGER,
@@ -68,6 +69,10 @@ def get_db():
     conn.execute("PRAGMA journal_mode=WAL")
     conn.execute("PRAGMA foreign_keys=ON")
     conn.executescript(SCHEMA)
+    # Migration: add name column to daily_snapshots if missing
+    cols = {r[1] for r in conn.execute("PRAGMA table_info(daily_snapshots)")}
+    if "name" not in cols:
+        conn.execute("ALTER TABLE daily_snapshots ADD COLUMN name TEXT")
     conn.commit()
     return conn
 
@@ -106,11 +111,12 @@ def upsert_players(conn, mapped_players, date):
         # Upsert into daily_snapshots
         cur.execute("""
             INSERT INTO daily_snapshots
-                (player_id, date, level, power, helps, rss_contrib, iso_contrib,
+                (player_id, date, name, level, power, helps, rss_contrib, iso_contrib,
                  players_killed, hostiles_killed, resources_mined, resources_raided,
                  rank_title, join_date, alliance_id, alliance_tag)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(player_id, date) DO UPDATE SET
+                name = excluded.name,
                 level = excluded.level,
                 power = excluded.power,
                 helps = excluded.helps,
@@ -126,6 +132,7 @@ def upsert_players(conn, mapped_players, date):
                 alliance_tag = excluded.alliance_tag
         """, (
             player_id, date,
+            m.get("name", ""),
             m.get("level", 0),
             m.get("power", 0),
             m.get("helps", 0),
@@ -301,7 +308,8 @@ def export_history_json(conn, alliance_id=NCC_ALLIANCE_ID):
         rows = conn.execute("""
             SELECT ds.player_id, ds.level, ds.power, ds.helps, ds.rss_contrib,
                    ds.iso_contrib, ds.players_killed, ds.hostiles_killed,
-                   ds.resources_mined, ds.resources_raided, p.name
+                   ds.resources_mined, ds.resources_raided,
+                   COALESCE(ds.name, p.name) as name
             FROM daily_snapshots ds
             JOIN players p ON p.player_id = ds.player_id
             WHERE ds.date = ? AND ds.alliance_id = ?
@@ -421,11 +429,12 @@ def import_history_json(conn):
             # Upsert snapshot
             cur.execute("""
                 INSERT INTO daily_snapshots
-                    (player_id, date, level, power, helps, rss_contrib, iso_contrib,
+                    (player_id, date, name, level, power, helps, rss_contrib, iso_contrib,
                      players_killed, hostiles_killed, resources_mined, resources_raided,
                      alliance_id, alliance_tag)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(player_id, date) DO UPDATE SET
+                    name = excluded.name,
                     level = excluded.level,
                     power = excluded.power,
                     helps = excluded.helps,
@@ -435,7 +444,7 @@ def import_history_json(conn):
                     hostiles_killed = excluded.hostiles_killed,
                     resources_mined = excluded.resources_mined,
                     resources_raided = excluded.resources_raided
-            """, (player_id, date, level, power, helps, rss_c, iso_c, pk, hk, rm, rr,
+            """, (player_id, date, name, level, power, helps, rss_c, iso_c, pk, hk, rm, rr,
                   NCC_ALLIANCE_ID, "NCC"))
 
     conn.commit()
