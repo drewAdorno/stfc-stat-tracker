@@ -18,20 +18,6 @@ if !ERRORLEVEL! neq 0 (
     goto :end
 )
 
-echo Committing data... >> "%LOG_FILE%"
-git add data\*.json >> "%LOG_FILE%" 2>&1
-git commit -m "Alliance data update %date% %time:~0,5%" >> "%LOG_FILE%" 2>&1
-if !ERRORLEVEL! neq 0 (
-    echo Nothing new to commit or commit failed. >> "%LOG_FILE%"
-)
-
-echo Pushing to GitHub... >> "%LOG_FILE%"
-git push origin master >> "%LOG_FILE%" 2>&1
-if !ERRORLEVEL! neq 0 (
-    echo Push failed, trying main branch... >> "%LOG_FILE%"
-    git push origin main >> "%LOG_FILE%" 2>&1
-)
-
 echo Sending hourly alerts... >> "%LOG_FILE%"
 "%PYTHON_EXE%" send_hourly_alerts.py >> "%LOG_FILE%" 2>&1
 if !ERRORLEVEL! neq 0 (

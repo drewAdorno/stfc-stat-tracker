@@ -34,7 +34,6 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd /opt/stfc
-            git checkout -- data/ || true
             git pull origin master
             venv/bin/pip install -r requirements.txt --quiet
             sudo cp deploy/stfc-nginx.conf /etc/nginx/sites-available/stfc

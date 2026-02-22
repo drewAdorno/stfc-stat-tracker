@@ -10,6 +10,10 @@ data/.last_notification_date
 data/stfc.db
 data/stfc.db-wal
 data/stfc.db-shm
+data/latest.json
+data/history.json
+data/server_alliances.json
+data/server_players.json
 data/session_cookies.json
 data/*.bin
 data/api_sniff.json
