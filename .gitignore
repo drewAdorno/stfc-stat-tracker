@@ -5,6 +5,8 @@ __pycache__/
 run_daily.log
 .env
 data/.last_notification_date
+.sent_hourly_alerts
+.last_failure_alert
 data/stfc.db
 data/stfc.db-wal
 data/stfc.db-shm
