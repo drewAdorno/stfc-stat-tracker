@@ -36,7 +36,16 @@ jobs:
             cd /opt/stfc
             git pull origin master
             venv/bin/pip install -r requirements.txt --quiet
+            venv/bin/playwright install --with-deps chromium
             chmod +x deploy/*.sh
+
+            # Update systemd services from repo
+            sudo cp deploy/stfc-scraper.service /etc/systemd/system/
+            sudo cp deploy/stfc-scraper-failure.service /etc/systemd/system/
+            sudo cp deploy/stfc-scraper.timer /etc/systemd/system/
+            sudo systemctl daemon-reload
+            sudo systemctl enable stfc-scraper.timer
+
             sudo cp deploy/stfc-nginx.conf /etc/nginx/sites-available/stfc
             sudo certbot --nginx -d ncctracker.top -d www.ncctracker.top --non-interactive --redirect
             sudo nginx -t && sudo systemctl reload nginx

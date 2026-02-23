@@ -2,14 +2,15 @@
 Description=STFC Stat Tracker - Daily Pull
 After=network-online.target
 Wants=network-online.target
+OnFailure=stfc-scraper-failure.service
 
 [Service]
 Type=oneshot
-User=stfc
-Group=stfc
+User=ubuntu
+Group=ubuntu
 WorkingDirectory=/opt/stfc
 ExecStart=/opt/stfc/deploy/run_pull.sh
-Environment=HOME=/home/stfc
+Environment=HOME=/home/ubuntu
 TimeoutStartSec=600
 
 # Logging
