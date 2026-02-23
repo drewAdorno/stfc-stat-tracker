@@ -1,0 +1,10 @@
+[Unit]
+Description=STFC Scraper Failure Alert
+
+[Service]
+Type=oneshot
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/opt/stfc
+Environment=HOME=/home/ubuntu
+ExecStart=/opt/stfc/venv/bin/python send_failure_alert.py "Scraper service failed (systemd OnFailure)"
