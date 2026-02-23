@@ -34,6 +34,7 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd /opt/stfc
+            git checkout -- .
             git pull origin master
             venv/bin/pip install -r requirements.txt --quiet
             venv/bin/playwright install --with-deps chromium
