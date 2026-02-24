@@ -44,8 +44,17 @@ jobs:
             sudo cp deploy/stfc-scraper.service /etc/systemd/system/
             sudo cp deploy/stfc-scraper-failure.service /etc/systemd/system/
             sudo cp deploy/stfc-scraper.timer /etc/systemd/system/
+            sudo cp deploy/stfc-discord-bot.service /etc/systemd/system/
             sudo systemctl daemon-reload
             sudo systemctl enable stfc-scraper.timer
+            sudo systemctl enable stfc-discord-bot
+            sudo systemctl restart stfc-discord-bot || true
+
+            # Regenerate JSON data files from DB (ensures they exist after deploy)
+            venv/bin/python -c "
+            from db import get_db, export_latest_json, export_history_json, export_server_alliances_json, export_server_players_json
+            conn = get_db(); export_latest_json(conn); export_history_json(conn); export_server_alliances_json(conn); export_server_players_json(conn); conn.close()
+            "
 
             sudo cp deploy/stfc-nginx.conf /etc/nginx/sites-available/stfc
             sudo certbot --nginx -d ncctracker.top -d www.ncctracker.top --non-interactive --redirect
