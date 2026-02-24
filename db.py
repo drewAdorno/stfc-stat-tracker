@@ -59,6 +59,13 @@ CREATE TABLE IF NOT EXISTS pull_log (
     total_players INTEGER,
     source      TEXT DEFAULT 'api'
 );
+
+CREATE TABLE IF NOT EXISTS discord_links (
+    discord_user_id TEXT PRIMARY KEY,
+    player_id       INTEGER NOT NULL,
+    linked_at       TEXT NOT NULL,
+    FOREIGN KEY (player_id) REFERENCES players(player_id)
+);
 """
 
 
@@ -540,7 +547,8 @@ def export_server_alliances_json(conn):
 def export_server_players_json(conn):
     """Query all server players and write data/server_players.json.
 
-    Includes current snapshot values and 7-day power delta + alliance movement.
+    Includes current snapshot values, 1d/7d/30d deltas for all 9 tracked
+    fields, and alliance movement detection (based on 7-day window).
     """
     # Find the most recent date with data
     row = conn.execute("SELECT MAX(date) FROM daily_snapshots").fetchone()
@@ -548,12 +556,15 @@ def export_server_players_json(conn):
         return
     latest_date = row[0]
 
-    # Find a date ~7 days ago for deltas/movement
-    delta_row = conn.execute("""
-        SELECT MAX(date) FROM daily_snapshots
-        WHERE date <= date(?, '-7 days')
-    """, (latest_date,)).fetchone()
-    delta_date = delta_row[0] if delta_row and delta_row[0] else None
+    # Find dates for each delta period
+    delta_periods = [1, 7, 30]
+    delta_dates = {}
+    for days in delta_periods:
+        dr = conn.execute("""
+            SELECT MAX(date) FROM daily_snapshots
+            WHERE date <= date(?, ?)
+        """, (latest_date, f"-{days} days")).fetchone()
+        delta_dates[days] = dr[0] if dr and dr[0] else None
 
     # Get pull timestamp
     pull_row = conn.execute(
@@ -573,51 +584,78 @@ def export_server_players_json(conn):
         ORDER BY ds.power DESC
     """, (latest_date,)).fetchall()
 
-    # Get 7-day-ago data for deltas and movement detection
-    past_data = {}
-    if delta_date:
+    # Load past snapshots for each delta period
+    past_snapshots = {}  # {days: {player_id: {field: value, ...}}}
+    for days in delta_periods:
+        dd = delta_dates[days]
+        if not dd:
+            past_snapshots[days] = {}
+            continue
         past_rows = conn.execute("""
-            SELECT player_id, power, alliance_id, alliance_tag
+            SELECT player_id, level, power, helps, rss_contrib, iso_contrib,
+                   players_killed, hostiles_killed, resources_mined, resources_raided,
+                   alliance_id, alliance_tag
             FROM daily_snapshots
             WHERE date = ?
-        """, (delta_date,)).fetchall()
-        past_data = {r[0]: {"power": r[1] or 0, "alliance_id": r[2], "alliance_tag": r[3] or ""} for r in past_rows}
+        """, (dd,)).fetchall()
+        past_snapshots[days] = {
+            r[0]: {
+                "level": r[1] or 0, "power": r[2] or 0, "helps": r[3] or 0,
+                "rss_contrib": r[4] or 0, "iso_contrib": r[5] or 0,
+                "players_killed": r[6] or 0, "hostiles_killed": r[7] or 0,
+                "resources_mined": r[8] or 0, "resources_raided": r[9] or 0,
+                "alliance_id": r[10], "alliance_tag": r[11] or "",
+            }
+            for r in past_rows
+        }
 
     players = []
     for r in rows:
         (pid, name, aid, atag, level, power, helps, rss_c, iso_c,
          pk, hk, rm, rr) = r
 
-        past = past_data.get(pid)
-        power_delta = (power or 0) - past["power"] if past else 0
-        moved = False
-        prev_tag = None
-        if past and past["alliance_id"] != aid:
-            moved = True
-            prev_tag = past["alliance_tag"]
+        current_vals = {
+            "level": level or 0, "power": power or 0, "helps": helps or 0,
+            "rss_contrib": rss_c or 0, "iso_contrib": iso_c or 0,
+            "players_killed": pk or 0, "hostiles_killed": hk or 0,
+            "resources_mined": rm or 0, "resources_raided": rr or 0,
+        }
 
-        players.append({
+        player = {
             "id": str(pid),
             "name": name or "",
             "alliance_id": aid or 0,
             "alliance_tag": atag or "",
-            "level": level or 0,
-            "power": power or 0,
-            "helps": helps or 0,
-            "rss_contrib": rss_c or 0,
-            "iso_contrib": iso_c or 0,
-            "players_killed": pk or 0,
-            "hostiles_killed": hk or 0,
-            "resources_mined": rm or 0,
-            "resources_raided": rr or 0,
-            "power_delta_7d": power_delta,
-            "moved": moved,
-            "prev_alliance_tag": prev_tag,
-        })
+            **current_vals,
+        }
+
+        # Compute deltas for all fields × all periods
+        for days in delta_periods:
+            past = past_snapshots[days].get(pid)
+            for field in TRACKED_FIELDS:
+                delta = current_vals[field] - past[field] if past else 0
+                player[f"{field}_delta_{days}d"] = delta
+
+        # Alliance movement detection (7-day window)
+        past_7d = past_snapshots[7].get(pid)
+        moved = False
+        prev_tag = None
+        if past_7d and past_7d["alliance_id"] != aid:
+            moved = True
+            prev_tag = past_7d["alliance_tag"]
+
+        player["moved"] = moved
+        player["prev_alliance_tag"] = prev_tag
+
+        players.append(player)
 
     record = {
         "pulled_at": pulled_at,
         "as_of_date": latest_date,
+        "delta_dates": {
+            f"{days}d": delta_dates[days] or latest_date
+            for days in delta_periods
+        },
         "player_count": len(players),
         "players": players,
     }
@@ -659,3 +697,115 @@ def get_members_for_date(conn, date, alliance_id=NCC_ALLIANCE_ID):
             "power": power or 0,
         }
     return members
+
+
+# --- Discord link helpers ---
+
+def link_discord(conn, discord_user_id, player_id):
+    """Link a Discord user to a player. Returns True on success."""
+    conn.execute("""
+        INSERT INTO discord_links (discord_user_id, player_id, linked_at)
+        VALUES (?, ?, ?)
+        ON CONFLICT(discord_user_id) DO UPDATE SET
+            player_id = excluded.player_id,
+            linked_at = excluded.linked_at
+    """, (str(discord_user_id), int(player_id), datetime.now().isoformat()))
+    conn.commit()
+    return True
+
+
+def unlink_discord(conn, discord_user_id):
+    """Remove a Discord-to-player link. Returns True if a row was deleted."""
+    cur = conn.execute(
+        "DELETE FROM discord_links WHERE discord_user_id = ?",
+        (str(discord_user_id),),
+    )
+    conn.commit()
+    return cur.rowcount > 0
+
+
+def get_linked_player(conn, discord_user_id):
+    """Return player_id for a Discord user, or None if not linked."""
+    row = conn.execute(
+        "SELECT player_id FROM discord_links WHERE discord_user_id = ?",
+        (str(discord_user_id),),
+    ).fetchone()
+    return row[0] if row else None
+
+
+def search_players(conn, query, limit=25):
+    """Search players by name prefix. Returns list of (player_id, name, alliance_tag).
+    NCC members are listed first."""
+    rows = conn.execute("""
+        SELECT player_id, name, alliance_tag
+        FROM players
+        WHERE name LIKE ? COLLATE NOCASE
+        ORDER BY
+            CASE WHEN alliance_id = ? THEN 0 ELSE 1 END,
+            name COLLATE NOCASE
+        LIMIT ?
+    """, (query + "%", NCC_ALLIANCE_ID, limit)).fetchall()
+    return rows
+
+
+def get_player_snapshot(conn, player_id, date=None):
+    """Get a player's snapshot for a specific date (or latest).
+    Returns dict with all tracked fields, or None."""
+    if date:
+        row = conn.execute("""
+            SELECT date, level, power, helps, rss_contrib, iso_contrib,
+                   players_killed, hostiles_killed, resources_mined, resources_raided,
+                   rank_title, join_date, alliance_id, alliance_tag, name
+            FROM daily_snapshots
+            WHERE player_id = ? AND date = ?
+        """, (player_id, date)).fetchone()
+    else:
+        row = conn.execute("""
+            SELECT date, level, power, helps, rss_contrib, iso_contrib,
+                   players_killed, hostiles_killed, resources_mined, resources_raided,
+                   rank_title, join_date, alliance_id, alliance_tag, name
+            FROM daily_snapshots
+            WHERE player_id = ?
+            ORDER BY date DESC LIMIT 1
+        """, (player_id,)).fetchone()
+    if not row:
+        return None
+    return {
+        "date": row[0], "level": row[1], "power": row[2], "helps": row[3],
+        "rss_contrib": row[4], "iso_contrib": row[5], "players_killed": row[6],
+        "hostiles_killed": row[7], "resources_mined": row[8], "resources_raided": row[9],
+        "rank_title": row[10], "join_date": row[11], "alliance_id": row[12],
+        "alliance_tag": row[13], "name": row[14],
+    }
+
+
+def get_snapshot_date_ago(conn, player_id, days_ago):
+    """Get the snapshot closest to N days ago for a player.
+    Returns the date string, or None."""
+    row = conn.execute("""
+        SELECT date FROM daily_snapshots
+        WHERE player_id = ? AND date <= date((SELECT MAX(date) FROM daily_snapshots WHERE player_id = ?), ?)
+        ORDER BY date DESC LIMIT 1
+    """, (player_id, player_id, f"-{days_ago} days")).fetchone()
+    return row[0] if row else None
+
+
+def get_earliest_snapshot_date(conn, player_id):
+    """Return the earliest snapshot date for a player."""
+    row = conn.execute(
+        "SELECT MIN(date) FROM daily_snapshots WHERE player_id = ?",
+        (player_id,),
+    ).fetchone()
+    return row[0] if row else None
+
+
+def get_player_name_history(conn, player_id):
+    """Return list of (name, first_date, last_date) for a player's name changes."""
+    rows = conn.execute("""
+        SELECT name, MIN(date) as first_date, MAX(date) as last_date
+        FROM daily_snapshots
+        WHERE player_id = ? AND name IS NOT NULL
+        GROUP BY name
+        ORDER BY first_date
+    """, (player_id,)).fetchall()
+    return [(r[0], r[1], r[2]) for r in rows]

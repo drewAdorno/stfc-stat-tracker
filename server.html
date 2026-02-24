@@ -288,6 +288,40 @@
   }
   .section-header:first-child { margin-top: 0; }
 
+  /* Period selector bar */
+  .period-bar {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 20px;
+  }
+  .period-btn {
+    background: #111827;
+    border: 1px solid #1e2d3d;
+    color: #8899aa;
+    padding: 6px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .period-btn:hover { border-color: #4dabf7; color: #c8d6e5; }
+  .period-btn.active {
+    background: #4dabf7;
+    color: #0a0e17;
+    border-color: #4dabf7;
+    font-weight: 600;
+  }
+
+  /* Delta display in table cells */
+  .cell-sub { display: block; font-size: 0.7rem; color: #4a5568; margin-top: 1px; }
+  .cell-delta-main {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
   /* Delta colors */
   .delta-pos { color: #34d399; }
   .delta-neg { color: #f87171; }
@@ -445,6 +479,22 @@
   let lbSortAsc = false;
   let detailSortCol = 'power';
   let detailSortAsc = false;
+  let detailPeriod = null; // null = all time, 1/7/30 = days
+
+  const DELTA_FIELDS = [
+    'level', 'power', 'helps', 'rss_contrib', 'iso_contrib',
+    'players_killed', 'hostiles_killed', 'resources_mined', 'resources_raided',
+  ];
+
+  // Gain-focused cell: delta as main value, current total as subtitle
+  function gainCellHtml(current, delta) {
+    if (delta === 0) {
+      return `<span class="cell-delta-main delta-zero">0</span><span class="cell-sub">${formatAbbr(current)}</span>`;
+    }
+    const cls = delta > 0 ? 'delta-pos' : 'delta-neg';
+    const sign = delta > 0 ? '+' : '';
+    return `<span class="cell-delta-main ${cls}">${sign}${formatAbbr(delta)}</span><span class="cell-sub">${formatAbbr(current)}</span>`;
+  }
 
   function loadData() {
     const t = Date.now();
@@ -605,6 +655,10 @@
   }
 
   // ===== TAB 2: Alliance Detail =====
+  function getDeltaKey(field, days) {
+    return `${field}_delta_${days}d`;
+  }
+
   function renderDetail() {
     const alliances = allianceData.alliances;
 
@@ -631,21 +685,54 @@
     }
 
     // Summary cards
+    const sumFields = ['power', 'helps', 'rss_contrib', 'iso_contrib',
+                       'players_killed', 'hostiles_killed', 'resources_mined', 'resources_raided'];
+    const sumLabels = {
+      power: 'Total Power', helps: 'Total Helps', rss_contrib: 'RSS Contrib',
+      iso_contrib: 'ISO Contrib', players_killed: 'PVP Kills',
+      hostiles_killed: 'Hostile Kills', resources_mined: 'RSS Mined',
+      resources_raided: 'RSS Raided',
+    };
+
     html += '<div class="cards">';
     html += `<div class="card"><div class="label">Tag</div><div class="value">${esc(info.alliance_tag)}</div></div>`;
     html += `<div class="card"><div class="label">Members</div><div class="value">${info.member_count}</div></div>`;
-    html += `<div class="card"><div class="label">Total Power</div><div class="value">${formatAbbr(info.total_power)}</div></div>`;
     html += `<div class="card"><div class="label">Avg Level</div><div class="value">${info.avg_level}</div></div>`;
     html += `<div class="card"><div class="label">Max Level</div><div class="value">${info.max_level}</div></div>`;
-    html += `<div class="card"><div class="label">7d Power Delta</div><div class="value">${formatDelta(info.power_delta_7d)}</div></div>`;
+
+    for (const field of sumFields) {
+      const total = members.reduce((s, p) => s + (p[field] || 0), 0);
+      let deltaHtml = '';
+      if (detailPeriod) {
+        const deltaTotal = members.reduce((s, p) => s + (p[getDeltaKey(field, detailPeriod)] || 0), 0);
+        deltaHtml = `<div style="font-size:0.85rem;margin-top:2px;">${formatDelta(deltaTotal)}</div>`;
+      }
+      html += `<div class="card"><div class="label">${sumLabels[field]}</div><div class="value">${formatAbbr(total)}</div>${deltaHtml}</div>`;
+    }
     html += '</div>';
 
-    // Sort members
+    // Period selector
+    html += '<div class="period-bar">';
+    const periods = [[null, 'All Time'], [1, '1 Day'], [7, '7 Days'], [30, '30 Days']];
+    for (const [p, label] of periods) {
+      const active = detailPeriod === p ? ' active' : '';
+      html += `<button class="period-btn${active}" data-period="${p}">${label}</button>`;
+    }
+    html += '</div>';
+
+    // Delta date info
+    if (detailPeriod && playerData.delta_dates) {
+      const baseDate = playerData.delta_dates[`${detailPeriod}d`];
+      if (baseDate) {
+        html += `<div style="text-align:center;font-size:0.78rem;color:#4a5568;margin-bottom:16px;">Comparing against ${baseDate}</div>`;
+      }
+    }
+
+    // Column definitions
     const cols = [
       { key: 'name',             label: 'Name' },
       { key: 'level',            label: 'Level' },
       { key: 'power',            label: 'Power' },
-      { key: 'power_delta_7d',   label: '7d Delta' },
       { key: 'helps',            label: 'Helps' },
       { key: 'rss_contrib',      label: 'RSS Contrib' },
       { key: 'iso_contrib',      label: 'ISO Contrib' },
@@ -655,9 +742,17 @@
       { key: 'resources_raided', label: 'RSS Raided' },
     ];
 
+    // Sort — use delta values when a period is active
+    const deltaFieldSet = new Set(DELTA_FIELDS);
     if (detailSortCol === 'name') {
       members.sort((a, b) => {
         const v = a.name.localeCompare(b.name);
+        return detailSortAsc ? v : -v;
+      });
+    } else if (detailPeriod && deltaFieldSet.has(detailSortCol)) {
+      const dk = getDeltaKey(detailSortCol, detailPeriod);
+      members.sort((a, b) => {
+        const v = (a[dk] || 0) - (b[dk] || 0);
         return detailSortAsc ? v : -v;
       });
     } else {
@@ -670,23 +765,24 @@
     html += '<div class="table-wrap"><table><thead><tr>';
     for (const col of cols) {
       const arrow = detailSortCol === col.key ? (detailSortAsc ? '&#9650;' : '&#9660;') : '';
-      html += `<th data-col="${col.key}">${col.label}<span class="arrow">${arrow}</span></th>`;
+      let label = col.label;
+      if (detailPeriod && deltaFieldSet.has(col.key)) label += '<br>Gained';
+      html += `<th data-col="${col.key}">${label}<span class="arrow">${arrow}</span></th>`;
     }
     html += '</tr></thead><tbody>';
 
     for (const p of members) {
       html += '<tr>';
-      html += `<td>${playerLink(p)}</td>`;
-      html += `<td>${p.level}</td>`;
-      html += `<td>${formatAbbr(p.power)}</td>`;
-      html += `<td>${formatDelta(p.power_delta_7d)}</td>`;
-      html += `<td>${formatAbbr(p.helps)}</td>`;
-      html += `<td>${formatAbbr(p.rss_contrib)}</td>`;
-      html += `<td>${formatAbbr(p.iso_contrib)}</td>`;
-      html += `<td>${formatAbbr(p.players_killed)}</td>`;
-      html += `<td>${formatAbbr(p.hostiles_killed)}</td>`;
-      html += `<td>${formatAbbr(p.resources_mined)}</td>`;
-      html += `<td>${formatAbbr(p.resources_raided)}</td>`;
+      for (const col of cols) {
+        if (col.key === 'name') {
+          html += `<td>${playerLink(p)}</td>`;
+        } else if (detailPeriod && deltaFieldSet.has(col.key)) {
+          const delta = p[getDeltaKey(col.key, detailPeriod)] || 0;
+          html += `<td>${gainCellHtml(p[col.key] || 0, delta)}</td>`;
+        } else {
+          html += `<td>${col.key === 'level' ? p[col.key] : formatAbbr(p[col.key] || 0)}</td>`;
+        }
+      }
       html += '</tr>';
     }
     html += '</tbody></table></div>';
@@ -708,6 +804,16 @@
         const col = th.dataset.col;
         if (detailSortCol === col) detailSortAsc = !detailSortAsc;
         else { detailSortCol = col; detailSortAsc = col === 'name'; }
+        document.getElementById('tab-content').innerHTML = renderDetail();
+        attachDetailHandlers();
+      });
+    });
+
+    // Period button handlers
+    document.querySelectorAll('#tab-content .period-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const p = btn.dataset.period;
+        detailPeriod = p === 'null' ? null : parseInt(p);
         document.getElementById('tab-content').innerHTML = renderDetail();
         attachDetailHandlers();
       });
@@ -748,7 +854,7 @@
       html += `<td>${esc(p.alliance_tag)}</td>`;
       html += `<td>${p.level}</td>`;
       html += `<td>${formatAbbr(p.power)}</td>`;
-      html += `<td>${formatDelta(p.power_delta_7d)}</td>`;
+      html += `<td>${formatDelta(p.power_delta_7d || 0)}</td>`;
       html += '</tr>';
     }
     html += '</tbody></table></div>';
