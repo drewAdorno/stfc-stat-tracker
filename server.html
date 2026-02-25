@@ -477,6 +477,7 @@
   // Sort state per tab
   let lbSortCol = 'total_power';
   let lbSortAsc = false;
+  let lbPeriod = 7; // 1/7/30 days for alliance leaderboard delta
   let detailSortCol = 'power';
   let detailSortAsc = false;
   let detailPeriod = null; // null = all time, 1/7/30 = days
@@ -568,13 +569,14 @@
   function renderLeaderboard() {
     const alliances = [...allianceData.alliances];
 
+    const deltaKey = `power_delta_${lbPeriod}d`;
     const cols = [
       { key: 'rank',         label: 'Rank' },
       { key: 'alliance_tag', label: 'Tag' },
       { key: 'member_count', label: 'Members' },
       { key: 'avg_level',    label: 'Avg Level' },
       { key: 'total_power',  label: 'Total Power' },
-      { key: 'power_delta_7d', label: '7d Delta' },
+      { key: deltaKey,       label: `${lbPeriod}d Delta` },
       { key: 'total_pvp',    label: 'PVP Kills' },
       { key: 'total_hk',     label: 'Hostile Kills' },
       { key: 'total_mined',  label: 'RSS Mined' },
@@ -602,7 +604,18 @@
     html += `<div class="card"><div class="label">Alliances</div><div class="value">${allianceData.alliance_count}</div></div>`;
     html += `<div class="card"><div class="label">Total Players</div><div class="value">${playerData.player_count}</div></div>`;
     html += `<div class="card"><div class="label">As Of</div><div class="value">${esc(allianceData.as_of_date)}</div></div>`;
-    html += `<div class="card"><div class="label">Delta Base</div><div class="value">${esc(allianceData.delta_base_date)}</div></div>`;
+    if (allianceData.delta_dates) {
+      const baseDate = allianceData.delta_dates[`${lbPeriod}d`];
+      if (baseDate) html += `<div class="card"><div class="label">Delta Base</div><div class="value">${esc(baseDate)}</div></div>`;
+    }
+    html += '</div>';
+
+    // Period selector
+    html += '<div class="period-bar">';
+    for (const [p, label] of [[1, '1 Day'], [7, '7 Days'], [30, '30 Days']]) {
+      const active = lbPeriod === p ? ' active' : '';
+      html += `<button class="lb-period-btn period-btn${active}" data-period="${p}">${label}</button>`;
+    }
     html += '</div>';
 
     // Table
@@ -622,7 +635,7 @@
       html += `<td>${a.member_count}</td>`;
       html += `<td>${a.avg_level}</td>`;
       html += `<td>${formatAbbr(a.total_power)}</td>`;
-      html += `<td>${formatDelta(a.power_delta_7d)}</td>`;
+      html += `<td>${formatDelta(a[deltaKey] || 0)}</td>`;
       html += `<td>${formatAbbr(a.total_pvp)}</td>`;
       html += `<td>${formatAbbr(a.total_hk)}</td>`;
       html += `<td>${formatAbbr(a.total_mined)}</td>`;
@@ -639,6 +652,15 @@
         const col = th.dataset.col;
         if (lbSortCol === col) lbSortAsc = !lbSortAsc;
         else { lbSortCol = col; lbSortAsc = col === 'alliance_tag'; }
+        document.getElementById('tab-content').innerHTML = renderLeaderboard();
+        attachLeaderboardHandlers();
+      });
+    });
+
+    // Period selector
+    document.querySelectorAll('.lb-period-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        lbPeriod = parseInt(btn.dataset.period);
         document.getElementById('tab-content').innerHTML = renderLeaderboard();
         attachLeaderboardHandlers();
       });

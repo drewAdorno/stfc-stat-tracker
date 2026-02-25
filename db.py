@@ -463,20 +463,24 @@ def import_history_json(conn):
 def export_server_alliances_json(conn):
     """Query all alliances on the server and write data/server_alliances.json.
 
-    Aggregates player data by alliance for the most recent date, with 7-day deltas.
+    Aggregates player data by alliance for the most recent date, with 1d/7d/30d deltas.
     """
+    delta_periods = [1, 7, 30]
+
     # Find the most recent date with data
     row = conn.execute("SELECT MAX(date) FROM daily_snapshots").fetchone()
     if not row or not row[0]:
         return
     latest_date = row[0]
 
-    # Find a date ~7 days ago for deltas
-    delta_row = conn.execute("""
-        SELECT MAX(date) FROM daily_snapshots
-        WHERE date <= date(?, '-7 days')
-    """, (latest_date,)).fetchone()
-    delta_date = delta_row[0] if delta_row and delta_row[0] else None
+    # Find delta dates for each period
+    delta_dates = {}
+    for days in delta_periods:
+        delta_row = conn.execute("""
+            SELECT MAX(date) FROM daily_snapshots
+            WHERE date <= date(?, ?)
+        """, (latest_date, f'-{days} days')).fetchone()
+        delta_dates[days] = delta_row[0] if delta_row and delta_row[0] else None
 
     # Get pull timestamp
     pull_row = conn.execute(
@@ -501,22 +505,25 @@ def export_server_alliances_json(conn):
         ORDER BY total_power DESC
     """, (latest_date,)).fetchall()
 
-    # Get 7-day-ago power by alliance for deltas
-    past_power = {}
-    if delta_date:
+    # Get past power by alliance for each delta period
+    past_power = {}  # {days: {alliance_id: total_power}}
+    for days in delta_periods:
+        dd = delta_dates[days]
+        if not dd:
+            past_power[days] = {}
+            continue
         past_rows = conn.execute("""
             SELECT alliance_id, SUM(power) as total_power
             FROM daily_snapshots
             WHERE date = ? AND alliance_id IS NOT NULL AND alliance_id != 0
             GROUP BY alliance_id
-        """, (delta_date,)).fetchall()
-        past_power = {r[0]: r[1] or 0 for r in past_rows}
+        """, (dd,)).fetchall()
+        past_power[days] = {r[0]: r[1] or 0 for r in past_rows}
 
     alliances = []
     for rank, r in enumerate(rows, 1):
         aid, atag, count, power, avg_lvl, max_lvl, pvp, hk, mined, raided = r
-        past_p = past_power.get(aid, 0)
-        alliances.append({
+        alliance = {
             "alliance_id": aid,
             "alliance_tag": atag or "",
             "rank": rank,
@@ -528,13 +535,19 @@ def export_server_alliances_json(conn):
             "total_hk": hk or 0,
             "total_mined": mined or 0,
             "total_raided": raided or 0,
-            "power_delta_7d": (power or 0) - past_p,
-        })
+        }
+        for days in delta_periods:
+            past_p = past_power[days].get(aid, 0)
+            alliance[f"power_delta_{days}d"] = (power or 0) - past_p
+        alliances.append(alliance)
 
     record = {
         "pulled_at": pulled_at,
         "as_of_date": latest_date,
-        "delta_base_date": delta_date or latest_date,
+        "delta_dates": {
+            f"{days}d": delta_dates[days] or latest_date
+            for days in delta_periods
+        },
         "alliance_count": len(alliances),
         "alliances": alliances,
     }
@@ -636,13 +649,15 @@ def export_server_players_json(conn):
                 delta = current_vals[field] - past[field] if past else 0
                 player[f"{field}_delta_{days}d"] = delta
 
-        # Alliance movement detection (7-day window)
-        past_7d = past_snapshots[7].get(pid)
+        # Alliance movement detection (check 1d, then 7d, then 30d)
         moved = False
         prev_tag = None
-        if past_7d and past_7d["alliance_id"] != aid:
-            moved = True
-            prev_tag = past_7d["alliance_tag"]
+        for days in delta_periods:
+            past = past_snapshots[days].get(pid)
+            if past and past["alliance_id"] != aid:
+                moved = True
+                prev_tag = past["alliance_tag"]
+                break  # use the shortest window that detects a change
 
         player["moved"] = moved
         player["prev_alliance_tag"] = prev_tag
