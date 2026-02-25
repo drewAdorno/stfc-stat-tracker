@@ -474,13 +474,20 @@ def export_server_alliances_json(conn):
     latest_date = row[0]
 
     # Find delta dates for each period
+    # If no snapshot exists that far back, use the earliest available date
+    earliest_date = conn.execute(
+        "SELECT MIN(date) FROM daily_snapshots"
+    ).fetchone()[0]
     delta_dates = {}
     for days in delta_periods:
         delta_row = conn.execute("""
             SELECT MAX(date) FROM daily_snapshots
             WHERE date <= date(?, ?)
         """, (latest_date, f'-{days} days')).fetchone()
-        delta_dates[days] = delta_row[0] if delta_row and delta_row[0] else None
+        dd = delta_row[0] if delta_row and delta_row[0] else None
+        if not dd and earliest_date and earliest_date < latest_date:
+            dd = earliest_date
+        delta_dates[days] = dd
 
     # Get pull timestamp
     pull_row = conn.execute(
@@ -578,14 +585,22 @@ def export_server_players_json(conn):
     latest_date = row[0]
 
     # Find dates for each delta period
+    # If no snapshot exists that far back, use the earliest available date
     delta_periods = [1, 7, 30]
+    earliest_date = conn.execute(
+        "SELECT MIN(date) FROM daily_snapshots"
+    ).fetchone()[0]
     delta_dates = {}
     for days in delta_periods:
         dr = conn.execute("""
             SELECT MAX(date) FROM daily_snapshots
             WHERE date <= date(?, ?)
         """, (latest_date, f"-{days} days")).fetchone()
-        delta_dates[days] = dr[0] if dr and dr[0] else None
+        dd = dr[0] if dr and dr[0] else None
+        # Fall back to earliest date if no data that far back
+        if not dd and earliest_date and earliest_date < latest_date:
+            dd = earliest_date
+        delta_dates[days] = dd
 
     # Get pull timestamp
     pull_row = conn.execute(
@@ -651,8 +666,8 @@ def export_server_players_json(conn):
         }
 
         # Compute deltas for all fields × all periods
-        # If a player has no snapshot for a longer period (e.g. 7d),
-        # fall back to the best available shorter period (e.g. 1d)
+        # If a player has no snapshot for a period (e.g. joined recently),
+        # fall back to their earliest available snapshot
         for days in delta_periods:
             past = past_snapshots[days].get(pid)
             if not past:
