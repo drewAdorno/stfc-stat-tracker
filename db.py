@@ -537,8 +537,16 @@ def export_server_alliances_json(conn):
             "total_raided": raided or 0,
         }
         for days in delta_periods:
-            past_p = past_power[days].get(aid, 0)
-            alliance[f"power_delta_{days}d"] = (power or 0) - past_p
+            past_p = past_power[days].get(aid)
+            if past_p is None:
+                # Fall back to the longest shorter period that has data
+                for shorter in reversed(delta_periods):
+                    if shorter < days:
+                        fallback = past_power[shorter].get(aid)
+                        if fallback is not None:
+                            past_p = fallback
+                            break
+            alliance[f"power_delta_{days}d"] = (power or 0) - (past_p or 0)
         alliances.append(alliance)
 
     record = {
@@ -643,8 +651,18 @@ def export_server_players_json(conn):
         }
 
         # Compute deltas for all fields × all periods
+        # If a player has no snapshot for a longer period (e.g. 7d),
+        # fall back to the best available shorter period (e.g. 1d)
         for days in delta_periods:
             past = past_snapshots[days].get(pid)
+            if not past:
+                # Fall back to the longest shorter period that has data
+                for shorter in reversed(delta_periods):
+                    if shorter < days:
+                        fallback = past_snapshots[shorter].get(pid)
+                        if fallback:
+                            past = fallback
+                            break
             for field in TRACKED_FIELDS:
                 delta = current_vals[field] - past[field] if past else 0
                 player[f"{field}_delta_{days}d"] = delta
