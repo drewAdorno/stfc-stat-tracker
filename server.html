@@ -184,6 +184,18 @@
     font-weight: 700;
     color: #4dabf7;
   }
+  .card .delta {
+    font-size: 0.8rem;
+    margin-top: 2px;
+    min-height: 1.2em;
+  }
+  .cards-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #636e7b;
+    margin-bottom: 8px;
+  }
 
   /* Search input */
   .search-wrap {
@@ -706,30 +718,37 @@
       return html;
     }
 
-    // Summary cards
-    const sumFields = ['power', 'helps', 'rss_contrib', 'iso_contrib',
-                       'players_killed', 'hostiles_killed', 'resources_mined', 'resources_raided'];
-    const sumLabels = {
-      power: 'Total Power', helps: 'Total Helps', rss_contrib: 'RSS Contrib',
+    // Summary cards — match homepage layout
+    const statFields = ['helps', 'rss_contrib', 'iso_contrib',
+                        'players_killed', 'hostiles_killed', 'resources_mined', 'resources_raided'];
+    const statLabels = {
+      helps: 'Helps', rss_contrib: 'RSS Contrib',
       iso_contrib: 'ISO Contrib', players_killed: 'PVP Kills',
       hostiles_killed: 'Hostile Kills', resources_mined: 'RSS Mined',
       resources_raided: 'RSS Raided',
     };
 
+    function statDelta(field) {
+      if (!detailPeriod) return '';
+      const dt = members.reduce((s, p) => s + (p[getDeltaKey(field, detailPeriod)] || 0), 0);
+      return `<div class="delta">${formatDelta(dt)}</div>`;
+    }
+
+    // Top row: key alliance info
+    const totalPower = members.reduce((s, p) => s + (p.power || 0), 0);
     html += '<div class="cards">';
-    html += `<div class="card"><div class="label">Tag</div><div class="value">${esc(info.alliance_tag)}</div></div>`;
+    html += `<div class="card"><div class="label">Total Power</div><div class="value">${formatAbbr(totalPower)}</div>${statDelta('power')}</div>`;
     html += `<div class="card"><div class="label">Members</div><div class="value">${info.member_count}</div></div>`;
     html += `<div class="card"><div class="label">Avg Level</div><div class="value">${info.avg_level}</div></div>`;
     html += `<div class="card"><div class="label">Max Level</div><div class="value">${info.max_level}</div></div>`;
+    html += '</div>';
 
-    for (const field of sumFields) {
+    // Bottom row: alliance stat totals
+    html += '<div class="cards-label">Alliance Totals</div>';
+    html += '<div class="cards">';
+    for (const field of statFields) {
       const total = members.reduce((s, p) => s + (p[field] || 0), 0);
-      let deltaHtml = '';
-      if (detailPeriod) {
-        const deltaTotal = members.reduce((s, p) => s + (p[getDeltaKey(field, detailPeriod)] || 0), 0);
-        deltaHtml = `<div style="font-size:0.85rem;margin-top:2px;">${formatDelta(deltaTotal)}</div>`;
-      }
-      html += `<div class="card"><div class="label">${sumLabels[field]}</div><div class="value">${formatAbbr(total)}</div>${deltaHtml}</div>`;
+      html += `<div class="card"><div class="label">${statLabels[field]}</div><div class="value">${formatAbbr(total)}</div>${statDelta(field)}</div>`;
     }
     html += '</div>';
 
