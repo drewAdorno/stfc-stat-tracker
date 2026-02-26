@@ -624,7 +624,7 @@
 
     // Period selector
     html += '<div class="period-bar">';
-    for (const [p, label] of [[1, '1 Day'], [7, '7 Days'], [30, '30 Days']]) {
+    for (const [p, label] of [[1, 'Yesterday'], [7, 'This Week'], [30, 'This Month']]) {
       const active = lbPeriod === p ? ' active' : '';
       html += `<button class="lb-period-btn period-btn${active}" data-period="${p}">${label}</button>`;
     }
@@ -754,7 +754,7 @@
 
     // Period selector
     html += '<div class="period-bar">';
-    const periods = [[null, 'All Time'], [1, '1 Day'], [7, '7 Days'], [30, '30 Days']];
+    const periods = [[null, 'All Time'], [1, 'Yesterday'], [7, 'This Week'], [30, 'This Month']];
     for (const [p, label] of periods) {
       const active = detailPeriod === p ? ' active' : '';
       html += `<button class="period-btn${active}" data-period="${p}">${label}</button>`;
