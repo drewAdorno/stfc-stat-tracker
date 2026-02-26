@@ -327,6 +327,10 @@ def export_history_json(conn, alliance_id=NCC_ALLIANCE_ID):
         total_helps = 0
         total_rss = 0
         total_iso = 0
+        total_pk = 0
+        total_hk = 0
+        total_rm = 0
+        total_rr = 0
         level_sum = 0
 
         for r in rows:
@@ -350,6 +354,10 @@ def export_history_json(conn, alliance_id=NCC_ALLIANCE_ID):
             total_helps += helps or 0
             total_rss += rss_c or 0
             total_iso += iso_c or 0
+            total_pk += pk or 0
+            total_hk += hk or 0
+            total_rm += rm or 0
+            total_rr += rr or 0
             level_sum += level or 0
 
         count = len(members_snapshot)
@@ -361,6 +369,10 @@ def export_history_json(conn, alliance_id=NCC_ALLIANCE_ID):
             "total_helps": _format_abbr(total_helps),
             "total_rss": _format_abbr(total_rss),
             "total_iso": _format_abbr(total_iso),
+            "total_players_killed": _format_abbr(total_pk),
+            "total_hostiles_killed": _format_abbr(total_hk),
+            "total_resources_mined": _format_abbr(total_rm),
+            "total_resources_raided": _format_abbr(total_rr),
             "avg_level": str(avg_level),
         }
 

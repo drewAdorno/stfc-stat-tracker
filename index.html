@@ -358,7 +358,9 @@
     let past = (member.id && pastSnapshot.members[member.id]) || pastSnapshot.members[member.name];
     if (!past) {
       // Member wasn't in this snapshot — find their earliest recorded entry
+      // Only search up to the past snapshot date (not beyond, which would find today's entry)
       for (const entry of history) {
+        if (entry.date > pastSnapshot.date) break;
         const m = (member.id && entry.members && entry.members[member.id]) || (entry.members && entry.members[member.name]);
         if (m) { past = m; break; }
       }
@@ -438,20 +440,19 @@
     const summaryKeyMap = {
       power: 'total_power', helps: 'total_helps',
       rss_contrib: 'total_rss', iso_contrib: 'total_iso',
+      players_killed: 'total_players_killed', hostiles_killed: 'total_hostiles_killed',
+      resources_mined: 'total_resources_mined', resources_raided: 'total_resources_raided',
     };
-    // Fields where totals are computed from members
-    const computedFields = new Set(['players_killed','hostiles_killed','resources_mined','resources_raided']);
     function renderCards(cardList) {
       let out = '';
       for (const [label, value, field] of cardList) {
         let cardDelta = '';
-        if (period && pastSnap && field) {
-          if (summaryKeyMap[field] && pastSnap.summary) {
-            const pastKey = summaryKeyMap[field];
-            if (pastSnap.summary[pastKey]) {
-              cardDelta = deltaHtml(value, pastSnap.summary[pastKey]);
-            }
-          } else if (computedFields.has(field) && pastSnap.members) {
+        if (period && pastSnap && field && summaryKeyMap[field] && pastSnap.summary) {
+          const pastKey = summaryKeyMap[field];
+          if (pastSnap.summary[pastKey]) {
+            cardDelta = deltaHtml(value, pastSnap.summary[pastKey]);
+          } else if (pastSnap.members) {
+            // Fallback for old history entries without summary totals
             const pastTotal = Object.values(pastSnap.members)
               .reduce((sum, m) => sum + parseAbbr(m[field]), 0);
             cardDelta = deltaHtml(value, formatAbbr(pastTotal));
