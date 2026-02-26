@@ -524,24 +524,39 @@ def export_server_alliances_json(conn):
         ORDER BY total_power DESC
     """, (latest_date,)).fetchall()
 
-    # Get past power by alliance for each delta period
-    past_power = {}  # {days: {alliance_id: total_power}}
+    # Stats fields to compute deltas for
+    delta_fields = [
+        ("total_power", "SUM(power)"),
+        ("member_count", "COUNT(*)"),
+        ("avg_level", "AVG(level)"),
+        ("total_pvp", "SUM(pvp_kills)"),
+        ("total_hk", "SUM(hostiles_killed)"),
+        ("total_mined", "SUM(resources_mined)"),
+        ("total_raided", "SUM(resources_raided)"),
+    ]
+    agg_sql = ", ".join(f"{sql} as {name}" for name, sql in delta_fields)
+
+    # Get past stats by alliance for each delta period
+    past_stats = {}  # {days: {alliance_id: {field: value}}}
     for days in delta_periods:
         dd = delta_dates[days]
         if not dd:
-            past_power[days] = {}
+            past_stats[days] = {}
             continue
-        past_rows = conn.execute("""
-            SELECT alliance_id, SUM(power) as total_power
+        past_rows = conn.execute(f"""
+            SELECT alliance_id, {agg_sql}
             FROM daily_snapshots
             WHERE date = ? AND alliance_id IS NOT NULL AND alliance_id != 0
             GROUP BY alliance_id
         """, (dd,)).fetchall()
-        past_power[days] = {r[0]: r[1] or 0 for r in past_rows}
+        past_stats[days] = {
+            r[0]: {name: r[i + 1] or 0 for i, (name, _) in enumerate(delta_fields)}
+            for r in past_rows
+        }
 
-    # Earliest power per alliance (fallback when alliance has no data for a period)
-    earliest_power_rows = conn.execute("""
-        SELECT ds.alliance_id, SUM(ds.power) as total_power
+    # Earliest stats per alliance (fallback when alliance has no data for a period)
+    earliest_rows = conn.execute(f"""
+        SELECT ds.alliance_id, {agg_sql}
         FROM daily_snapshots ds
         INNER JOIN (
             SELECT alliance_id, MIN(date) as min_date
@@ -551,7 +566,10 @@ def export_server_alliances_json(conn):
         ) e ON ds.alliance_id = e.alliance_id AND ds.date = e.min_date
         GROUP BY ds.alliance_id
     """).fetchall()
-    earliest_power = {r[0]: r[1] or 0 for r in earliest_power_rows}
+    earliest_stats = {
+        r[0]: {name: r[i + 1] or 0 for i, (name, _) in enumerate(delta_fields)}
+        for r in earliest_rows
+    }
 
     alliances = []
     for rank, r in enumerate(rows, 1):
@@ -569,11 +587,24 @@ def export_server_alliances_json(conn):
             "total_mined": mined or 0,
             "total_raided": raided or 0,
         }
+        current_vals = {
+            "total_power": power or 0,
+            "member_count": count or 0,
+            "avg_level": round(avg_lvl) if avg_lvl else 0,
+            "total_pvp": pvp or 0,
+            "total_hk": hk or 0,
+            "total_mined": mined or 0,
+            "total_raided": raided or 0,
+        }
         for days in delta_periods:
-            past_p = past_power[days].get(aid)
-            if past_p is None:
-                past_p = earliest_power.get(aid)
-            alliance[f"power_delta_{days}d"] = (power or 0) - (past_p or 0)
+            past_alliance = past_stats[days].get(aid)
+            if past_alliance is None:
+                past_alliance = earliest_stats.get(aid, {})
+            for field_name, _ in delta_fields:
+                past_val = past_alliance.get(field_name, 0)
+                if field_name == "avg_level":
+                    past_val = round(past_val) if past_val else 0
+                alliance[f"{field_name}_delta_{days}d"] = current_vals[field_name] - (past_val or 0)
         alliances.append(alliance)
 
     record = {

@@ -581,21 +581,19 @@
   function renderLeaderboard() {
     const alliances = [...allianceData.alliances];
 
-    const deltaKey = `power_delta_${lbPeriod}d`;
     const cols = [
       { key: 'rank',         label: 'Rank' },
       { key: 'alliance_tag', label: 'Tag' },
-      { key: 'member_count', label: 'Members' },
-      { key: 'avg_level',    label: 'Avg Level' },
-      { key: 'total_power',  label: 'Total Power' },
-      { key: deltaKey,       label: `${lbPeriod}d Delta` },
-      { key: 'total_pvp',    label: 'PVP Kills' },
-      { key: 'total_hk',     label: 'Hostile Kills' },
-      { key: 'total_mined',  label: 'RSS Mined' },
-      { key: 'total_raided', label: 'RSS Raided' },
+      { key: 'member_count', label: 'Members',       delta: true },
+      { key: 'avg_level',    label: 'Avg Level',     delta: true },
+      { key: 'total_power',  label: 'Total Power',   delta: true },
+      { key: 'total_pvp',    label: 'PVP Kills',     delta: true },
+      { key: 'total_hk',     label: 'Hostile Kills',  delta: true },
+      { key: 'total_mined',  label: 'RSS Mined',     delta: true },
+      { key: 'total_raided', label: 'RSS Raided',    delta: true },
     ];
 
-    // Sort
+    // Sort — use delta value for delta-enabled columns when a period is active
     const sortDef = cols.find(c => c.key === lbSortCol);
     if (sortDef) {
       if (lbSortCol === 'alliance_tag') {
@@ -604,8 +602,10 @@
           return lbSortAsc ? v : -v;
         });
       } else {
+        const useDelta = sortDef.delta && lbPeriod;
+        const sortKey = useDelta ? `${lbSortCol}_delta_${lbPeriod}d` : lbSortCol;
         alliances.sort((a, b) => {
-          const v = (a[lbSortCol] || 0) - (b[lbSortCol] || 0);
+          const v = (a[sortKey] || 0) - (b[sortKey] || 0);
           return lbSortAsc ? v : -v;
         });
       }
@@ -644,14 +644,15 @@
       html += `<tr class="${rowCls.trim()}" data-aid="${a.alliance_id}">`;
       html += `<td>${a.rank}</td>`;
       html += `<td><strong>${esc(a.alliance_tag)}</strong></td>`;
-      html += `<td>${a.member_count}</td>`;
-      html += `<td>${a.avg_level}</td>`;
-      html += `<td>${formatAbbr(a.total_power)}</td>`;
-      html += `<td>${formatDelta(a[deltaKey] || 0)}</td>`;
-      html += `<td>${formatAbbr(a.total_pvp)}</td>`;
-      html += `<td>${formatAbbr(a.total_hk)}</td>`;
-      html += `<td>${formatAbbr(a.total_mined)}</td>`;
-      html += `<td>${formatAbbr(a.total_raided)}</td>`;
+      for (const col of cols.slice(2)) {
+        const val = a[col.key] || 0;
+        if (col.delta && lbPeriod) {
+          const delta = a[`${col.key}_delta_${lbPeriod}d`] || 0;
+          html += `<td>${gainCellHtml(val, delta)}</td>`;
+        } else {
+          html += `<td>${col.key === 'member_count' || col.key === 'avg_level' ? val : formatAbbr(val)}</td>`;
+        }
+      }
       html += '</tr>';
     }
     html += '</tbody></table></div>';
