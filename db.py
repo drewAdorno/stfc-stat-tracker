@@ -529,7 +529,7 @@ def export_server_alliances_json(conn):
         ("total_power", "SUM(power)"),
         ("member_count", "COUNT(*)"),
         ("avg_level", "AVG(level)"),
-        ("total_pvp", "SUM(pvp_kills)"),
+        ("total_pvp", "SUM(players_killed)"),
         ("total_hk", "SUM(hostiles_killed)"),
         ("total_mined", "SUM(resources_mined)"),
         ("total_raided", "SUM(resources_raided)"),
