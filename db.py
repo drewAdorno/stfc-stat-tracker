@@ -539,6 +539,20 @@ def export_server_alliances_json(conn):
         """, (dd,)).fetchall()
         past_power[days] = {r[0]: r[1] or 0 for r in past_rows}
 
+    # Earliest power per alliance (fallback when alliance has no data for a period)
+    earliest_power_rows = conn.execute("""
+        SELECT ds.alliance_id, SUM(ds.power) as total_power
+        FROM daily_snapshots ds
+        INNER JOIN (
+            SELECT alliance_id, MIN(date) as min_date
+            FROM daily_snapshots
+            WHERE alliance_id IS NOT NULL AND alliance_id != 0
+            GROUP BY alliance_id
+        ) e ON ds.alliance_id = e.alliance_id AND ds.date = e.min_date
+        GROUP BY ds.alliance_id
+    """).fetchall()
+    earliest_power = {r[0]: r[1] or 0 for r in earliest_power_rows}
+
     alliances = []
     for rank, r in enumerate(rows, 1):
         aid, atag, count, power, avg_lvl, max_lvl, pvp, hk, mined, raided = r
@@ -558,13 +572,7 @@ def export_server_alliances_json(conn):
         for days in delta_periods:
             past_p = past_power[days].get(aid)
             if past_p is None:
-                # Fall back to the longest shorter period that has data
-                for shorter in reversed(delta_periods):
-                    if shorter < days:
-                        fallback = past_power[shorter].get(aid)
-                        if fallback is not None:
-                            past_p = fallback
-                            break
+                past_p = earliest_power.get(aid)
             alliance[f"power_delta_{days}d"] = (power or 0) - (past_p or 0)
         alliances.append(alliance)
 
@@ -657,6 +665,28 @@ def export_server_players_json(conn):
             for r in past_rows
         }
 
+    # Load earliest snapshot per player (fallback when player has no data for a period)
+    earliest_rows = conn.execute("""
+        SELECT ds.player_id, ds.level, ds.power, ds.helps, ds.rss_contrib,
+               ds.iso_contrib, ds.players_killed, ds.hostiles_killed,
+               ds.resources_mined, ds.resources_raided, ds.alliance_id, ds.alliance_tag
+        FROM daily_snapshots ds
+        INNER JOIN (
+            SELECT player_id, MIN(date) as min_date
+            FROM daily_snapshots GROUP BY player_id
+        ) e ON ds.player_id = e.player_id AND ds.date = e.min_date
+    """).fetchall()
+    earliest_snapshot = {
+        r[0]: {
+            "level": r[1] or 0, "power": r[2] or 0, "helps": r[3] or 0,
+            "rss_contrib": r[4] or 0, "iso_contrib": r[5] or 0,
+            "players_killed": r[6] or 0, "hostiles_killed": r[7] or 0,
+            "resources_mined": r[8] or 0, "resources_raided": r[9] or 0,
+            "alliance_id": r[10], "alliance_tag": r[11] or "",
+        }
+        for r in earliest_rows
+    }
+
     players = []
     for r in rows:
         (pid, name, aid, atag, level, power, helps, rss_c, iso_c,
@@ -678,18 +708,11 @@ def export_server_players_json(conn):
         }
 
         # Compute deltas for all fields × all periods
-        # If a player has no snapshot for a period (e.g. joined recently),
-        # fall back to their earliest available snapshot
+        # If a player has no snapshot for a period, fall back to earliest available
         for days in delta_periods:
             past = past_snapshots[days].get(pid)
             if not past:
-                # Fall back to the longest shorter period that has data
-                for shorter in reversed(delta_periods):
-                    if shorter < days:
-                        fallback = past_snapshots[shorter].get(pid)
-                        if fallback:
-                            past = fallback
-                            break
+                past = earliest_snapshot.get(pid)
             for field in TRACKED_FIELDS:
                 delta = current_vals[field] - past[field] if past else 0
                 player[f"{field}_delta_{days}d"] = delta
