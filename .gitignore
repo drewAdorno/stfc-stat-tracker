@@ -14,8 +14,10 @@ data/latest.json
 data/history.json
 data/server_alliances.json
 data/server_players.json
+data/server_history.json
 data/session_cookies.json
 data/*.bin
 data/api_sniff.json
 data/api_sample_response.json
 venv/
+CLAUDE.md

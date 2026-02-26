@@ -472,6 +472,56 @@ def import_history_json(conn):
     print(f"Import complete: {players} players, {total} snapshot rows.")
 
 
+def export_server_history_json(conn):
+    """Query all daily snapshots for ALL server players and write data/server_history.json.
+
+    Same per-player format as history.json but without alliance filtering and without
+    the per-date summary object (not needed for individual player lookups, saves space).
+    """
+    dates = conn.execute(
+        "SELECT DISTINCT date FROM daily_snapshots ORDER BY date",
+    ).fetchall()
+
+    history = []
+    for (date,) in dates:
+        rows = conn.execute("""
+            SELECT ds.player_id, ds.level, ds.power, ds.helps, ds.rss_contrib,
+                   ds.iso_contrib, ds.players_killed, ds.hostiles_killed,
+                   ds.resources_mined, ds.resources_raided,
+                   COALESCE(ds.name, p.name) as name
+            FROM daily_snapshots ds
+            JOIN players p ON p.player_id = ds.player_id
+            WHERE ds.date = ?
+        """, (date,)).fetchall()
+
+        members_snapshot = {}
+        for r in rows:
+            (pid, level, power, helps, rss_c, iso_c,
+             pk, hk, rm, rr, name) = r
+
+            members_snapshot[str(pid)] = {
+                "level": _format_abbr(level),
+                "power": _format_abbr(power),
+                "helps": _format_abbr(helps),
+                "rss_contrib": _format_abbr(rss_c),
+                "iso_contrib": _format_abbr(iso_c),
+                "players_killed": _format_abbr(pk),
+                "hostiles_killed": _format_abbr(hk),
+                "resources_mined": _format_abbr(rm),
+                "resources_raided": _format_abbr(rr),
+                "name": name,
+            }
+
+        history.append({
+            "date": date,
+            "members": members_snapshot,
+        })
+
+    history_file = DATA_DIR / "server_history.json"
+    with open(history_file, "w", encoding="utf-8") as f:
+        json.dump(history, f, ensure_ascii=False)
+
+
 def export_server_alliances_json(conn):
     """Query all alliances on the server and write data/server_alliances.json.
 

@@ -250,7 +250,7 @@
 <body>
 <div class="container">
   <header>
-    <a class="back-link" href="index.html">&larr; Back to Alliance</a>
+    <a class="back-link" id="back-link" href="index.html">&larr; Back to Alliance</a>
     <div id="player-header"></div>
   </header>
 
@@ -343,6 +343,7 @@
 
   let chart = null;
   let currentStat = 'power';
+  let isNccPlayer = true; // set during render
 
   function renderChart(dates, player, statKey) {
     const values = dates.map(d => d.value);
@@ -412,14 +413,13 @@
     return points;
   }
 
-  function render(data, history) {
-    const members = data.members || [];
-    const player = members.find(m => m.id === playerId);
+  function render(player, history, peerMembers) {
     if (!player) {
       $('player-header').innerHTML = '';
       $('content').innerHTML = '<div class="loading error">Player not found in current data.</div>';
       return;
     }
+    const members = peerMembers;
 
     // Collect name history from snapshots
     const nameHistory = [];
@@ -450,7 +450,7 @@
       </div>
       <div class="player-meta">${metaHtml}</div>
     `;
-    document.title = player.name + ' — NCC Alliance Tracker';
+    document.title = player.name + (isNccPlayer ? ' — NCC Alliance Tracker' : ' — Server 716 Player');
 
     // Get 1-day-ago snapshot for deltas
     let pastSnap = null;
@@ -517,7 +517,8 @@
 
     // Alliance Standing
     html += '<div class="section">';
-    html += '<div class="section-title">Alliance Standing</div>';
+    const standingTitle = isNccPlayer ? 'Alliance Standing' : 'Alliance Standing' + (player.alliance_tag ? ' [' + esc(player.alliance_tag) + ']' : '');
+    html += `<div class="section-title">${standingTitle}</div>`;
     const standingStats = [
       { key: 'power', label: 'Power' },
       { key: 'helps', label: 'Helps' },
@@ -591,18 +592,95 @@
     }
   }
 
-  // Load data
-  const dataPromise = fetch('data/latest.json?t=' + Date.now())
+  // Load data — try NCC data first, fall back to server-wide data for non-NCC players
+  const cacheBust = Date.now();
+
+  const latestP = fetch('data/latest.json?t=' + cacheBust)
     .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
 
-  const historyPromise = fetch('data/history.json?t=' + Date.now())
+  const historyP = fetch('data/history.json?t=' + cacheBust)
     .then(r => { if (!r.ok) return []; return r.json(); })
     .catch(() => []);
 
-  Promise.all([dataPromise, historyPromise])
-    .then(([d, h]) => {
-      const history = h.sort((a, b) => a.date.localeCompare(b.date));
-      render(d, history);
+  const serverPlayersP = fetch('data/server_players.json?t=' + cacheBust)
+    .then(r => { if (!r.ok) return null; return r.json(); })
+    .catch(() => null);
+
+  Promise.all([latestP, historyP, serverPlayersP])
+    .then(([latestData, nccHistory, serverPlayersData]) => {
+      const nccMembers = latestData.members || [];
+      const nccPlayer = nccMembers.find(m => m.id === playerId);
+
+      if (nccPlayer) {
+        // NCC member — use NCC data as before
+        isNccPlayer = true;
+        const history = nccHistory.sort((a, b) => a.date.localeCompare(b.date));
+        render(nccPlayer, history, nccMembers);
+      } else if (serverPlayersData) {
+        // Non-NCC player — use server-wide data
+        isNccPlayer = false;
+
+        // Update back link to point to server page
+        const backLink = $('back-link');
+        backLink.href = 'server.html';
+        backLink.innerHTML = '&larr; Back to Server';
+
+        // Find player in server_players.json
+        const sp = serverPlayersData.players.find(p => p.id === playerId);
+        if (!sp) {
+          $('player-header').innerHTML = '';
+          $('content').innerHTML = '<div class="loading error">Player not found in current data.</div>';
+          return;
+        }
+
+        // Map server_players fields to the format render() expects (abbreviated strings)
+        const player = {
+          id: sp.id,
+          name: sp.name,
+          alliance_tag: sp.alliance_tag,
+          alliance_id: sp.alliance_id,
+          rank: '',
+          join_date: '',
+          level: formatAbbr(sp.level),
+          power: formatAbbr(sp.power),
+          helps: formatAbbr(sp.helps),
+          rss_contrib: formatAbbr(sp.rss_contrib),
+          iso_contrib: formatAbbr(sp.iso_contrib),
+          players_killed: formatAbbr(sp.players_killed),
+          hostiles_killed: formatAbbr(sp.hostiles_killed),
+          resources_mined: formatAbbr(sp.resources_mined),
+          resources_raided: formatAbbr(sp.resources_raided),
+        };
+
+        // Build peer list: same-alliance members for Alliance Standing
+        const allianceId = sp.alliance_id;
+        const peers = serverPlayersData.players
+          .filter(p => p.alliance_id === allianceId)
+          .map(p => ({
+            id: p.id,
+            name: p.name,
+            power: formatAbbr(p.power),
+            helps: formatAbbr(p.helps),
+            rss_contrib: formatAbbr(p.rss_contrib),
+            iso_contrib: formatAbbr(p.iso_contrib),
+            players_killed: formatAbbr(p.players_killed),
+            hostiles_killed: formatAbbr(p.hostiles_killed),
+            resources_mined: formatAbbr(p.resources_mined),
+            resources_raided: formatAbbr(p.resources_raided),
+          }));
+
+        // Load server_history.json for chart and name history (lazy, only for non-NCC)
+        fetch('data/server_history.json?t=' + cacheBust)
+          .then(r => { if (!r.ok) return []; return r.json(); })
+          .catch(() => [])
+          .then(serverHistory => {
+            const history = serverHistory.sort((a, b) => a.date.localeCompare(b.date));
+            render(player, history, peers);
+          });
+      } else {
+        $('player-header').innerHTML = '';
+        $('content').innerHTML = '<div class="loading error">Player not found in current data.</div>';
+      }
     })
     .catch(err => {
       $('player-header').innerHTML = '';

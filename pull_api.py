@@ -22,7 +22,8 @@ from curl_cffi import requests as cffi_requests
 from playwright.sync_api import sync_playwright
 
 from db import (get_db, upsert_players, log_pull, export_latest_json, export_history_json,
-                export_server_alliances_json, export_server_players_json)
+                export_server_alliances_json, export_server_players_json,
+                export_server_history_json)
 
 IS_WINDOWS = platform.system() == "Windows"
 
@@ -548,6 +549,9 @@ def save_data(all_players, total_count, league=""):
 
     export_server_players_json(conn)
     safe_print(f"Exported {DATA_DIR / 'server_players.json'}")
+
+    export_server_history_json(conn)
+    safe_print(f"Exported {DATA_DIR / 'server_history.json'}")
 
     conn.close()
 
