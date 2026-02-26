@@ -56,6 +56,10 @@ jobs:
             conn = get_db(); export_latest_json(conn); export_history_json(conn); export_server_alliances_json(conn); export_server_players_json(conn); conn.close()
             "
 
-            sudo cp deploy/stfc-nginx.conf /etc/nginx/sites-available/stfc
-            sudo certbot --nginx -d ncctracker.top -d www.ncctracker.top --non-interactive --redirect
+            # Only update nginx config + re-run certbot if the base config changed
+            if ! diff -q deploy/stfc-nginx.conf /etc/nginx/sites-available/stfc.base > /dev/null 2>&1; then
+              sudo cp deploy/stfc-nginx.conf /etc/nginx/sites-available/stfc.base
+              sudo cp deploy/stfc-nginx.conf /etc/nginx/sites-available/stfc
+              sudo certbot --nginx -d ncctracker.top -d www.ncctracker.top --non-interactive --redirect
+            fi
             sudo nginx -t && sudo systemctl reload nginx
