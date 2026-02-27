@@ -297,10 +297,9 @@ def compute_activity_scores(players):
         return {}
 
     WEIGHTS = [
-        ("hostiles_killed", 0.30),
-        ("resources_mined", 0.25),
-        ("helps", 0.20),
-        ("power", 0.15),
+        ("hostiles_killed", 0.35),
+        ("resources_mined", 0.30),
+        ("helps", 0.25),
         ("players_killed", 0.10),
     ]
 
