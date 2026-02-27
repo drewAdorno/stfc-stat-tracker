@@ -808,10 +808,14 @@ def export_server_players_json(conn):
                 player[f"{field}_delta_{days}d"] = delta
 
         # Alliance movement detection (check 1d, then 7d, then 30d)
+        # Falls back to earliest snapshot so moves are caught even when a
+        # player has no data for a specific delta date.
         moved = False
         prev_tag = None
         for days in delta_periods:
             past = past_snapshots[days].get(pid)
+            if not past:
+                past = earliest_snapshot.get(pid)
             if past and past["alliance_id"] != aid:
                 moved = True
                 prev_tag = past["alliance_tag"]
