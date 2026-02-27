@@ -525,6 +525,12 @@
           year: 'numeric', month: 'short', day: 'numeric',
           hour: '2-digit', minute: '2-digit'
         });
+        // Deep-link: ?alliance=<id> opens alliance detail tab
+        const urlAllianceId = parseInt(new URLSearchParams(window.location.search).get('alliance'));
+        if (urlAllianceId && a.alliances.some(al => al.alliance_id === urlAllianceId)) {
+          detailAllianceId = urlAllianceId;
+          currentTab = 'detail';
+        }
         renderPage();
       })
       .catch(err => {

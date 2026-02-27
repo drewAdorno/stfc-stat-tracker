@@ -445,8 +445,8 @@
         ? `${esc(player.alliance_name)} [${esc(player.alliance_tag)}]`
         : esc(player.alliance_tag || '');
       if (allianceLabel) {
-        const allianceUrl = `https://v3.stfc.pro/alliances/${player.alliance_id}`;
-        metaHtml += ` &middot; <a href="${allianceUrl}" target="_blank" rel="noopener" style="color:#4dabf7;text-decoration:none">${allianceLabel}</a>`;
+        const allianceUrl = `server?alliance=${encodeURIComponent(player.alliance_id)}`;
+        metaHtml += ` &middot; <a href="${allianceUrl}" style="color:#4dabf7;text-decoration:none">${allianceLabel}</a>`;
       }
     }
     if (player.join_date) {
