@@ -767,37 +767,38 @@
     return '<span class="badge badge-cold">COLD</span>';
   }
 
+  // Filter test functions (reused for counts and actual filtering)
+  function testNoAlliance(p) { return !p.alliance_tag || p.alliance_tag === ''; }
+  function testSmallAlliance(p) { return p.alliance_tag && (allianceMemberCounts[p.alliance_tag] || 0) < 10; }
+  function testRecentlyMoved(p) { return p.moved === true; }
+  function testHighActivity(p, period) {
+    const dk = getDeltaKey('power', period);
+    return (p[dk] || 0) > avgPowerDelta7d;
+  }
+  function testHighLevel(p, minLevel) { return (p.level || 0) >= minLevel; }
+
   function renderRecruiting() {
-    let players = [...playerData.players];
+    // Base pool: everyone except NCC
+    const basePlayers = playerData.players.filter(p => p.alliance_id !== NCC_ID);
 
-    // Exclude NCC members from recruiting board
-    players = players.filter(p => p.alliance_id !== NCC_ID);
+    // Count how many match each filter (against the base pool) for button labels
+    const filterCounts = {
+      noAlliance:    basePlayers.filter(p => testNoAlliance(p)).length,
+      smallAlliance: basePlayers.filter(p => testSmallAlliance(p)).length,
+      recentlyMoved: basePlayers.filter(p => testRecentlyMoved(p)).length,
+      highActivity:  basePlayers.filter(p => testHighActivity(p, recPeriod)).length,
+      highLevel:     basePlayers.filter(p => testHighLevel(p, recMinLevel)).length,
+    };
 
-    // Apply filters
-    const anyFilterActive = recFilters.noAlliance || recFilters.smallAlliance ||
-      recFilters.recentlyMoved || recFilters.highActivity || recFilters.highLevel || recMinPower > 0;
+    // Apply filters with AND logic — each active filter narrows the list
+    let players = [...basePlayers];
 
-    if (anyFilterActive) {
-      players = players.filter(p => {
-        // Min power always applies if set
-        if (recMinPower > 0 && (p.power || 0) < recMinPower) return false;
-
-        // Toggle filters: player must match at least one active toggle
-        const toggles = [];
-        if (recFilters.noAlliance) toggles.push(!p.alliance_tag || p.alliance_tag === '');
-        if (recFilters.smallAlliance) toggles.push(p.alliance_tag && (allianceMemberCounts[p.alliance_tag] || 0) < 10);
-        if (recFilters.recentlyMoved) toggles.push(p.moved === true);
-        if (recFilters.highActivity) {
-          const dk = getDeltaKey('power', recPeriod);
-          toggles.push((p[dk] || 0) > avgPowerDelta7d);
-        }
-        if (recFilters.highLevel) toggles.push((p.level || 0) >= recMinLevel);
-
-        // If any toggle filters are active, player must match at least one
-        if (toggles.length > 0) return toggles.some(v => v);
-        return true; // Only min power was set
-      });
-    }
+    if (recFilters.noAlliance) players = players.filter(p => testNoAlliance(p));
+    if (recFilters.smallAlliance) players = players.filter(p => testSmallAlliance(p));
+    if (recFilters.recentlyMoved) players = players.filter(p => testRecentlyMoved(p));
+    if (recFilters.highActivity) players = players.filter(p => testHighActivity(p, recPeriod));
+    if (recFilters.highLevel) players = players.filter(p => testHighLevel(p, recMinLevel));
+    if (recMinPower > 0) players = players.filter(p => (p.power || 0) >= recMinPower);
 
     // Search
     if (recSearch.length >= 2) {
@@ -852,7 +853,7 @@
 
     let html = '';
 
-    // Filter controls
+    // Filter controls with counts
     html += '<div class="filter-bar">';
     const toggleDefs = [
       ['noAlliance',    'No Alliance'],
@@ -863,7 +864,7 @@
     ];
     for (const [key, label] of toggleDefs) {
       const active = recFilters[key] ? ' active' : '';
-      html += `<button class="filter-toggle${active}" data-filter="${key}">${label}</button>`;
+      html += `<button class="filter-toggle${active}" data-filter="${key}">${label} (${filterCounts[key]})</button>`;
     }
     html += '<div class="filter-input-wrap">';
     html += `<label>Min Level:</label><input type="number" id="rec-min-level" value="${recMinLevel}" min="1" max="99">`;
@@ -886,12 +887,7 @@
     }
     html += '</div>';
 
-    if (!anyFilterActive && recSearch.length < 2) {
-      html += '<div class="empty">Enable at least one filter or search to view recruiting targets</div>';
-      return html;
-    }
-
-    html += `<div class="result-count">${players.length.toLocaleString()} players match</div>`;
+    html += `<div class="result-count">${players.length.toLocaleString()} players</div>`;
 
     const shown = players.slice(0, 500);
 
