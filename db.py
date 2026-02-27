@@ -75,6 +75,16 @@ CREATE TABLE IF NOT EXISTS discord_links (
     linked_at       TEXT NOT NULL,
     FOREIGN KEY (player_id) REFERENCES players(player_id)
 );
+
+CREATE TABLE IF NOT EXISTS daily_stat_changes (
+    date        TEXT NOT NULL,
+    field       TEXT NOT NULL,
+    detected_at TEXT NOT NULL,
+    sample_player_id INTEGER,
+    old_value   INTEGER,
+    new_value   INTEGER,
+    PRIMARY KEY (date, field)
+);
 """
 
 
@@ -93,12 +103,69 @@ def get_db():
     return conn
 
 
+DAILY_STAT_FIELDS = ["hostiles_killed", "resources_mined", "helps", "players_killed"]
+
+
+def _detect_daily_stat_changes(conn, mapped_players, date):
+    """Check if daily-reset stats changed since last pull and log the first detection.
+
+    Compares incoming values against stored snapshots for a sample of players.
+    Uses INSERT OR IGNORE so only the first detection per field per date is recorded.
+    """
+    # Build a lookup of incoming data by player_id
+    incoming = {}
+    for m in mapped_players:
+        pid = int(m["id"])
+        incoming[pid] = m
+
+    # Get a sample of players that already have a snapshot for today
+    sample_rows = conn.execute("""
+        SELECT player_id, hostiles_killed, resources_mined, helps, players_killed
+        FROM daily_snapshots
+        WHERE date = ?
+        LIMIT 5
+    """, (date,)).fetchall()
+
+    if not sample_rows:
+        return  # First pull of the day, nothing to compare
+
+    detected_at = now_est().isoformat()
+
+    for row in sample_rows:
+        pid = row[0]
+        if pid not in incoming:
+            continue
+        stored = {
+            "hostiles_killed": row[1] or 0,
+            "resources_mined": row[2] or 0,
+            "helps": row[3] or 0,
+            "players_killed": row[4] or 0,
+        }
+        inc = incoming[pid]
+        for field in DAILY_STAT_FIELDS:
+            old_val = stored[field]
+            new_val = int(inc.get(field, 0))
+            if new_val != old_val:
+                conn.execute("""
+                    INSERT OR IGNORE INTO daily_stat_changes
+                        (date, field, detected_at, sample_player_id, old_value, new_value)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                """, (date, field, detected_at, pid, old_val, new_val))
+                print(f"[daily_stat_change] {field} changed for player {pid}: "
+                      f"{old_val} -> {new_val} (detected {detected_at})")
+
+    conn.commit()
+
+
 def upsert_players(conn, mapped_players, date):
     """Bulk insert/update players and daily_snapshots for a given date.
 
     mapped_players: list of dicts from pull_api.map_player() with integer values.
     date: YYYY-MM-DD string.
     """
+    # Detect daily stat refreshes before overwriting snapshots
+    _detect_daily_stat_changes(conn, mapped_players, date)
+
     cur = conn.cursor()
 
     for m in mapped_players:
