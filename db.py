@@ -4,6 +4,7 @@ Stores all player data in data/stfc.db and exports JSON files for dashboards.
 """
 
 import json
+import math
 import sqlite3
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
@@ -282,6 +283,86 @@ def _format_abbr(n):
     return str(n)
 
 
+def compute_activity_scores(players):
+    """Compute activity scores (0-100) for a list of player dicts with raw integer stats.
+
+    Uses a 50/50 blend of log-absolute engagement and level-relative performance.
+    Returns a dict {player_id_str: score_int}.
+    """
+    if not players:
+        return {}
+
+    WEIGHTS = [
+        ("hostiles_killed", 0.30),
+        ("resources_mined", 0.25),
+        ("helps", 0.20),
+        ("power", 0.15),
+        ("players_killed", 0.10),
+    ]
+
+    # --- Component 1: Log-absolute score ---
+    raw_abs = []
+    for p in players:
+        s = sum(math.log1p(p.get(f, 0) or 0) * w for f, w in WEIGHTS)
+        raw_abs.append(s)
+
+    abs_min = min(raw_abs) if raw_abs else 0
+    abs_max = max(raw_abs) if raw_abs else 1
+    abs_range = abs_max - abs_min if abs_max != abs_min else 1
+
+    # --- Component 2: Level-relative score ---
+    # Group players into 5-level bands
+    bands = {}
+    for i, p in enumerate(players):
+        level = p.get("level", 0) or 0
+        band = (level // 5) * 5
+        bands.setdefault(band, []).append(i)
+
+    # Compute median for each stat per band
+    band_medians = {}
+    for band, indices in bands.items():
+        medians = {}
+        for field, _ in WEIGHTS:
+            vals = sorted((players[i].get(field, 0) or 0) for i in indices)
+            n = len(vals)
+            if n % 2 == 1:
+                medians[field] = vals[n // 2]
+            else:
+                medians[field] = (vals[n // 2 - 1] + vals[n // 2]) / 2
+        band_medians[band] = medians
+
+    raw_rel = []
+    for p in players:
+        level = p.get("level", 0) or 0
+        band = (level // 5) * 5
+        medians = band_medians[band]
+        s = 0
+        for field, w in WEIGHTS:
+            median = medians[field]
+            if median > 0:
+                ratio = min((p.get(field, 0) or 0) / median, 5.0)
+            else:
+                ratio = 1.0 if (p.get(field, 0) or 0) > 0 else 0.0
+            s += ratio * w
+        raw_rel.append(s)
+
+    rel_min = min(raw_rel) if raw_rel else 0
+    rel_max = max(raw_rel) if raw_rel else 1
+    rel_range = rel_max - rel_min if rel_max != rel_min else 1
+
+    # --- Blend and produce final scores ---
+    scores = {}
+    for i, p in enumerate(players):
+        norm_abs = (raw_abs[i] - abs_min) / abs_range
+        norm_rel = (raw_rel[i] - rel_min) / rel_range
+        final = int((norm_abs * 0.5 + norm_rel * 0.5) * 100)
+        final = max(0, min(100, final))
+        pid = str(p.get("id", p.get("player_id", "")))
+        scores[pid] = final
+
+    return scores
+
+
 def export_latest_json(conn, alliance_id=NCC_ALLIANCE_ID, league=""):
     """Query the most recent snapshot for an alliance and write data/latest.json.
 
@@ -357,6 +438,22 @@ def export_latest_json(conn, alliance_id=NCC_ALLIANCE_ID, league=""):
         level_sum += level or 0
 
     avg_level = round(level_sum / len(members)) if members else 0
+
+    # Compute activity scores using all server players for normalization
+    all_rows = conn.execute("""
+        SELECT player_id, level, power, helps, players_killed,
+               hostiles_killed, resources_mined
+        FROM daily_snapshots WHERE date = ?
+    """, (latest_date,)).fetchall()
+    all_players_raw = [
+        {"id": str(r[0]), "level": r[1] or 0, "power": r[2] or 0,
+         "helps": r[3] or 0, "players_killed": r[4] or 0,
+         "hostiles_killed": r[5] or 0, "resources_mined": r[6] or 0}
+        for r in all_rows
+    ]
+    scores = compute_activity_scores(all_players_raw)
+    for m in members:
+        m["activity_score"] = scores.get(m["id"], 0)
 
     record = {
         "pulled_at": pulled_at,
@@ -898,6 +995,11 @@ def export_server_players_json(conn):
         player["prev_alliance_tag"] = prev_tag
 
         players.append(player)
+
+    # Compute activity scores across all server players
+    scores = compute_activity_scores(players)
+    for p in players:
+        p["activity_score"] = scores.get(p["id"], 0)
 
     record = {
         "pulled_at": pulled_at,

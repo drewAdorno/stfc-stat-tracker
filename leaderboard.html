@@ -471,6 +471,17 @@
     return `${field}_delta_${days}d`;
   }
 
+  function activityBadge(score) {
+    if (score == null) return '';
+    let label, color, bg;
+    if (score >= 76)      { label = 'Very Active'; color = '#34d399'; bg = '#0d946822'; }
+    else if (score >= 56) { label = 'Active';      color = '#60a5fa'; bg = '#1d4ed822'; }
+    else if (score >= 36) { label = 'Moderate';    color = '#fbbf24'; bg = '#78350f44'; }
+    else if (score >= 16) { label = 'Low';         color = '#fb923c'; bg = '#d9770644'; }
+    else                  { label = 'Inactive';    color = '#f87171'; bg = '#dc262622'; }
+    return `<span style="display:inline-block;padding:2px 6px;border-radius:4px;font-size:0.72rem;font-weight:600;background:${bg};color:${color}">${score}</span> <span style="font-size:0.72rem;color:${color}">${label}</span>`;
+  }
+
   // --- Data & State ---
   let playerData = null;
   let currentTab = 'leaderboard';
@@ -599,6 +610,7 @@
       { key: 'name',             label: 'Player',         type: 'name' },
       { key: 'alliance_tag',     label: 'Alliance',       type: 'text' },
       { key: 'level',            label: 'Level',          type: 'num' },
+      { key: 'activity_score',   label: 'Activity',       type: 'num' },
       { key: 'power',            label: 'Power',          delta: true },
       { key: 'players_killed',   label: 'PVP Kills',      delta: true },
       { key: 'hostiles_killed',  label: 'Hostile Kills',   delta: true },
@@ -705,6 +717,9 @@
       } else {
         html += `<td>${p.level}</td>`;
       }
+
+      // Activity score
+      html += `<td>${activityBadge(p.activity_score)}</td>`;
 
       // Delta columns
       for (const col of cols.filter(c => c.delta)) {
@@ -831,6 +846,7 @@
       { key: 'name',             label: 'Player',         type: 'name' },
       { key: 'alliance_tag',     label: 'Alliance',       type: 'text' },
       { key: 'level',            label: 'Level',          type: 'num' },
+      { key: 'activity_score',   label: 'Activity',       type: 'num' },
       { key: 'power',            label: 'Power',          delta: true },
       { key: 'players_killed',   label: 'PVP Kills',      delta: true },
       { key: 'hostiles_killed',  label: 'Hostile Kills',   delta: true },
@@ -934,6 +950,9 @@
       } else {
         html += `<td>${p.level}</td>`;
       }
+
+      // Activity score
+      html += `<td>${activityBadge(p.activity_score)}</td>`;
 
       // Delta columns
       for (const col of cols.filter(c => c.delta)) {

@@ -299,6 +299,17 @@
   function rankSort(r) { return RANK_ORDER[(r || '').toLowerCase()] ?? 99; }
   function rankClass(r) { return 'rank rank-' + (r || 'agent').toLowerCase(); }
 
+  function activityBadge(score) {
+    if (score == null) return '';
+    let label, color, bg;
+    if (score >= 76)      { label = 'Very Active'; color = '#34d399'; bg = '#0d946822'; }
+    else if (score >= 56) { label = 'Active';      color = '#60a5fa'; bg = '#1d4ed822'; }
+    else if (score >= 36) { label = 'Moderate';    color = '#fbbf24'; bg = '#78350f44'; }
+    else if (score >= 16) { label = 'Low';         color = '#fb923c'; bg = '#d9770644'; }
+    else                  { label = 'Inactive';    color = '#f87171'; bg = '#dc262622'; }
+    return `<span style="display:inline-block;padding:2px 6px;border-radius:4px;font-size:0.72rem;font-weight:600;background:${bg};color:${color}">${score}</span> <span style="font-size:0.72rem;color:${color}">${label}</span>`;
+  }
+
   function esc(s) {
     const el = document.createElement('span');
     el.textContent = s || '';
@@ -321,6 +332,7 @@
     { key: 'name',             label: 'Name',              sort: (a,b) => a.name.localeCompare(b.name) },
     { key: 'rank',             label: 'Rank',              sort: (a,b) => rankSort(a.rank) - rankSort(b.rank) },
     { key: 'level',            label: 'Level',             sort: (a,b) => parseAbbr(a.level) - parseAbbr(b.level) },
+    { key: 'activity_score',   label: 'Activity',          sort: (a,b) => (a.activity_score || 0) - (b.activity_score || 0) },
     { key: 'power',            label: 'Power',             sort: (a,b) => parseAbbr(a.power) - parseAbbr(b.power) },
     { key: 'helps',            label: 'Helps',             sort: (a,b) => parseAbbr(a.helps) - parseAbbr(b.helps) },
     { key: 'rss_contrib',      label: 'RSS<br>Contrib',    sort: (a,b) => parseAbbr(a.rss_contrib) - parseAbbr(b.rss_contrib) },
@@ -526,6 +538,8 @@
           html += `<td><a class="player-link" href="player.html?id=${encodeURIComponent(m.id)}">${esc(val)}</a></td>`;
         } else if (col.key === 'rank') {
           html += `<td><span class="${rankClass(val)}">${esc(val)}</span></td>`;
+        } else if (col.key === 'activity_score') {
+          html += `<td>${activityBadge(m.activity_score)}</td>`;
         } else if (period && NUMERIC_KEYS.has(col.key)) {
           const pastVal = getDelta(m, col.key, pastSnap);
           html += `<td>${gainCellHtml(val, pastVal)}</td>`;

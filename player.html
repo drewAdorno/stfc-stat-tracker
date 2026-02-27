@@ -334,6 +334,17 @@
   const STAT_MAP = {};
   STATS.forEach(s => STAT_MAP[s.key] = s.label);
 
+  function activityBadge(score) {
+    if (score == null) return '';
+    let label, color, bg;
+    if (score >= 76)      { label = 'Very Active'; color = '#34d399'; bg = '#0d946822'; }
+    else if (score >= 56) { label = 'Active';      color = '#60a5fa'; bg = '#1d4ed822'; }
+    else if (score >= 36) { label = 'Moderate';    color = '#fbbf24'; bg = '#78350f44'; }
+    else if (score >= 16) { label = 'Low';         color = '#fb923c'; bg = '#d9770644'; }
+    else                  { label = 'Inactive';    color = '#f87171'; bg = '#dc262622'; }
+    return `<span style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:0.78rem;font-weight:600;background:${bg};color:${color};border:1px solid ${color}33">${score} ${label}</span>`;
+  }
+
   const playerId = new URLSearchParams(window.location.search).get('id');
   if (!playerId) {
     $('player-header').innerHTML = '';
@@ -440,6 +451,9 @@
 
     // Header
     let metaHtml = `Level ${esc(player.level)}`;
+    if (player.activity_score != null) {
+      metaHtml += ` &middot; ${activityBadge(player.activity_score)}`;
+    }
     if (player.alliance_id && player.alliance_id !== 0) {
       const allianceLabel = player.alliance_name
         ? `${esc(player.alliance_name)} [${esc(player.alliance_tag)}]`
@@ -663,6 +677,7 @@
           hostiles_killed: formatAbbr(sp.hostiles_killed),
           resources_mined: formatAbbr(sp.resources_mined),
           resources_raided: formatAbbr(sp.resources_raided),
+          activity_score: sp.activity_score,
         };
 
         // Build peer list: same-alliance members for Alliance Standing
