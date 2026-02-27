@@ -286,7 +286,11 @@ def _format_abbr(n):
 def compute_activity_scores(players):
     """Compute activity scores (0-100) for a list of player dicts with raw integer stats.
 
-    Uses a 50/50 blend of log-absolute engagement and level-relative performance.
+    Uses a blend of log-absolute engagement, level-relative performance, and
+    recency of activity (7d deltas).  If 7d delta fields are present on the
+    player dicts (e.g. hostiles_killed_delta_7d), recency acts as a steep
+    multiplier: zero recent gains → score drops to ~15% of base.
+
     Returns a dict {player_id_str: score_int}.
     """
     if not players:
@@ -299,6 +303,9 @@ def compute_activity_scores(players):
         ("power", 0.15),
         ("players_killed", 0.10),
     ]
+
+    DELTA_FIELDS = [(f + "_delta_7d", w) for f, w in WEIGHTS]
+    has_deltas = any(players[0].get(f) is not None for f, _ in DELTA_FIELDS)
 
     # --- Component 1: Log-absolute score ---
     raw_abs = []
@@ -350,12 +357,32 @@ def compute_activity_scores(players):
     rel_max = max(raw_rel) if raw_rel else 1
     rel_range = rel_max - rel_min if rel_max != rel_min else 1
 
+    # --- Component 3: Recency multiplier (from 7d deltas) ---
+    # Normalized recency score → steep multiplier on the base score.
+    # Floor of 0.15 means completely inactive players keep only 15% of base.
+    raw_recency = []
+    if has_deltas:
+        for p in players:
+            s = sum(math.log1p(max(p.get(f, 0) or 0, 0)) * w for f, w in DELTA_FIELDS)
+            raw_recency.append(s)
+        rec_min = min(raw_recency)
+        rec_max = max(raw_recency)
+        rec_range = rec_max - rec_min if rec_max != rec_min else 1
+
     # --- Blend and produce final scores ---
     scores = {}
     for i, p in enumerate(players):
         norm_abs = (raw_abs[i] - abs_min) / abs_range
         norm_rel = (raw_rel[i] - rel_min) / rel_range
-        final = int((norm_abs * 0.5 + norm_rel * 0.5) * 100)
+        base = norm_abs * 0.5 + norm_rel * 0.5
+
+        if has_deltas:
+            norm_rec = (raw_recency[i] - rec_min) / rec_range
+            recency_mult = 0.15 + 0.85 * norm_rec
+            final = int(base * recency_mult * 100)
+        else:
+            final = int(base * 100)
+
         final = max(0, min(100, final))
         pid = str(p.get("id", p.get("player_id", "")))
         scores[pid] = final
@@ -445,12 +472,31 @@ def export_latest_json(conn, alliance_id=NCC_ALLIANCE_ID, league=""):
                hostiles_killed, resources_mined
         FROM daily_snapshots WHERE date = ?
     """, (latest_date,)).fetchall()
-    all_players_raw = [
-        {"id": str(r[0]), "level": r[1] or 0, "power": r[2] or 0,
-         "helps": r[3] or 0, "players_killed": r[4] or 0,
-         "hostiles_killed": r[5] or 0, "resources_mined": r[6] or 0}
-        for r in all_rows
-    ]
+    # Find 7d-ago snapshot date for recency calculation
+    delta_row = conn.execute("""
+        SELECT MAX(date) FROM daily_snapshots WHERE date <= date(?, '-7 days')
+    """, (latest_date,)).fetchone()
+    delta_date = delta_row[0] if delta_row and delta_row[0] else None
+    past_7d = {}
+    if delta_date:
+        past_rows = conn.execute("""
+            SELECT player_id, power, helps, players_killed,
+                   hostiles_killed, resources_mined
+            FROM daily_snapshots WHERE date = ?
+        """, (delta_date,)).fetchall()
+        past_7d = {r[0]: {"power": r[1] or 0, "helps": r[2] or 0,
+                          "players_killed": r[3] or 0, "hostiles_killed": r[4] or 0,
+                          "resources_mined": r[5] or 0} for r in past_rows}
+    all_players_raw = []
+    for r in all_rows:
+        pid = r[0]
+        d = {"id": str(pid), "level": r[1] or 0, "power": r[2] or 0,
+             "helps": r[3] or 0, "players_killed": r[4] or 0,
+             "hostiles_killed": r[5] or 0, "resources_mined": r[6] or 0}
+        past = past_7d.get(pid, {})
+        for f in ["power", "helps", "players_killed", "hostiles_killed", "resources_mined"]:
+            d[f + "_delta_7d"] = max((d[f] or 0) - (past.get(f, 0) or 0), 0)
+        all_players_raw.append(d)
     scores = compute_activity_scores(all_players_raw)
     for m in members:
         m["activity_score"] = scores.get(m["id"], 0)
