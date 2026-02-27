@@ -356,9 +356,9 @@ def compute_activity_scores(players):
     rel_max = max(raw_rel) if raw_rel else 1
     rel_range = rel_max - rel_min if rel_max != rel_min else 1
 
-    # --- Component 3: Recency multiplier (from 7d deltas) ---
-    # Normalized recency score → steep multiplier on the base score.
-    # Floor of 0.15 means completely inactive players keep only 15% of base.
+    # --- Component 3: Recency (from 7d deltas) ---
+    # Blended as a third component rather than a multiplier, so lifetime
+    # engagement still counts even during a quiet week.
     raw_recency = []
     if has_deltas:
         for p in players:
@@ -369,18 +369,18 @@ def compute_activity_scores(players):
         rec_range = rec_max - rec_min if rec_max != rec_min else 1
 
     # --- Blend and produce final scores ---
+    # With deltas: 35% lifetime, 25% level-relative, 40% recency
+    # Without deltas: 50/50 lifetime + level-relative
     scores = {}
     for i, p in enumerate(players):
         norm_abs = (raw_abs[i] - abs_min) / abs_range
         norm_rel = (raw_rel[i] - rel_min) / rel_range
-        base = norm_abs * 0.5 + norm_rel * 0.5
 
         if has_deltas:
             norm_rec = (raw_recency[i] - rec_min) / rec_range
-            recency_mult = 0.15 + 0.85 * norm_rec
-            final = int(base * recency_mult * 100)
+            final = int((norm_abs * 0.35 + norm_rel * 0.25 + norm_rec * 0.40) * 100)
         else:
-            final = int(base * 100)
+            final = int((norm_abs * 0.5 + norm_rel * 0.5) * 100)
 
         final = max(0, min(100, final))
         pid = str(p.get("id", p.get("player_id", "")))
