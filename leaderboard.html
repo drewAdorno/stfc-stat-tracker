@@ -626,22 +626,32 @@
       }
     }
 
-    // Summary cards
+    // Summary cards — find leader for each tracked stat in the selected period
+    function findLeader(field) {
+      if (filtered.length === 0) return null;
+      const dk = getDeltaKey(field, lbPeriod);
+      return filtered.reduce((best, p) => (p[dk] || 0) > (best[dk] || 0) ? p : best);
+    }
+    function leaderCard(label, field) {
+      const leader = findLeader(field);
+      if (!leader) return '';
+      const dk = getDeltaKey(field, lbPeriod);
+      const val = leader[dk] || 0;
+      return `<div class="card"><div class="label">${label} (${lbPeriod}d)</div><div class="value">${formatAbbr(val)}</div><div class="sub">${esc(leader.name)}</div></div>`;
+    }
     const topPower = filtered.length > 0 ? filtered.reduce((best, p) => (p.power || 0) > (best.power || 0) ? p : best) : null;
-    const biggestGainer = filtered.length > 0 ? filtered.reduce((best, p) => (p.power_delta_7d || 0) > (best.power_delta_7d || 0) ? p : best) : null;
-    const mostPvp = filtered.length > 0 ? filtered.reduce((best, p) => {
-      const dk = getDeltaKey('players_killed', lbPeriod);
-      return (p[dk] || 0) > (best[dk] || 0) ? p : best;
-    }) : null;
 
     let html = '<div class="cards">';
     html += `<div class="card"><div class="label">Total Players</div><div class="value">${filtered.length.toLocaleString()}</div></div>`;
     if (topPower) html += `<div class="card"><div class="label">Most Powerful</div><div class="value">${formatAbbr(topPower.power)}</div><div class="sub">${esc(topPower.name)}</div></div>`;
-    if (biggestGainer) html += `<div class="card"><div class="label">Biggest Gainer (7d)</div><div class="value">${formatAbbr(biggestGainer.power_delta_7d || 0)}</div><div class="sub">${esc(biggestGainer.name)}</div></div>`;
-    if (mostPvp) {
-      const dk = getDeltaKey('players_killed', lbPeriod);
-      html += `<div class="card"><div class="label">Most PVP Kills</div><div class="value">${formatAbbr(mostPvp[dk] || 0)}</div><div class="sub">${esc(mostPvp.name)}</div></div>`;
-    }
+    html += leaderCard('Power Gained', 'power');
+    html += leaderCard('PVP Kills', 'players_killed');
+    html += leaderCard('Hostile Kills', 'hostiles_killed');
+    html += leaderCard('RSS Mined', 'resources_mined');
+    html += leaderCard('RSS Raided', 'resources_raided');
+    html += leaderCard('Helps', 'helps');
+    html += leaderCard('RSS Contributed', 'rss_contrib');
+    html += leaderCard('ISO Contributed', 'iso_contrib');
     html += '</div>';
 
     // Search
