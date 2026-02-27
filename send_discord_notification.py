@@ -12,6 +12,7 @@ import sys
 import urllib.request
 import urllib.error
 from datetime import datetime, timedelta
+from db import now_est
 from pathlib import Path
 
 BASE_DIR = Path(__file__).parent
@@ -283,7 +284,7 @@ def truncate_field(text, limit=1024):
 def build_embed(latest, history):
     """Build the Discord embed payload."""
     members = latest.get("members", [])
-    today = datetime.now().strftime("%Y-%m-%d")
+    today = now_est().strftime("%Y-%m-%d")
 
     embed = {
         "title": f"NCC Daily Report \u2014 {today}",
@@ -415,7 +416,7 @@ def post_webhook(url, embed):
 
 def already_sent_today():
     """Check if we already sent a notification today."""
-    today = datetime.now().strftime("%Y-%m-%d")
+    today = now_est().strftime("%Y-%m-%d")
     if LAST_SENT_FILE.exists():
         last = LAST_SENT_FILE.read_text().strip()
         if last == today:
@@ -425,7 +426,7 @@ def already_sent_today():
 
 def mark_sent_today():
     """Record that we sent a notification today."""
-    LAST_SENT_FILE.write_text(datetime.now().strftime("%Y-%m-%d"))
+    LAST_SENT_FILE.write_text(now_est().strftime("%Y-%m-%d"))
 
 
 def main():

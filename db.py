@@ -5,8 +5,17 @@ Stores all player data in data/stfc.db and exports JSON files for dashboards.
 
 import json
 import sqlite3
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
+
+# US Eastern Time (EST = UTC-5, EDT = UTC-4)
+# Using fixed UTC-5 so the day always resets at midnight EST.
+EST = timezone(timedelta(hours=-5))
+
+
+def now_est():
+    """Return the current datetime in US Eastern (EST, UTC-5)."""
+    return datetime.now(EST)
 
 BASE_DIR = Path(__file__).parent
 DATA_DIR = BASE_DIR / "data"
