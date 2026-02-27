@@ -880,6 +880,22 @@ def export_server_alliances_json(conn):
                 alliance[f"{field_name}_delta_{days}d"] = current_vals[field_name] - (past_val or 0)
         alliances.append(alliance)
 
+    # Compute avg activity score per alliance from server_players.json
+    # (must be exported first via export_server_players_json)
+    sp_file = DATA_DIR / "server_players.json"
+    if sp_file.exists():
+        with open(sp_file, "r", encoding="utf-8") as f:
+            sp_data = json.load(f)
+        # Group scores by alliance_id
+        alliance_scores = {}
+        for p in sp_data.get("players", []):
+            aid = p.get("alliance_id", 0)
+            if aid:
+                alliance_scores.setdefault(aid, []).append(p.get("activity_score", 0))
+        for a in alliances:
+            scores = alliance_scores.get(a["alliance_id"], [])
+            a["avg_activity_score"] = round(sum(scores) / len(scores)) if scores else 0
+
     record = {
         "pulled_at": pulled_at,
         "as_of_date": latest_date,

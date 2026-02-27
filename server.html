@@ -599,15 +599,16 @@
     const alliances = [...allianceData.alliances];
 
     const cols = [
-      { key: 'rank',         label: 'Rank' },
-      { key: 'alliance_tag', label: 'Tag' },
-      { key: 'member_count', label: 'Members',       delta: true },
-      { key: 'avg_level',    label: 'Avg Level',     delta: true },
-      { key: 'total_power',  label: 'Total Power',   delta: true },
-      { key: 'total_pvp',    label: 'PVP Kills',     delta: true },
-      { key: 'total_hk',     label: 'Hostile Kills',  delta: true },
-      { key: 'total_mined',  label: 'RSS Mined',     delta: true },
-      { key: 'total_raided', label: 'RSS Raided',    delta: true },
+      { key: 'rank',               label: 'Rank' },
+      { key: 'alliance_tag',       label: 'Tag' },
+      { key: 'member_count',       label: 'Members',       delta: true },
+      { key: 'avg_level',          label: 'Avg Level',     delta: true },
+      { key: 'avg_activity_score', label: 'Activity' },
+      { key: 'total_power',        label: 'Total Power',   delta: true },
+      { key: 'total_pvp',          label: 'PVP Kills',     delta: true },
+      { key: 'total_hk',           label: 'Hostile Kills',  delta: true },
+      { key: 'total_mined',        label: 'RSS Mined',     delta: true },
+      { key: 'total_raided',       label: 'RSS Raided',    delta: true },
     ];
 
     // Sort — use delta value for delta-enabled columns when a period is active
@@ -663,7 +664,9 @@
       html += `<td><strong>${esc(a.alliance_tag)}</strong></td>`;
       for (const col of cols.slice(2)) {
         const val = a[col.key] || 0;
-        if (col.delta && lbPeriod) {
+        if (col.key === 'avg_activity_score') {
+          html += `<td>${activityBadge(val)}</td>`;
+        } else if (col.delta && lbPeriod) {
           const delta = a[`${col.key}_delta_${lbPeriod}d`] || 0;
           html += `<td>${gainCellHtml(val, delta)}</td>`;
         } else {
