@@ -480,6 +480,17 @@
     return `<a class="player-link" href="player?id=${encodeURIComponent(p.id)}">${esc(p.name)}</a>`;
   }
 
+  function activityBadge(score) {
+    if (score == null) return '';
+    let label, color, bg;
+    if (score >= 76)      { label = 'Very Active'; color = '#34d399'; bg = '#0d946822'; }
+    else if (score >= 56) { label = 'Active';      color = '#60a5fa'; bg = '#1d4ed822'; }
+    else if (score >= 36) { label = 'Moderate';    color = '#fbbf24'; bg = '#78350f44'; }
+    else if (score >= 16) { label = 'Low';         color = '#fb923c'; bg = '#d9770644'; }
+    else                  { label = 'Inactive';    color = '#f87171'; bg = '#dc262622'; }
+    return `<span style="display:inline-block;padding:2px 6px;border-radius:4px;font-size:0.72rem;font-weight:600;background:${bg};color:${color}">${score}</span> <span style="font-size:0.72rem;color:${color}">${label}</span>`;
+  }
+
   // --- Data ---
   let allianceData = null; // server_alliances.json
   let playerData = null;   // server_players.json
@@ -780,6 +791,7 @@
     const cols = [
       { key: 'name',             label: 'Name' },
       { key: 'level',            label: 'Level' },
+      { key: 'activity_score',   label: 'Activity' },
       { key: 'power',            label: 'Power' },
       { key: 'helps',            label: 'Helps' },
       { key: 'rss_contrib',      label: 'RSS Contrib' },
@@ -824,6 +836,8 @@
       for (const col of cols) {
         if (col.key === 'name') {
           html += `<td>${playerLink(p)}</td>`;
+        } else if (col.key === 'activity_score') {
+          html += `<td>${activityBadge(p.activity_score)}</td>`;
         } else if (detailPeriod && deltaFieldSet.has(col.key)) {
           const delta = p[getDeltaKey(col.key, detailPeriod)] || 0;
           html += `<td>${gainCellHtml(p[col.key] || 0, delta)}</td>`;
