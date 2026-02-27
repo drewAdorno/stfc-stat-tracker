@@ -439,7 +439,19 @@
     const pastNames = nameHistory.filter(n => n.name !== player.name);
 
     // Header
-    let metaHtml = `Level ${esc(player.level)} &middot; Joined ${esc(player.join_date)}`;
+    let metaHtml = `Level ${esc(player.level)}`;
+    if (player.alliance_id && player.alliance_id !== 0) {
+      const allianceLabel = player.alliance_name
+        ? `${esc(player.alliance_name)} [${esc(player.alliance_tag)}]`
+        : esc(player.alliance_tag || '');
+      if (allianceLabel) {
+        const allianceUrl = `https://v3.stfc.pro/alliances/${player.alliance_id}`;
+        metaHtml += ` &middot; <a href="${allianceUrl}" target="_blank" rel="noopener" style="color:#4dabf7;text-decoration:none">${allianceLabel}</a>`;
+      }
+    }
+    if (player.join_date) {
+      metaHtml += ` &middot; Joined ${esc(player.join_date)}`;
+    }
     if (pastNames.length > 0) {
       metaHtml += ` &middot; Formerly: ${pastNames.map(n => `<span style="color:#8899aa">${esc(n.name)}</span> <span style="color:#4a5568;font-size:0.78rem">(${n.date})</span>`).join(', ')}`;
     }
@@ -638,6 +650,7 @@
           id: sp.id,
           name: sp.name,
           alliance_tag: sp.alliance_tag,
+          alliance_name: sp.alliance_name || '',
           alliance_id: sp.alliance_id,
           rank: '',
           join_date: '',

@@ -58,6 +58,7 @@ CREATE TABLE IF NOT EXISTS daily_snapshots (
     join_date       TEXT,
     alliance_id     INTEGER,
     alliance_tag    TEXT,
+    alliance_name   TEXT,
     PRIMARY KEY (player_id, date)
 );
 
@@ -95,10 +96,12 @@ def get_db():
     conn.execute("PRAGMA journal_mode=WAL")
     conn.execute("PRAGMA foreign_keys=ON")
     conn.executescript(SCHEMA)
-    # Migration: add name column to daily_snapshots if missing
+    # Migrations: add columns to daily_snapshots if missing
     cols = {r[1] for r in conn.execute("PRAGMA table_info(daily_snapshots)")}
     if "name" not in cols:
         conn.execute("ALTER TABLE daily_snapshots ADD COLUMN name TEXT")
+    if "alliance_name" not in cols:
+        conn.execute("ALTER TABLE daily_snapshots ADD COLUMN alliance_name TEXT")
     conn.commit()
     return conn
 
@@ -196,8 +199,8 @@ def upsert_players(conn, mapped_players, date):
             INSERT INTO daily_snapshots
                 (player_id, date, name, level, power, helps, rss_contrib, iso_contrib,
                  players_killed, hostiles_killed, resources_mined, resources_raided,
-                 rank_title, join_date, alliance_id, alliance_tag)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                 rank_title, join_date, alliance_id, alliance_tag, alliance_name)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(player_id, date) DO UPDATE SET
                 name = excluded.name,
                 level = excluded.level,
@@ -212,7 +215,8 @@ def upsert_players(conn, mapped_players, date):
                 rank_title = excluded.rank_title,
                 join_date = excluded.join_date,
                 alliance_id = excluded.alliance_id,
-                alliance_tag = excluded.alliance_tag
+                alliance_tag = excluded.alliance_tag,
+                alliance_name = excluded.alliance_name
         """, (
             player_id, date,
             m.get("name", ""),
@@ -229,6 +233,7 @@ def upsert_players(conn, mapped_players, date):
             m.get("join_date", ""),
             m.get("alliance_id", 0),
             m.get("alliance_tag", ""),
+            m.get("alliance_name", ""),
         ))
 
     conn.commit()
@@ -790,7 +795,7 @@ def export_server_players_json(conn):
         SELECT ds.player_id, p.name, ds.alliance_id, ds.alliance_tag,
                ds.level, ds.power, ds.helps, ds.rss_contrib, ds.iso_contrib,
                ds.players_killed, ds.hostiles_killed, ds.resources_mined,
-               ds.resources_raided
+               ds.resources_raided, ds.alliance_name
         FROM daily_snapshots ds
         JOIN players p ON p.player_id = ds.player_id
         WHERE ds.date = ?
@@ -847,7 +852,7 @@ def export_server_players_json(conn):
     players = []
     for r in rows:
         (pid, name, aid, atag, level, power, helps, rss_c, iso_c,
-         pk, hk, rm, rr) = r
+         pk, hk, rm, rr, aname) = r
 
         current_vals = {
             "level": level or 0, "power": power or 0, "helps": helps or 0,
@@ -861,6 +866,7 @@ def export_server_players_json(conn):
             "name": name or "",
             "alliance_id": aid or 0,
             "alliance_tag": atag or "",
+            "alliance_name": aname or "",
             **current_vals,
         }
 
