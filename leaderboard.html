@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Server 716 Leaderboard</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #0a0e17;
+    color: #c8d6e5;
+    min-height: 100vh;
+    line-height: 1.5;
+  }
+
+  .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+
+  /* Header */
+  header {
+    text-align: center;
+    padding: 30px 0 20px;
+    border-bottom: 1px solid #1a2332;
+    margin-bottom: 24px;
+  }
+  header h1 {
+    font-size: 1.8rem;
+    color: #e2e8f0;
+    letter-spacing: 1px;
+  }
+  header h1 span { color: #4dabf7; }
+  .updated {
+    font-size: 0.85rem;
+    color: #636e7b;
+    margin-top: 6px;
+  }
+
+  /* Login */
+  #login-gate {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 60vh;
+  }
+  .login-box {
+    background: #111827;
+    border: 1px solid #1e2d3d;
+    border-radius: 12px;
+    padding: 40px;
+    text-align: center;
+    max-width: 360px;
+    width: 100%;
+  }
+  .login-box h2 {
+    color: #e2e8f0;
+    font-size: 1.3rem;
+    margin-bottom: 20px;
+  }
+  .login-box input {
+    width: 100%;
+    padding: 10px 14px;
+    background: #0a0e17;
+    border: 1px solid #1e2d3d;
+    border-radius: 6px;
+    color: #c8d6e5;
+    font-size: 1rem;
+    font-family: inherit;
+    margin-bottom: 14px;
+  }
+  .login-box input:focus {
+    outline: none;
+    border-color: #4dabf7;
+  }
+  .login-box button {
+    width: 100%;
+    padding: 10px;
+    background: #4dabf7;
+    color: #0a0e17;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .login-box button:hover { background: #74c0fc; }
+  .login-error {
+    color: #f87171;
+    font-size: 0.85rem;
+    margin-top: 10px;
+    min-height: 1.2em;
+  }
+
+  /* Tabs */
+  .tab-bar {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .tab-btn {
+    background: #111827;
+    border: 1px solid #1e2d3d;
+    color: #8899aa;
+    padding: 8px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .tab-btn:hover { border-color: #4dabf7; color: #c8d6e5; }
+  .tab-btn.active {
+    background: #4dabf7;
+    color: #0a0e17;
+    border-color: #4dabf7;
+    font-weight: 600;
+  }
+
+  /* Tables */
+  .table-wrap {
+    overflow-x: auto;
+    border: 1px solid #1e2d3d;
+    border-radius: 10px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  th, td {
+    padding: 10px 14px;
+    text-align: left;
+    white-space: nowrap;
+  }
+  th {
+    background: #111827;
+    color: #8899aa;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    cursor: pointer;
+    user-select: none;
+    position: sticky;
+    top: 0;
+  }
+  th:hover { color: #4dabf7; }
+  th .arrow { margin-left: 4px; font-size: 0.7rem; }
+  tr { border-bottom: 1px solid #1a2332; }
+  tr:last-child { border-bottom: none; }
+  tr:hover td { background: #111827; }
+  td { font-size: 0.9rem; }
+  tr.ncc-row td { background: #111d2e; }
+
+  /* Summary cards */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  .card {
+    background: #111827;
+    border: 1px solid #1e2d3d;
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+  }
+  .card .label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #636e7b;
+    margin-bottom: 4px;
+  }
+  .card .value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #4dabf7;
+  }
+  .card .sub {
+    font-size: 0.78rem;
+    color: #636e7b;
+    margin-top: 2px;
+  }
+
+  /* Search input */
+  .search-wrap {
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  .search-input {
+    width: 100%;
+    max-width: 500px;
+    padding: 10px 16px;
+    background: #111827;
+    border: 1px solid #1e2d3d;
+    border-radius: 8px;
+    color: #c8d6e5;
+    font-size: 1rem;
+    font-family: inherit;
+  }
+  .search-input:focus {
+    outline: none;
+    border-color: #4dabf7;
+  }
+  .search-hint {
+    font-size: 0.78rem;
+    color: #4a5568;
+    margin-top: 6px;
+  }
+
+  /* Period selector bar */
+  .period-bar {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 20px;
+  }
+  .period-btn {
+    background: #111827;
+    border: 1px solid #1e2d3d;
+    color: #8899aa;
+    padding: 6px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .period-btn:hover { border-color: #4dabf7; color: #c8d6e5; }
+  .period-btn.active {
+    background: #4dabf7;
+    color: #0a0e17;
+    border-color: #4dabf7;
+    font-weight: 600;
+  }
+
+  /* Delta display in table cells */
+  .cell-sub { display: block; font-size: 0.7rem; color: #4a5568; margin-top: 1px; }
+  .cell-delta-main {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  /* Delta colors */
+  .delta-pos { color: #34d399; }
+  .delta-neg { color: #f87171; }
+  .delta-zero { color: #3a4250; }
+
+  /* Player name links */
+  .player-link { color: #4dabf7; text-decoration: none; }
+  .player-link:hover { text-decoration: underline; }
+
+  /* Loading / Error */
+  .loading {
+    text-align: center;
+    padding: 60px 0;
+    color: #636e7b;
+    font-size: 1.1rem;
+  }
+  .error { color: #f87171; }
+
+  .empty {
+    color: #4a5568;
+    font-style: italic;
+    padding: 20px 0;
+    text-align: center;
+  }
+
+  /* Filter controls */
+  .filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+    justify-content: center;
+    align-items: center;
+  }
+  .filter-toggle {
+    background: #111827;
+    border: 1px solid #1e2d3d;
+    color: #8899aa;
+    padding: 6px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .filter-toggle:hover { border-color: #4dabf7; color: #c8d6e5; }
+  .filter-toggle.active {
+    background: #1e3a5f;
+    color: #4dabf7;
+    border-color: #4dabf7;
+    font-weight: 600;
+  }
+  .filter-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.82rem;
+    color: #8899aa;
+  }
+  .filter-input-wrap input {
+    width: 80px;
+    padding: 5px 10px;
+    background: #111827;
+    border: 1px solid #1e2d3d;
+    border-radius: 6px;
+    color: #c8d6e5;
+    font-size: 0.85rem;
+    font-family: inherit;
+  }
+  .filter-input-wrap input:focus {
+    outline: none;
+    border-color: #4dabf7;
+  }
+
+  /* Recruit score badges */
+  .badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+  .badge-hot { background: #7f1d1d; color: #fca5a5; }
+  .badge-warm { background: #78350f; color: #fcd34d; }
+  .badge-cold { background: #1e3a5f; color: #93c5fd; }
+
+  /* Result count */
+  .result-count {
+    text-align: center;
+    font-size: 0.85rem;
+    color: #636e7b;
+    margin-bottom: 12px;
+  }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    padding: 24px 0;
+    margin-top: 28px;
+    border-top: 1px solid #1a2332;
+    font-size: 0.8rem;
+    color: #4a5568;
+  }
+  footer a { color: #4dabf7; text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  @media (max-width: 600px) {
+    .container { padding: 12px; }
+    header h1 { font-size: 1.3rem; }
+    .filter-bar { gap: 6px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1><span>Server 716</span> Leaderboard</h1>
+    <div class="updated" id="updated"></div>
+  </header>
+
+  <div id="login-gate">
+    <div class="login-box">
+      <h2>Player Leaderboard</h2>
+      <input type="password" id="pw-input" placeholder="Enter password" autocomplete="off">
+      <button id="pw-btn">Enter</button>
+      <div class="login-error" id="pw-error"></div>
+    </div>
+  </div>
+
+  <div id="content" style="display:none">
+    <div class="loading">Loading player data...</div>
+  </div>
+
+  <footer style="display:none" id="footer-el">
+    Data sourced from <a href="https://stfc.pro" target="_blank" rel="noopener">stfc.pro</a>
+    &middot; <a href="index">Main Dashboard</a>
+    &middot; <a href="server">Server Analytics</a>
+  </footer>
+</div>
+
+<script>
+(function() {
+  const $ = id => document.getElementById(id);
+  const NCC_ID = 3974286889;
+
+  // --- Auth gate ---
+  const PASSWORD = 'salsa';
+
+  function checkAuth() {
+    return sessionStorage.getItem('ncc_admin_auth') === 'ok';
+  }
+
+  function showDashboard() {
+    $('login-gate').style.display = 'none';
+    $('content').style.display = '';
+    $('footer-el').style.display = '';
+    loadData();
+  }
+
+  if (checkAuth()) {
+    showDashboard();
+  } else {
+    $('pw-btn').addEventListener('click', tryLogin);
+    $('pw-input').addEventListener('keydown', e => { if (e.key === 'Enter') tryLogin(); });
+  }
+
+  function tryLogin() {
+    const val = $('pw-input').value;
+    if (val === PASSWORD) {
+      sessionStorage.setItem('ncc_admin_auth', 'ok');
+      showDashboard();
+    } else {
+      $('pw-error').textContent = 'Incorrect password';
+      $('pw-input').value = '';
+      $('pw-input').focus();
+    }
+  }
+
+  // --- Utilities ---
+  function esc(s) {
+    const el = document.createElement('span');
+    el.textContent = s == null ? '' : String(s);
+    return el.innerHTML;
+  }
+
+  function formatAbbr(n) {
+    if (n == null) n = 0;
+    if (n === 0) return '0';
+    const abs = Math.abs(n);
+    const sign = n < 0 ? '-' : '';
+    let val, suf;
+    if (abs >= 1e15)      { val = abs / 1e15; suf = 'Q'; }
+    else if (abs >= 1e12) { val = abs / 1e12; suf = 'T'; }
+    else if (abs >= 1e9)  { val = abs / 1e9;  suf = 'B'; }
+    else if (abs >= 1e6)  { val = abs / 1e6;  suf = 'M'; }
+    else if (abs >= 1e3)  { val = abs / 1e3;  suf = 'K'; }
+    else                  { val = abs;         suf = '';  }
+    return sign + val.toFixed(2).replace(/\.?0+$/, '') + suf;
+  }
+
+  function formatDelta(n) {
+    if (n === 0) return '<span class="delta-zero">0</span>';
+    const cls = n > 0 ? 'delta-pos' : 'delta-neg';
+    const sign = n > 0 ? '+' : '';
+    return `<span class="${cls}">${sign}${formatAbbr(n)}</span>`;
+  }
+
+  function playerLink(p) {
+    return `<a class="player-link" href="player?id=${encodeURIComponent(p.id)}">${esc(p.name)}</a>`;
+  }
+
+  function gainCellHtml(current, delta) {
+    if (delta === 0) {
+      return `<span class="cell-delta-main delta-zero">0</span><span class="cell-sub">${formatAbbr(current)}</span>`;
+    }
+    const cls = delta > 0 ? 'delta-pos' : 'delta-neg';
+    const sign = delta > 0 ? '+' : '';
+    return `<span class="cell-delta-main ${cls}">${sign}${formatAbbr(delta)}</span><span class="cell-sub">${formatAbbr(current)}</span>`;
+  }
+
+  function getDeltaKey(field, days) {
+    return `${field}_delta_${days}d`;
+  }
+
+  // --- Data & State ---
+  let playerData = null;
+  let currentTab = 'leaderboard';
+
+  // Leaderboard state
+  let lbSortCol = 'power';
+  let lbSortAsc = false;
+  let lbPeriod = 7;
+  let lbSearch = '';
+
+  // Recruiting state
+  let recSortCol = 'recruit_score';
+  let recSortAsc = false;
+  let recPeriod = 7;
+  let recSearch = '';
+  let recFilters = {
+    noAlliance: false,
+    smallAlliance: false,
+    recentlyMoved: false,
+    highActivity: false,
+    highLevel: false,
+  };
+  let recMinPower = 0;
+  let recMinLevel = 25;
+
+  // Precomputed data
+  let allianceMemberCounts = {};
+  let avgPowerDelta7d = 0;
+
+  const DELTA_FIELDS = [
+    'level', 'power', 'helps', 'rss_contrib', 'iso_contrib',
+    'players_killed', 'hostiles_killed', 'resources_mined', 'resources_raided',
+  ];
+
+  function loadData() {
+    const t = Date.now();
+    fetch('data/server_players.json?t=' + t)
+      .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then(data => {
+        playerData = data;
+        const d = new Date(data.pulled_at);
+        $('updated').textContent = 'Last updated: ' + d.toLocaleDateString('en-US', {
+          year: 'numeric', month: 'short', day: 'numeric',
+          hour: '2-digit', minute: '2-digit'
+        });
+        precompute();
+        renderPage();
+      })
+      .catch(err => {
+        $('content').innerHTML = `<div class="loading error">Failed to load data: ${esc(err.message)}<br>Run pull_api.py to generate server JSON files.</div>`;
+      });
+  }
+
+  function precompute() {
+    // Count members per alliance
+    allianceMemberCounts = {};
+    for (const p of playerData.players) {
+      if (p.alliance_tag) {
+        allianceMemberCounts[p.alliance_tag] = (allianceMemberCounts[p.alliance_tag] || 0) + 1;
+      }
+    }
+
+    // Average power delta for "high activity" filter
+    let totalDelta = 0;
+    let count = 0;
+    for (const p of playerData.players) {
+      const d = p.power_delta_7d || 0;
+      if (d > 0) { totalDelta += d; count++; }
+    }
+    avgPowerDelta7d = count > 0 ? totalDelta / count : 0;
+  }
+
+  function renderPage() {
+    let html = '';
+
+    const tabs = [
+      ['leaderboard', 'Player Leaderboard'],
+      ['recruiting', 'Recruiting Board'],
+    ];
+    html += '<div class="tab-bar">';
+    for (const [id, label] of tabs) {
+      const cls = currentTab === id ? ' active' : '';
+      html += `<button class="tab-btn${cls}" data-tab="${id}">${label}</button>`;
+    }
+    html += '</div>';
+
+    html += '<div id="tab-content"></div>';
+    $('content').innerHTML = html;
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        currentTab = btn.dataset.tab;
+        renderPage();
+      });
+    });
+
+    renderTab();
+  }
+
+  function renderTab() {
+    const el = document.getElementById('tab-content');
+    if (!el) return;
+
+    switch (currentTab) {
+      case 'leaderboard': el.innerHTML = renderLeaderboard(); attachLeaderboardHandlers(); break;
+      case 'recruiting':  el.innerHTML = renderRecruiting();  attachRecruitingHandlers(); break;
+    }
+  }
+
+  // ===== TAB 1: Player Leaderboard =====
+  function renderLeaderboard() {
+    const players = [...playerData.players];
+
+    // Search filter
+    let filtered = players;
+    if (lbSearch.length >= 2) {
+      const q = lbSearch.toLowerCase();
+      filtered = players.filter(p =>
+        p.name.toLowerCase().includes(q) ||
+        (p.alliance_tag && p.alliance_tag.toLowerCase().includes(q))
+      );
+    }
+
+    const cols = [
+      { key: 'rank',             label: '#',              sortable: false },
+      { key: 'name',             label: 'Player',         type: 'name' },
+      { key: 'alliance_tag',     label: 'Alliance',       type: 'text' },
+      { key: 'level',            label: 'Level',          type: 'num' },
+      { key: 'power',            label: 'Power',          delta: true },
+      { key: 'players_killed',   label: 'PVP Kills',      delta: true },
+      { key: 'hostiles_killed',  label: 'Hostile Kills',   delta: true },
+      { key: 'resources_mined',  label: 'RSS Mined',      delta: true },
+      { key: 'resources_raided', label: 'RSS Raided',     delta: true },
+    ];
+
+    // Sort
+    const sortDef = cols.find(c => c.key === lbSortCol);
+    if (sortDef) {
+      if (sortDef.type === 'name' || sortDef.type === 'text') {
+        filtered.sort((a, b) => {
+          const va = (a[lbSortCol] || '').toLowerCase();
+          const vb = (b[lbSortCol] || '').toLowerCase();
+          const v = va.localeCompare(vb);
+          return lbSortAsc ? v : -v;
+        });
+      } else {
+        const useDelta = sortDef.delta && lbPeriod;
+        const sortKey = useDelta ? getDeltaKey(lbSortCol, lbPeriod) : lbSortCol;
+        filtered.sort((a, b) => {
+          const v = (a[sortKey] || 0) - (b[sortKey] || 0);
+          return lbSortAsc ? v : -v;
+        });
+      }
+    }
+
+    // Summary cards
+    const topPower = filtered.length > 0 ? filtered.reduce((best, p) => (p.power || 0) > (best.power || 0) ? p : best) : null;
+    const biggestGainer = filtered.length > 0 ? filtered.reduce((best, p) => (p.power_delta_7d || 0) > (best.power_delta_7d || 0) ? p : best) : null;
+    const mostPvp = filtered.length > 0 ? filtered.reduce((best, p) => {
+      const dk = getDeltaKey('players_killed', lbPeriod);
+      return (p[dk] || 0) > (best[dk] || 0) ? p : best;
+    }) : null;
+
+    let html = '<div class="cards">';
+    html += `<div class="card"><div class="label">Total Players</div><div class="value">${filtered.length.toLocaleString()}</div></div>`;
+    if (topPower) html += `<div class="card"><div class="label">Most Powerful</div><div class="value">${formatAbbr(topPower.power)}</div><div class="sub">${esc(topPower.name)}</div></div>`;
+    if (biggestGainer) html += `<div class="card"><div class="label">Biggest Gainer (7d)</div><div class="value">${formatAbbr(biggestGainer.power_delta_7d || 0)}</div><div class="sub">${esc(biggestGainer.name)}</div></div>`;
+    if (mostPvp) {
+      const dk = getDeltaKey('players_killed', lbPeriod);
+      html += `<div class="card"><div class="label">Most PVP Kills</div><div class="value">${formatAbbr(mostPvp[dk] || 0)}</div><div class="sub">${esc(mostPvp.name)}</div></div>`;
+    }
+    html += '</div>';
+
+    // Search
+    html += '<div class="search-wrap">';
+    html += `<input type="text" class="search-input" id="lb-search" placeholder="Search by player name or alliance tag..." value="${esc(lbSearch)}">`;
+    html += '</div>';
+
+    // Period selector
+    html += '<div class="period-bar">';
+    for (const [p, label] of [[1, 'Yesterday'], [7, 'This Week'], [30, 'This Month']]) {
+      const active = lbPeriod === p ? ' active' : '';
+      html += `<button class="period-btn${active}" data-period="${p}">${label}</button>`;
+    }
+    html += '</div>';
+
+    // Delta date info
+    if (playerData.delta_dates) {
+      const baseDate = playerData.delta_dates[`${lbPeriod}d`];
+      if (baseDate) {
+        html += `<div style="text-align:center;font-size:0.78rem;color:#4a5568;margin-bottom:16px;">Comparing against ${baseDate}</div>`;
+      }
+    }
+
+    // Show top 500
+    const shown = filtered.slice(0, 500);
+
+    html += '<div class="table-wrap"><table><thead><tr>';
+    for (const col of cols) {
+      if (col.sortable === false) {
+        html += `<th>${col.label}</th>`;
+      } else {
+        const arrow = lbSortCol === col.key ? (lbSortAsc ? '&#9650;' : '&#9660;') : '';
+        html += `<th data-col="${col.key}">${col.label}<span class="arrow">${arrow}</span></th>`;
+      }
+    }
+    html += '</tr></thead><tbody>';
+
+    for (let i = 0; i < shown.length; i++) {
+      const p = shown[i];
+      const isNcc = p.alliance_id === NCC_ID;
+      const rowCls = isNcc ? 'ncc-row' : '';
+      html += `<tr class="${rowCls}">`;
+      html += `<td>${i + 1}</td>`;
+      html += `<td>${playerLink(p)}</td>`;
+      html += `<td>${esc(p.alliance_tag || '—')}</td>`;
+
+      // Level with delta
+      const levelDelta = p[getDeltaKey('level', lbPeriod)] || 0;
+      if (levelDelta > 0) {
+        html += `<td>${p.level} <span class="delta-pos" style="font-size:0.75rem">+${levelDelta}</span></td>`;
+      } else {
+        html += `<td>${p.level}</td>`;
+      }
+
+      // Delta columns
+      for (const col of cols.filter(c => c.delta)) {
+        const val = p[col.key] || 0;
+        const delta = p[getDeltaKey(col.key, lbPeriod)] || 0;
+        html += `<td>${gainCellHtml(val, delta)}</td>`;
+      }
+
+      html += '</tr>';
+    }
+    html += '</tbody></table></div>';
+
+    if (filtered.length > 500) {
+      html += `<div class="empty">Showing top 500 of ${filtered.length.toLocaleString()} players. Use search to find specific players.</div>`;
+    }
+
+    return html;
+  }
+
+  function attachLeaderboardHandlers() {
+    document.querySelectorAll('#tab-content th[data-col]').forEach(th => {
+      th.addEventListener('click', () => {
+        const col = th.dataset.col;
+        if (lbSortCol === col) lbSortAsc = !lbSortAsc;
+        else { lbSortCol = col; lbSortAsc = (col === 'name' || col === 'alliance_tag'); }
+        document.getElementById('tab-content').innerHTML = renderLeaderboard();
+        attachLeaderboardHandlers();
+      });
+    });
+
+    document.querySelectorAll('#tab-content .period-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        lbPeriod = parseInt(btn.dataset.period);
+        document.getElementById('tab-content').innerHTML = renderLeaderboard();
+        attachLeaderboardHandlers();
+      });
+    });
+
+    const searchInput = document.getElementById('lb-search');
+    if (searchInput) {
+      searchInput.addEventListener('input', () => {
+        lbSearch = searchInput.value;
+        document.getElementById('tab-content').innerHTML = renderLeaderboard();
+        attachLeaderboardHandlers();
+        const newInput = document.getElementById('lb-search');
+        if (newInput) {
+          newInput.focus();
+          newInput.setSelectionRange(newInput.value.length, newInput.value.length);
+        }
+      });
+    }
+  }
+
+  // ===== TAB 2: Recruiting / Sniping Board =====
+  function computeRecruitScore(p) {
+    // Gather all players' power deltas and levels for percentile calculation
+    // (uses cached values computed once)
+    const powerDelta = p[getDeltaKey('power', 7)] || 0;
+    const powerPct = powerDelta > 0 ? Math.min(powerDelta / (avgPowerDelta7d * 3), 1) : 0;
+    const levelPct = Math.min((p.level || 0) / 50, 1);
+    const noAllianceBonus = (!p.alliance_tag || p.alliance_tag === '') ? 1 : 0;
+    const movedBonus = p.moved ? 1 : 0;
+
+    return (powerPct * 0.4) + (levelPct * 0.3) + (noAllianceBonus * 0.2) + (movedBonus * 0.1);
+  }
+
+  function scoreBadge(score) {
+    if (score >= 0.6) return '<span class="badge badge-hot">HOT</span>';
+    if (score >= 0.3) return '<span class="badge badge-warm">WARM</span>';
+    return '<span class="badge badge-cold">COLD</span>';
+  }
+
+  function renderRecruiting() {
+    let players = [...playerData.players];
+
+    // Exclude NCC members from recruiting board
+    players = players.filter(p => p.alliance_id !== NCC_ID);
+
+    // Apply filters
+    const anyFilterActive = recFilters.noAlliance || recFilters.smallAlliance ||
+      recFilters.recentlyMoved || recFilters.highActivity || recFilters.highLevel || recMinPower > 0;
+
+    if (anyFilterActive) {
+      players = players.filter(p => {
+        // Min power always applies if set
+        if (recMinPower > 0 && (p.power || 0) < recMinPower) return false;
+
+        // Toggle filters: player must match at least one active toggle
+        const toggles = [];
+        if (recFilters.noAlliance) toggles.push(!p.alliance_tag || p.alliance_tag === '');
+        if (recFilters.smallAlliance) toggles.push(p.alliance_tag && (allianceMemberCounts[p.alliance_tag] || 0) < 10);
+        if (recFilters.recentlyMoved) toggles.push(p.moved === true);
+        if (recFilters.highActivity) {
+          const dk = getDeltaKey('power', recPeriod);
+          toggles.push((p[dk] || 0) > avgPowerDelta7d);
+        }
+        if (recFilters.highLevel) toggles.push((p.level || 0) >= recMinLevel);
+
+        // If any toggle filters are active, player must match at least one
+        if (toggles.length > 0) return toggles.some(v => v);
+        return true; // Only min power was set
+      });
+    }
+
+    // Search
+    if (recSearch.length >= 2) {
+      const q = recSearch.toLowerCase();
+      players = players.filter(p =>
+        p.name.toLowerCase().includes(q) ||
+        (p.alliance_tag && p.alliance_tag.toLowerCase().includes(q))
+      );
+    }
+
+    // Compute recruit scores
+    for (const p of players) {
+      p._score = computeRecruitScore(p);
+    }
+
+    // Sort
+    const cols = [
+      { key: 'rank',             label: '#',              sortable: false },
+      { key: 'recruit_score',    label: 'Score',          type: 'score' },
+      { key: 'name',             label: 'Player',         type: 'name' },
+      { key: 'alliance_tag',     label: 'Alliance',       type: 'text' },
+      { key: 'level',            label: 'Level',          type: 'num' },
+      { key: 'power',            label: 'Power',          delta: true },
+      { key: 'players_killed',   label: 'PVP Kills',      delta: true },
+      { key: 'hostiles_killed',  label: 'Hostile Kills',   delta: true },
+      { key: 'resources_mined',  label: 'RSS Mined',      delta: true },
+      { key: 'resources_raided', label: 'RSS Raided',     delta: true },
+    ];
+
+    const sortDef = cols.find(c => c.key === recSortCol);
+    if (sortDef) {
+      if (sortDef.type === 'score') {
+        players.sort((a, b) => {
+          const v = (a._score || 0) - (b._score || 0);
+          return recSortAsc ? v : -v;
+        });
+      } else if (sortDef.type === 'name' || sortDef.type === 'text') {
+        players.sort((a, b) => {
+          const va = (a[recSortCol] || '').toLowerCase();
+          const vb = (b[recSortCol] || '').toLowerCase();
+          return recSortAsc ? va.localeCompare(vb) : -va.localeCompare(vb);
+        });
+      } else {
+        const useDelta = sortDef.delta && recPeriod;
+        const sortKey = useDelta ? getDeltaKey(recSortCol, recPeriod) : recSortCol;
+        players.sort((a, b) => {
+          const v = (a[sortKey] || 0) - (b[sortKey] || 0);
+          return recSortAsc ? v : -v;
+        });
+      }
+    }
+
+    let html = '';
+
+    // Filter controls
+    html += '<div class="filter-bar">';
+    const toggleDefs = [
+      ['noAlliance',    'No Alliance'],
+      ['smallAlliance', 'Small Alliance (<10)'],
+      ['recentlyMoved', 'Recently Moved'],
+      ['highActivity',  'High Activity'],
+      ['highLevel',     'High Level'],
+    ];
+    for (const [key, label] of toggleDefs) {
+      const active = recFilters[key] ? ' active' : '';
+      html += `<button class="filter-toggle${active}" data-filter="${key}">${label}</button>`;
+    }
+    html += '<div class="filter-input-wrap">';
+    html += `<label>Min Level:</label><input type="number" id="rec-min-level" value="${recMinLevel}" min="1" max="99">`;
+    html += '</div>';
+    html += '<div class="filter-input-wrap">';
+    html += `<label>Min Power:</label><input type="number" id="rec-min-power" value="${recMinPower}" min="0" step="1000000">`;
+    html += '</div>';
+    html += '</div>';
+
+    // Search
+    html += '<div class="search-wrap">';
+    html += `<input type="text" class="search-input" id="rec-search" placeholder="Search by player name or alliance tag..." value="${esc(recSearch)}">`;
+    html += '</div>';
+
+    // Period selector
+    html += '<div class="period-bar">';
+    for (const [p, label] of [[1, 'Yesterday'], [7, 'This Week'], [30, 'This Month']]) {
+      const active = recPeriod === p ? ' active' : '';
+      html += `<button class="period-btn${active}" data-period="${p}">${label}</button>`;
+    }
+    html += '</div>';
+
+    if (!anyFilterActive && recSearch.length < 2) {
+      html += '<div class="empty">Enable at least one filter or search to view recruiting targets</div>';
+      return html;
+    }
+
+    html += `<div class="result-count">${players.length.toLocaleString()} players match</div>`;
+
+    const shown = players.slice(0, 500);
+
+    html += '<div class="table-wrap"><table><thead><tr>';
+    for (const col of cols) {
+      if (col.sortable === false) {
+        html += `<th>${col.label}</th>`;
+      } else {
+        const arrow = recSortCol === col.key ? (recSortAsc ? '&#9650;' : '&#9660;') : '';
+        html += `<th data-col="${col.key}">${col.label}<span class="arrow">${arrow}</span></th>`;
+      }
+    }
+    html += '</tr></thead><tbody>';
+
+    for (let i = 0; i < shown.length; i++) {
+      const p = shown[i];
+      html += '<tr>';
+      html += `<td>${i + 1}</td>`;
+      html += `<td>${scoreBadge(p._score)}</td>`;
+      html += `<td>${playerLink(p)}</td>`;
+
+      // Alliance with member count hint
+      if (p.alliance_tag) {
+        const mc = allianceMemberCounts[p.alliance_tag] || 0;
+        html += `<td>${esc(p.alliance_tag)} <span style="font-size:0.7rem;color:#4a5568">(${mc})</span></td>`;
+      } else {
+        html += '<td><span style="color:#636e7b">None</span></td>';
+      }
+
+      // Level
+      const levelDelta = p[getDeltaKey('level', recPeriod)] || 0;
+      if (levelDelta > 0) {
+        html += `<td>${p.level} <span class="delta-pos" style="font-size:0.75rem">+${levelDelta}</span></td>`;
+      } else {
+        html += `<td>${p.level}</td>`;
+      }
+
+      // Delta columns
+      for (const col of cols.filter(c => c.delta)) {
+        const val = p[col.key] || 0;
+        const delta = p[getDeltaKey(col.key, recPeriod)] || 0;
+        html += `<td>${gainCellHtml(val, delta)}</td>`;
+      }
+
+      html += '</tr>';
+    }
+    html += '</tbody></table></div>';
+
+    if (players.length > 500) {
+      html += `<div class="empty">Showing top 500 of ${players.length.toLocaleString()} matches. Use search or filters to narrow down.</div>`;
+    }
+
+    return html;
+  }
+
+  function attachRecruitingHandlers() {
+    // Filter toggles
+    document.querySelectorAll('#tab-content .filter-toggle').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const key = btn.dataset.filter;
+        recFilters[key] = !recFilters[key];
+        reRenderRecruiting();
+      });
+    });
+
+    // Min level input
+    const minLevelInput = document.getElementById('rec-min-level');
+    if (minLevelInput) {
+      minLevelInput.addEventListener('change', () => {
+        recMinLevel = parseInt(minLevelInput.value) || 25;
+        reRenderRecruiting();
+      });
+    }
+
+    // Min power input
+    const minPowerInput = document.getElementById('rec-min-power');
+    if (minPowerInput) {
+      minPowerInput.addEventListener('change', () => {
+        recMinPower = parseInt(minPowerInput.value) || 0;
+        reRenderRecruiting();
+      });
+    }
+
+    // Column sort
+    document.querySelectorAll('#tab-content th[data-col]').forEach(th => {
+      th.addEventListener('click', () => {
+        const col = th.dataset.col;
+        if (recSortCol === col) recSortAsc = !recSortAsc;
+        else { recSortCol = col; recSortAsc = (col === 'name' || col === 'alliance_tag'); }
+        reRenderRecruiting();
+      });
+    });
+
+    // Period buttons
+    document.querySelectorAll('#tab-content .period-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        recPeriod = parseInt(btn.dataset.period);
+        reRenderRecruiting();
+      });
+    });
+
+    // Search
+    const searchInput = document.getElementById('rec-search');
+    if (searchInput) {
+      searchInput.addEventListener('input', () => {
+        recSearch = searchInput.value;
+        reRenderRecruiting();
+        const newInput = document.getElementById('rec-search');
+        if (newInput) {
+          newInput.focus();
+          newInput.setSelectionRange(newInput.value.length, newInput.value.length);
+        }
+      });
+    }
+  }
+
+  function reRenderRecruiting() {
+    document.getElementById('tab-content').innerHTML = renderRecruiting();
+    attachRecruitingHandlers();
+  }
+
+})();
+</script>
+</body>
+</html>
