@@ -233,6 +233,8 @@ def fetch_alliance_contrib(alliance_ids):
     """Fetch RSS and ISO contribution scores for all alliances' members.
 
     Uses the by_group rankings endpoint (no auth) with alliance-scoped configs.
+    Players who changed alliances may have scores under multiple alliance IDs,
+    so we sum across all alliances to get their total contribution.
     Returns (rss_dict, iso_dict) where each is {hex_id: score}.
     """
     rss = {}
@@ -257,7 +259,9 @@ def fetch_alliance_contrib(alliance_ids):
                 if not results:
                     break
                 for entry in results:
-                    target[entry["id"]] = int(entry.get("score", 0))
+                    pid = entry["id"]
+                    score = int(entry.get("score", 0))
+                    target[pid] = target.get(pid, 0) + score
                 if len(results) < page_size:
                     break
                 start += page_size
