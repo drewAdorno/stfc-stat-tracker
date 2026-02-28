@@ -142,6 +142,13 @@ def _game_post(auth, path, body, retries=2):
         try:
             r = requests.post(url, json=body, headers=headers, timeout=15)
             if r.status_code == 200:
+                # Verify response is valid JSON (expired auth can return non-JSON)
+                try:
+                    r.json()
+                except (requests.exceptions.JSONDecodeError, ValueError):
+                    safe_print(f"FATAL: Auth expired (got non-JSON response from {path}).")
+                    safe_print("Relaunch the game to refresh auth.json, then retry.")
+                    sys.exit(2)
                 return r
             if r.status_code in (401, 403):
                 safe_print(f"FATAL: Auth expired (HTTP {r.status_code}).")
