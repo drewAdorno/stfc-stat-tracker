@@ -757,12 +757,20 @@ def main():
         all_stats = stats_future.result()
         bg_executor.shutdown(wait=False)
 
-    # --- Map all players ---
+    # --- Map all players (filter out cross-server) ---
     safe_print("=== Mapping players ===")
     all_mapped = []
+    skipped_cross_server = 0
     for hex_id in hex_ids:
-        ranking = rankings_by_id.get(hex_id, {})
         profile = profiles.get(hex_id, {})
+
+        # Skip players from other servers (Scopely rankings bug)
+        gw = profile.get("gameworld_id")
+        if gw is not None and gw != SERVER:
+            skipped_cross_server += 1
+            continue
+
+        ranking = rankings_by_id.get(hex_id, {})
         aid = str(profile.get("alliance_id", "") or "")
         alliance_info = alliances.get(aid, {})
         stats = all_stats.get(hex_id, {})
@@ -774,6 +782,8 @@ def main():
                             rss_c, iso_c)
         all_mapped.append(mapped)
 
+    if skipped_cross_server:
+        safe_print(f"  Skipped {skipped_cross_server} cross-server players")
     safe_print(f"Mapped {len(all_mapped)} players")
 
     if args.dry_run:
