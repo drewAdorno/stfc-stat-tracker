@@ -35,7 +35,10 @@ from db import (get_db, upsert_players, log_pull, now_est, export_latest_json,
 # ---------------------------------------------------------------------------
 
 PLATFORM_BASE = "https://cdn-nv3-live.startrek.digitgaming.com"
-AUTH_FILE = Path("C:/Users/drewa/Desktop/stfc-api/auth.json")
+# Auth file: check local project dir first, then Windows dev path
+_LOCAL_AUTH = Path(__file__).parent / "auth.json"
+_DEV_AUTH = Path("C:/Users/drewa/Desktop/stfc-api/auth.json")
+AUTH_FILE = _LOCAL_AUTH if _LOCAL_AUTH.exists() else _DEV_AUTH
 MILITARY_MIGHT_CONFIG = "3fcdb730de6656735924fa085dffb74b1954bf19"
 SERVER = 716
 PROFILE_BATCH_SIZE = 200
