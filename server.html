@@ -1071,13 +1071,14 @@
       if (players.length === 0) return '';
       let s = `<div class="section-header">${title} (${players.length})</div>`;
       s += '<div class="table-wrap"><table><thead><tr>';
-      s += '<th>Player</th><th>From</th><th>To</th><th>Level</th><th>Power</th>';
+      s += '<th>Player</th><th>From</th><th>To</th><th>Date</th><th>Level</th><th>Power</th>';
       s += '</tr></thead><tbody>';
       for (const p of players) {
         s += '<tr>';
         s += `<td>${playerLink(p)}</td>`;
         s += `<td>${esc(p.prev_alliance_tag || '(none)')}</td>`;
         s += `<td>${esc(p.alliance_tag || '(none)')}</td>`;
+        s += `<td>${p.moved_date || ''}</td>`;
         s += `<td>${p.level}</td>`;
         s += `<td>${formatAbbr(p.power)}</td>`;
         s += '</tr>';

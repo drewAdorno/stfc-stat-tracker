@@ -1165,6 +1165,7 @@ def export_server_players_json(conn):
         # the tag didn't actually change (same tag or both empty).
         moved = False
         prev_tag = None
+        moved_date = None
         current_tag = player.get("alliance_tag") or ""
         for days in delta_periods:
             past = past_snapshots[days].get(pid)
@@ -1176,12 +1177,34 @@ def export_server_players_json(conn):
                 if past_tag != current_tag:
                     moved = True
                     prev_tag = past_tag or None
+                    moved_date = delta_dates[days]
                     break  # use the shortest window that detects a change
 
         player["moved"] = moved
         player["prev_alliance_tag"] = prev_tag
+        player["moved_date"] = moved_date
 
         players.append(player)
+
+    # Refine move dates: find the first snapshot date with the current tag
+    moved_pids = [p["id"] for p in players if p["moved"]]
+    if moved_pids:
+        placeholders = ",".join("?" * len(moved_pids))
+        move_rows = conn.execute(f"""
+            SELECT player_id, MIN(date) as first_date
+            FROM daily_snapshots
+            WHERE player_id IN ({placeholders})
+              AND alliance_tag = (
+                  SELECT ds2.alliance_tag FROM daily_snapshots ds2
+                  WHERE ds2.player_id = daily_snapshots.player_id
+                  AND ds2.date = ?
+              )
+            GROUP BY player_id
+        """, (*moved_pids, latest_date)).fetchall()
+        first_new_tag = {r[0]: r[1] for r in move_rows}
+        for p in players:
+            if p["moved"] and p["id"] in first_new_tag:
+                p["moved_date"] = first_new_tag[p["id"]]
 
     # Compute activity scores across all server players
     scores = compute_activity_scores(players)
