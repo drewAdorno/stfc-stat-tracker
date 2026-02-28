@@ -622,7 +622,7 @@ def export_latest_json(conn, alliance_id=NCC_ALLIANCE_ID, league=""):
 
     record = {
         "pulled_at": pulled_at,
-        "alliance_url": f"https://v3.stfc.pro/alliances/{alliance_id}",
+        "alliance_url": "",
         "alliance_name": NCC_ALLIANCE_NAME if alliance_id == NCC_ALLIANCE_ID else "",
         "alliance_tag": "NCC" if alliance_id == NCC_ALLIANCE_ID else "",
         "summary": {
@@ -1161,16 +1161,22 @@ def export_server_players_json(conn):
         # Alliance movement detection (check 1d, then 7d, then 30d)
         # Falls back to earliest snapshot so moves are caught even when a
         # player has no data for a specific delta date.
+        # Filter out false positives from ID migration: ignore moves where
+        # the tag didn't actually change (same tag or both empty).
         moved = False
         prev_tag = None
+        current_tag = player.get("alliance_tag") or ""
         for days in delta_periods:
             past = past_snapshots[days].get(pid)
             if not past:
                 past = earliest_snapshot.get(pid)
             if past and past["alliance_id"] != aid:
-                moved = True
-                prev_tag = past["alliance_tag"]
-                break  # use the shortest window that detects a change
+                past_tag = past["alliance_tag"] or ""
+                # Only count as a real move if the tag actually changed
+                if past_tag != current_tag:
+                    moved = True
+                    prev_tag = past_tag or None
+                    break  # use the shortest window that detects a change
 
         player["moved"] = moved
         player["prev_alliance_tag"] = prev_tag
