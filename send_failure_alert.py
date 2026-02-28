@@ -36,10 +36,10 @@ def main():
         "title": "Scraper Failure",
         "description": (
             f"{message}\n\n"
-            "**To fix:** Copy fresh cookies from Windows:\n"
+            "**To fix:** Relaunch the game to refresh auth tokens, then:\n"
             "```\n"
-            "scp -i STFC_pem.pem data/session_cookies.json "
-            "ubuntu@3.16.255.133:/opt/stfc/data/\n"
+            "scp -i STFC_pem.pem auth.json "
+            "ubuntu@3.16.255.133:/opt/stfc/auth.json\n"
             "```"
         ),
         "color": 0xFF0000,  # red
