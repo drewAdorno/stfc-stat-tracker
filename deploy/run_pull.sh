@@ -12,12 +12,18 @@ cd "$APP_DIR"
 
 logger -t "$LOG_TAG" "Starting pull..."
 
-# Run the API puller (xvfb provides virtual display for non-headless Chromium)
-if xvfb-run --auto-servernum "$VENV/python" pull_api.py 2>&1; then
+# Run the Scopely API scraper (no browser needed)
+if "$VENV/python" -u pull_scopely.py 2>&1; then
     logger -t "$LOG_TAG" "Pull complete"
 else
-    logger -t "$LOG_TAG" "ERROR: Pull failed!"
-    "$VENV/python" send_failure_alert.py "Scraper failed — cookies may need refreshing" || true
+    EXIT_CODE=$?
+    if [ "$EXIT_CODE" -eq 2 ]; then
+        logger -t "$LOG_TAG" "ERROR: Auth expired — update auth.json on server"
+        "$VENV/python" send_failure_alert.py "Auth expired — relaunch game and upload fresh auth.json" || true
+    else
+        logger -t "$LOG_TAG" "ERROR: Pull failed (exit $EXIT_CODE)"
+        "$VENV/python" send_failure_alert.py "Scraper failed (exit $EXIT_CODE)" || true
+    fi
     exit 1
 fi
 
