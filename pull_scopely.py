@@ -45,7 +45,6 @@ PROFILE_BATCH_SIZE = 200
 
 BASE_DIR = Path(__file__).parent
 DATA_DIR = BASE_DIR / "data"
-LAST_STATS_FILE = DATA_DIR / ".last_stats_pull"
 MIGRATED_FLAG = DATA_DIR / ".scopely_migrated"
 
 # Stat hash prefix (8 chars) → name mappings from decoded player-stats protobuf.
@@ -560,25 +559,6 @@ def bridge_player_ids(conn, profiles):
     return matched
 
 
-# ---------------------------------------------------------------------------
-# Stats pull gating
-# ---------------------------------------------------------------------------
-
-def should_pull_stats():
-    """Check if stats were already pulled today."""
-    if not LAST_STATS_FILE.exists():
-        return True
-    try:
-        last = LAST_STATS_FILE.read_text().strip()
-        return last != now_est().strftime("%Y-%m-%d")
-    except Exception:
-        return True
-
-
-def mark_stats_pulled():
-    """Record that stats were pulled today."""
-    LAST_STATS_FILE.write_text(now_est().strftime("%Y-%m-%d"))
-
 
 # ---------------------------------------------------------------------------
 # Save data (same pattern as pull_api.py)
@@ -640,8 +620,6 @@ def save_data(all_mapped, total_count):
 
 def main():
     parser = argparse.ArgumentParser(description="STFC Scopely API Scraper")
-    parser.add_argument("--with-stats", action="store_true",
-                        help="Force player stats pull even if already done today")
     parser.add_argument("--skip-stats", action="store_true",
                         help="Skip player stats entirely")
     parser.add_argument("--dry-run", action="store_true",
@@ -661,15 +639,7 @@ def main():
     rankings_by_id = {r["id"]: r for r in rankings}
 
     # Determine if we need stats
-    do_stats = False
-    if args.skip_stats:
-        safe_print("=== Stage 4: Skipped (--skip-stats) ===")
-    elif args.with_stats:
-        do_stats = True
-    elif should_pull_stats():
-        do_stats = True
-    else:
-        safe_print("=== Stage 4: Skipped (already pulled today) ===")
+    do_stats = not args.skip_stats
 
     # --- Start stats in background (CDN, no auth) while we do profiles+alliances ---
     stats_future = None
@@ -698,7 +668,6 @@ def main():
     if stats_future is not None:
         safe_print("=== Waiting for stats to finish ===")
         all_stats = stats_future.result()
-        mark_stats_pulled()
         bg_executor.shutdown(wait=False)
 
     # --- Map all players ---
