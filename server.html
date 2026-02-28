@@ -1069,6 +1069,7 @@
 
     function movementTable(players, title) {
       if (players.length === 0) return '';
+      players.sort((a, b) => (b.moved_date || '').localeCompare(a.moved_date || ''));
       let s = `<div class="section-header">${title} (${players.length})</div>`;
       s += '<div class="table-wrap"><table><thead><tr>';
       s += '<th>Player</th><th>From</th><th>To</th><th>Date</th><th>Level</th><th>Power</th>';
