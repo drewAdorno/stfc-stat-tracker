@@ -40,6 +40,9 @@ _LOCAL_AUTH = Path(__file__).parent / "auth.json"
 _DEV_AUTH = Path("C:/Users/drewa/Desktop/stfc-api/auth.json")
 AUTH_FILE = _LOCAL_AUTH if _LOCAL_AUTH.exists() else _DEV_AUTH
 MILITARY_MIGHT_CONFIG = "3fcdb730de6656735924fa085dffb74b1954bf19"
+RESOURCES_RAIDED_CONFIG = "e5422e292629984b1b3126b9aca593a2f7909a58"
+RSS_CONTRIB_CONFIG = "32e959047182a77eb2ac98d8c547ebfcd7f11ded"
+ISO_CONTRIB_CONFIG = "4d21cabdec534dbf5896b0441d774dd7c0f1252d"
 SERVER = 716
 PROFILE_BATCH_SIZE = 200
 
@@ -192,6 +195,77 @@ def fetch_all_rankings():
 
     safe_print(f"Stage 1 complete: {len(all_results)} players from rankings")
     return all_results
+
+
+def fetch_resources_raided():
+    """Paginate the resources raided monthly leaderboard. Returns dict[hex_id → score]."""
+    raided = {}
+    start = 0
+    page_size = 500
+
+    while True:
+        r = _platform_get(
+            f"/content/v1/products/prime/event/rankings/{SERVER}/{RESOURCES_RAIDED_CONFIG}",
+            params={"count": page_size, "start": start},
+        )
+        if r is None:
+            break
+
+        data = r.json()
+        results = data.get("results", [])
+        if not results:
+            break
+
+        for entry in results:
+            raided[entry["id"]] = int(entry.get("score", 0))
+
+        if len(results) < page_size:
+            break
+
+        start += page_size
+        time.sleep(PLATFORM_DELAY)
+
+    safe_print(f"  Resources raided: {len(raided)} players with scores")
+    return raided
+
+
+def fetch_alliance_contrib(alliance_ids):
+    """Fetch RSS and ISO contribution scores for all alliances' members.
+
+    Uses the by_group rankings endpoint (no auth) with alliance-scoped configs.
+    Returns (rss_dict, iso_dict) where each is {hex_id: score}.
+    """
+    rss = {}
+    iso = {}
+
+    for config, label, target in [
+        (RSS_CONTRIB_CONFIG, "RSS contrib", rss),
+        (ISO_CONTRIB_CONFIG, "ISO contrib", iso),
+    ]:
+        for alliance_id in alliance_ids:
+            start = 0
+            page_size = 500
+            while True:
+                r = _platform_get(
+                    f"/content/v1/products/prime/event/rankings/by_group/{SERVER}/{config}/{alliance_id}",
+                    params={"count": page_size, "start": start},
+                )
+                if r is None:
+                    break
+                data = r.json()
+                results = data.get("results", [])
+                if not results:
+                    break
+                for entry in results:
+                    target[entry["id"]] = int(entry.get("score", 0))
+                if len(results) < page_size:
+                    break
+                start += page_size
+                time.sleep(PLATFORM_DELAY)
+            time.sleep(PLATFORM_DELAY)
+        safe_print(f"  {label}: {len(target)} players with scores")
+
+    return rss, iso
 
 
 # ---------------------------------------------------------------------------
@@ -448,7 +522,8 @@ def _fetch_stats_with_delay(hex_id):
 # Mapping: Scopely data → upsert-compatible dict
 # ---------------------------------------------------------------------------
 
-def map_player(hex_id, ranking, profile, alliance_info, stats):
+def map_player(hex_id, ranking, profile, alliance_info, stats, resources_raided=0,
+               rss_contrib=0, iso_contrib=0):
     """Map Scopely API data to the format expected by db.upsert_players().
 
     Returns a dict compatible with pull_api.map_player() output.
@@ -479,12 +554,12 @@ def map_player(hex_id, ranking, profile, alliance_info, stats):
         "level": level,
         "power": power,
         "helps": helps,
-        "rss_contrib": 0,
-        "iso_contrib": 0,
+        "rss_contrib": rss_contrib,
+        "iso_contrib": iso_contrib,
         "players_killed": players_killed,
         "hostiles_killed": hostiles_killed,
         "resources_mined": resources_mined,
-        "resources_raided": 0,
+        "resources_raided": resources_raided,
         "alliance_tag": alliance_tag,
         "alliance_name": alliance_name,
         "alliance_id": alliance_id,
@@ -638,6 +713,10 @@ def main():
     hex_ids = [r["id"] for r in rankings]
     rankings_by_id = {r["id"]: r for r in rankings}
 
+    # --- Fetch resources raided from monthly leaderboard ---
+    safe_print("  Fetching resources raided leaderboard...")
+    raided_scores = fetch_resources_raided()
+
     # Determine if we need stats
     do_stats = not args.skip_stats
 
@@ -664,6 +743,10 @@ def main():
             alliance_ids.add(aid)  # keep as original type (int) for the API
     alliances = fetch_alliances(alliance_ids, auth) if alliance_ids else {}
 
+    # --- Fetch RSS/ISO contrib for all alliances ---
+    safe_print(f"=== Fetching alliance contributions (RSS + ISO) for {len(alliance_ids)} alliances ===")
+    rss_scores, iso_scores = fetch_alliance_contrib(alliance_ids)
+
     # --- Collect stats results ---
     if stats_future is not None:
         safe_print("=== Waiting for stats to finish ===")
@@ -680,7 +763,11 @@ def main():
         alliance_info = alliances.get(aid, {})
         stats = all_stats.get(hex_id, {})
 
-        mapped = map_player(hex_id, ranking, profile, alliance_info, stats)
+        raided = raided_scores.get(hex_id, 0)
+        rss_c = rss_scores.get(hex_id, 0)
+        iso_c = iso_scores.get(hex_id, 0)
+        mapped = map_player(hex_id, ranking, profile, alliance_info, stats, raided,
+                            rss_c, iso_c)
         all_mapped.append(mapped)
 
     safe_print(f"Mapped {len(all_mapped)} players")
