@@ -399,7 +399,7 @@
   </div>
 
   <footer style="display:none" id="footer-el">
-    Data sourced from <a href="https://stfc.pro" target="_blank" rel="noopener">stfc.pro</a>
+    Data sourced from Scopely game APIs
     &middot; <a href="index">Main Dashboard</a>
   </footer>
 </div>
@@ -407,7 +407,7 @@
 <script>
 (function() {
   const $ = id => document.getElementById(id);
-  const NCC_ID = 3974286889;
+  const NCC_ID = '2616095065411838478';
 
   // --- Auth gate (same as admin.html) ---
   const PASSWORD = 'salsa';
@@ -537,7 +537,7 @@
           hour: '2-digit', minute: '2-digit'
         });
         // Deep-link: ?alliance=<id> opens alliance detail tab
-        const urlAllianceId = parseInt(new URLSearchParams(window.location.search).get('alliance'));
+        const urlAllianceId = new URLSearchParams(window.location.search).get('alliance');
         if (urlAllianceId && a.alliances.some(al => al.alliance_id === urlAllianceId)) {
           detailAllianceId = urlAllianceId;
           currentTab = 'detail';
@@ -702,7 +702,7 @@
     // Click row → alliance detail
     document.querySelectorAll('#tab-content tr.clickable').forEach(tr => {
       tr.addEventListener('click', () => {
-        detailAllianceId = parseInt(tr.dataset.aid);
+        detailAllianceId = tr.dataset.aid;
         currentTab = 'detail';
         renderPage();
       });
@@ -858,7 +858,7 @@
     const sel = document.getElementById('alliance-select');
     if (sel) {
       sel.addEventListener('change', () => {
-        detailAllianceId = sel.value ? parseInt(sel.value) : null;
+        detailAllianceId = sel.value || null;
         document.getElementById('tab-content').innerHTML = renderDetail();
         attachDetailHandlers();
       });
@@ -1035,14 +1035,14 @@
     const selB = document.getElementById('compare-b');
     if (selA) {
       selA.addEventListener('change', () => {
-        compareA = selA.value ? parseInt(selA.value) : null;
+        compareA = selA.value || null;
         document.getElementById('tab-content').innerHTML = renderCompare();
         attachCompareHandlers();
       });
     }
     if (selB) {
       selB.addEventListener('change', () => {
-        compareB = selB.value ? parseInt(selB.value) : null;
+        compareB = selB.value || null;
         document.getElementById('tab-content').innerHTML = renderCompare();
         attachCompareHandlers();
       });
