@@ -32,7 +32,7 @@ DATA_DIR = BASE_DIR / "data"
 SESSION_DIR = BASE_DIR / "browser_session"
 COOKIE_FILE = DATA_DIR / "session_cookies.json"
 API_BASE = "https://v3.stfc.pro/api/players"
-NCC_ALLIANCE_ID = 3974286889
+NCC_ALLIANCE_ID = "2616095065411838478"
 SERVER = 716
 PAGE_SIZE = 100
 IMPERSONATE = "chrome131"
@@ -513,7 +513,7 @@ def map_player(raw):
         "resources_raided": d.get("rss", 0),
         "alliance_tag": d.get("tag", ""),
         "alliance_name": d.get("name", ""),
-        "alliance_id": d.get("allianceid", 0),
+        "alliance_id": str(d.get("allianceid", "") or ""),
     }
 
 

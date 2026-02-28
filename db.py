@@ -22,7 +22,7 @@ BASE_DIR = Path(__file__).parent
 DATA_DIR = BASE_DIR / "data"
 DB_PATH = DATA_DIR / "stfc.db"
 
-NCC_ALLIANCE_ID = 3974286889
+NCC_ALLIANCE_ID = "2616095065411838478"
 NCC_ALLIANCE_NAME = "Discovery"
 SERVER = 716
 
@@ -33,17 +33,17 @@ TRACKED_FIELDS = [
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS players (
-    player_id   INTEGER PRIMARY KEY,
+    player_id   TEXT PRIMARY KEY,
     name        TEXT NOT NULL,
     server      INTEGER NOT NULL,
-    alliance_id INTEGER,
+    alliance_id TEXT,
     alliance_tag TEXT,
     first_seen  TEXT NOT NULL,
     last_seen   TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS daily_snapshots (
-    player_id       INTEGER NOT NULL,
+    player_id       TEXT NOT NULL,
     date            TEXT NOT NULL,
     name            TEXT,
     level           INTEGER,
@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS daily_snapshots (
     resources_raided INTEGER,
     rank_title      TEXT,
     join_date       TEXT,
-    alliance_id     INTEGER,
+    alliance_id     TEXT,
     alliance_tag    TEXT,
     alliance_name   TEXT,
     PRIMARY KEY (player_id, date)
@@ -73,7 +73,7 @@ CREATE TABLE IF NOT EXISTS pull_log (
 
 CREATE TABLE IF NOT EXISTS discord_links (
     discord_user_id TEXT PRIMARY KEY,
-    player_id       INTEGER NOT NULL,
+    player_id       TEXT NOT NULL,
     linked_at       TEXT NOT NULL,
     FOREIGN KEY (player_id) REFERENCES players(player_id)
 );
@@ -82,12 +82,129 @@ CREATE TABLE IF NOT EXISTS daily_stat_changes (
     date        TEXT NOT NULL,
     field       TEXT NOT NULL,
     detected_at TEXT NOT NULL,
-    sample_player_id INTEGER,
+    sample_player_id TEXT,
     old_value   INTEGER,
     new_value   INTEGER,
     PRIMARY KEY (date, field)
 );
 """
+
+
+def _migrate_player_id_to_text(conn):
+    """One-time migration: convert player_id columns from INTEGER to TEXT.
+
+    SQLite doesn't support ALTER COLUMN, so we recreate tables with TEXT types
+    and copy data with CAST(player_id AS TEXT).
+    """
+    # Check if migration is needed by inspecting the players table schema
+    cols = conn.execute("PRAGMA table_info(players)").fetchall()
+    pid_col = next((c for c in cols if c[1] == "player_id"), None)
+    if not pid_col or pid_col[2].upper() == "TEXT":
+        return  # Already TEXT or table doesn't exist yet
+
+    print("[migration] Converting player_id from INTEGER to TEXT...")
+    conn.execute("PRAGMA foreign_keys=OFF")
+
+    # --- players ---
+    conn.execute("""CREATE TABLE players_new (
+        player_id TEXT PRIMARY KEY, name TEXT NOT NULL, server INTEGER NOT NULL,
+        alliance_id TEXT, alliance_tag TEXT, first_seen TEXT NOT NULL, last_seen TEXT NOT NULL
+    )""")
+    conn.execute("""INSERT INTO players_new
+        SELECT CAST(player_id AS TEXT), name, server, CAST(alliance_id AS TEXT),
+               alliance_tag, first_seen, last_seen FROM players""")
+    conn.execute("DROP TABLE players")
+    conn.execute("ALTER TABLE players_new RENAME TO players")
+
+    # --- daily_snapshots ---
+    # Get existing columns to handle optional ones
+    ds_cols = {r[1] for r in conn.execute("PRAGMA table_info(daily_snapshots)")}
+    name_col = ", name" if "name" in ds_cols else ""
+    aname_col = ", alliance_name" if "alliance_name" in ds_cols else ""
+    name_col_def = ", name TEXT" if "name" in ds_cols else ""
+    aname_col_def = ", alliance_name TEXT" if "alliance_name" in ds_cols else ""
+
+    conn.execute(f"""CREATE TABLE daily_snapshots_new (
+        player_id TEXT NOT NULL, date TEXT NOT NULL{name_col_def},
+        level INTEGER, power INTEGER, helps INTEGER, rss_contrib INTEGER,
+        iso_contrib INTEGER, players_killed INTEGER, hostiles_killed INTEGER,
+        resources_mined INTEGER, resources_raided INTEGER, rank_title TEXT,
+        join_date TEXT, alliance_id TEXT, alliance_tag TEXT{aname_col_def},
+        PRIMARY KEY (player_id, date)
+    )""")
+    conn.execute(f"""INSERT INTO daily_snapshots_new
+        SELECT CAST(player_id AS TEXT), date{name_col},
+               level, power, helps, rss_contrib, iso_contrib,
+               players_killed, hostiles_killed, resources_mined, resources_raided,
+               rank_title, join_date, CAST(alliance_id AS TEXT), alliance_tag{aname_col}
+        FROM daily_snapshots""")
+    conn.execute("DROP TABLE daily_snapshots")
+    conn.execute("ALTER TABLE daily_snapshots_new RENAME TO daily_snapshots")
+
+    # --- discord_links ---
+    if conn.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='discord_links'").fetchone():
+        conn.execute("""CREATE TABLE discord_links_new (
+            discord_user_id TEXT PRIMARY KEY, player_id TEXT NOT NULL,
+            linked_at TEXT NOT NULL, FOREIGN KEY (player_id) REFERENCES players(player_id)
+        )""")
+        conn.execute("""INSERT INTO discord_links_new
+            SELECT discord_user_id, CAST(player_id AS TEXT), linked_at FROM discord_links""")
+        conn.execute("DROP TABLE discord_links")
+        conn.execute("ALTER TABLE discord_links_new RENAME TO discord_links")
+
+    # --- daily_stat_changes ---
+    if conn.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='daily_stat_changes'").fetchone():
+        conn.execute("""CREATE TABLE daily_stat_changes_new (
+            date TEXT NOT NULL, field TEXT NOT NULL, detected_at TEXT NOT NULL,
+            sample_player_id TEXT, old_value INTEGER, new_value INTEGER,
+            PRIMARY KEY (date, field)
+        )""")
+        conn.execute("""INSERT INTO daily_stat_changes_new
+            SELECT date, field, detected_at, CAST(sample_player_id AS TEXT),
+                   old_value, new_value FROM daily_stat_changes""")
+        conn.execute("DROP TABLE daily_stat_changes")
+        conn.execute("ALTER TABLE daily_stat_changes_new RENAME TO daily_stat_changes")
+
+    conn.commit()
+    conn.execute("PRAGMA foreign_keys=ON")
+    print("[migration] Done — all player_id columns are now TEXT.")
+
+
+def _migrate_alliance_ids(conn, new_alliance_map):
+    """Remap old stfc.pro alliance_ids to Scopely IDs using tag as the bridge.
+
+    new_alliance_map: dict of {alliance_tag: new_alliance_id} from Scopely data.
+    Only runs once (checks for short numeric-looking alliance_ids in old data).
+    """
+    # Check if there are old-style alliance IDs (stfc.pro used ~10-digit integers,
+    # Scopely uses ~19-digit integers)
+    old_count = conn.execute("""
+        SELECT COUNT(DISTINCT alliance_id) FROM daily_snapshots
+        WHERE length(alliance_id) < 15 AND alliance_id != '' AND alliance_tag != ''
+    """).fetchone()[0]
+    if old_count == 0:
+        return
+
+    # Build old_tag -> old_id mapping from short-id rows
+    old_rows = conn.execute("""
+        SELECT DISTINCT alliance_id, alliance_tag FROM daily_snapshots
+        WHERE length(alliance_id) < 15 AND alliance_id != '' AND alliance_tag != ''
+    """).fetchall()
+
+    remapped = 0
+    for old_id, tag in old_rows:
+        new_id = new_alliance_map.get(tag)
+        if not new_id or new_id == old_id:
+            continue
+        conn.execute("UPDATE daily_snapshots SET alliance_id = ? WHERE alliance_id = ?",
+                     (new_id, old_id))
+        conn.execute("UPDATE players SET alliance_id = ? WHERE alliance_id = ?",
+                     (new_id, old_id))
+        remapped += 1
+
+    if remapped:
+        conn.commit()
+        print(f"[migration] Remapped {remapped} old alliance IDs to Scopely IDs")
 
 
 def get_db():
@@ -96,6 +213,9 @@ def get_db():
     conn = sqlite3.connect(str(DB_PATH))
     conn.execute("PRAGMA journal_mode=WAL")
     conn.execute("PRAGMA foreign_keys=ON")
+    # Migrate INTEGER player_id to TEXT if DB already exists
+    if DB_PATH.exists():
+        _migrate_player_id_to_text(conn)
     conn.executescript(SCHEMA)
     # Migrations: add columns to daily_snapshots if missing
     cols = {r[1] for r in conn.execute("PRAGMA table_info(daily_snapshots)")}
@@ -119,7 +239,7 @@ def _detect_daily_stat_changes(conn, mapped_players, date):
     # Build a lookup of incoming data by player_id
     incoming = {}
     for m in mapped_players:
-        pid = int(m["id"])
+        pid = str(m["id"])
         incoming[pid] = m
 
     # Get a sample of players that already have a snapshot for today
@@ -136,7 +256,7 @@ def _detect_daily_stat_changes(conn, mapped_players, date):
     detected_at = now_est().isoformat()
 
     for row in sample_rows:
-        pid = row[0]
+        pid = str(row[0])
         if pid not in incoming:
             continue
         stored = {
@@ -173,7 +293,7 @@ def upsert_players(conn, mapped_players, date):
     cur = conn.cursor()
 
     for m in mapped_players:
-        player_id = int(m["id"])
+        player_id = str(m["id"])
 
         # Upsert into players table
         cur.execute("""
@@ -189,7 +309,7 @@ def upsert_players(conn, mapped_players, date):
             player_id,
             m.get("name", ""),
             SERVER,
-            m.get("alliance_id", 0),
+            str(m.get("alliance_id", "") or ""),
             m.get("alliance_tag", ""),
             date,
             date,
@@ -232,7 +352,7 @@ def upsert_players(conn, mapped_players, date):
             m.get("resources_raided", 0),
             m.get("rank", ""),
             m.get("join_date", ""),
-            m.get("alliance_id", 0),
+            str(m.get("alliance_id", "") or ""),
             m.get("alliance_tag", ""),
             m.get("alliance_name", ""),
         ))
@@ -454,7 +574,7 @@ def export_latest_json(conn, alliance_id=NCC_ALLIANCE_ID, league=""):
             "resources_raided": _format_abbr(rr),
             "alliance_tag": atag or "",
             "alliance_name": NCC_ALLIANCE_NAME if aid == NCC_ALLIANCE_ID else "",
-            "alliance_id": aid or 0,
+            "alliance_id": aid or "",
         })
 
         total_power += power or 0
@@ -646,7 +766,7 @@ def import_history_json(conn):
         members = entry.get("members", {})
 
         for pid_str, m in members.items():
-            player_id = int(pid_str)
+            player_id = str(pid_str)
             name = m.get("name", "")
             level = _parse_abbr(m.get("level", 0))
             power = _parse_abbr(m.get("power", 0))
@@ -792,7 +912,7 @@ def export_server_alliances_json(conn):
                SUM(resources_mined) as total_mined,
                SUM(resources_raided) as total_raided
         FROM daily_snapshots
-        WHERE date = ? AND alliance_id IS NOT NULL AND alliance_id != 0
+        WHERE date = ? AND alliance_id IS NOT NULL AND alliance_id != '' AND alliance_id != '0'
         GROUP BY alliance_id
         ORDER BY total_power DESC
     """, (latest_date,)).fetchall()
@@ -819,7 +939,7 @@ def export_server_alliances_json(conn):
         past_rows = conn.execute(f"""
             SELECT alliance_id, {agg_sql}
             FROM daily_snapshots
-            WHERE date = ? AND alliance_id IS NOT NULL AND alliance_id != 0
+            WHERE date = ? AND alliance_id IS NOT NULL AND alliance_id != '' AND alliance_id != '0'
             GROUP BY alliance_id
         """, (dd,)).fetchall()
         past_stats[days] = {
@@ -834,7 +954,7 @@ def export_server_alliances_json(conn):
         INNER JOIN (
             SELECT alliance_id, MIN(date) as min_date
             FROM daily_snapshots
-            WHERE alliance_id IS NOT NULL AND alliance_id != 0
+            WHERE alliance_id IS NOT NULL AND alliance_id != '' AND alliance_id != '0'
             GROUP BY alliance_id
         ) e ON ds.alliance_id = e.alliance_id AND ds.date = e.min_date
         GROUP BY ds.alliance_id
@@ -1022,7 +1142,7 @@ def export_server_players_json(conn):
         player = {
             "id": str(pid),
             "name": name or "",
-            "alliance_id": aid or 0,
+            "alliance_id": aid or "",
             "alliance_tag": atag or "",
             "alliance_name": aname or "",
             **current_vals,
@@ -1122,7 +1242,7 @@ def link_discord(conn, discord_user_id, player_id):
         ON CONFLICT(discord_user_id) DO UPDATE SET
             player_id = excluded.player_id,
             linked_at = excluded.linked_at
-    """, (str(discord_user_id), int(player_id), datetime.now().isoformat()))
+    """, (str(discord_user_id), str(player_id), datetime.now().isoformat()))
     conn.commit()
     return True
 
