@@ -108,8 +108,8 @@
   /* Event bars */
   .ev-bar {
     display: block;
-    font-size: 0.65rem;
-    padding: 2px 5px;
+    font-size: 0.6rem;
+    padding: 1px 4px;
     margin: 1px 0;
     border-radius: 3px;
     color: #fff;
@@ -120,17 +120,19 @@
     line-height: 1.4;
     font-weight: 500;
   }
-  .ev-bar.priority-1 { background: #c0392b; }
-  .ev-bar.priority-2 { background: #8e44ad; }
-  .ev-bar.priority-3 { background: #2980b9; }
-  .ev-bar.priority-default { background: #27ae60; }
-  .ev-bar.pinned { border-left: 3px solid #f1c40f; }
+  .ev-bar.cat-standard { background: #2980b9; }
+  .ev-bar.cat-leaderboard { background: #8e44ad; }
+  .ev-bar.cat-daily { background: #27ae60; }
+  .ev-bar.cat-battlepass { background: #d35400; }
+  .ev-bar.cat-alliance { background: #c0392b; }
+  .ev-bar.cat-other { background: #34495e; }
+  .ev-bar.cross-server { border-left: 3px solid #f1c40f; }
   .ev-bar.start { border-radius: 3px 0 0 3px; margin-right: -1px; }
   .ev-bar.end { border-radius: 0 3px 3px 0; margin-left: -1px; }
   .ev-bar.mid { border-radius: 0; margin-left: -1px; margin-right: -1px; }
   .ev-bar.single { border-radius: 3px; }
 
-  /* Event list (below calendar) */
+  /* Event list */
   .event-list {
     margin-top: 24px;
     background: #111827;
@@ -154,15 +156,13 @@
     font-size: 0.85rem;
   }
   .ev-row:last-child { border-bottom: none; }
-  .ev-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-  }
-  .ev-dot.priority-1 { background: #c0392b; }
-  .ev-dot.priority-2 { background: #8e44ad; }
-  .ev-dot.priority-3 { background: #2980b9; }
-  .ev-dot.priority-default { background: #27ae60; }
+  .ev-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .ev-dot.cat-standard { background: #2980b9; }
+  .ev-dot.cat-leaderboard { background: #8e44ad; }
+  .ev-dot.cat-daily { background: #27ae60; }
+  .ev-dot.cat-battlepass { background: #d35400; }
+  .ev-dot.cat-alliance { background: #c0392b; }
+  .ev-dot.cat-other { background: #34495e; }
   .ev-name { color: #c8d6e5; }
   .ev-name .badge {
     display: inline-block;
@@ -172,15 +172,12 @@
     margin-left: 6px;
     vertical-align: middle;
   }
-  .badge.pinned { background: #f1c40f22; color: #f1c40f; border: 1px solid #f1c40f44; }
-  .badge.important { background: #e74c3c22; color: #e74c3c; border: 1px solid #e74c3c44; }
+  .badge.cat-label { background: #ffffff11; color: #8899aa; border: 1px solid #ffffff22; }
+  .badge.cross { background: #f1c40f22; color: #f1c40f; border: 1px solid #f1c40f44; }
   .ev-dates { color: #5a6a7a; font-size: 0.8rem; white-space: nowrap; }
 
-  .no-events {
-    padding: 40px;
-    text-align: center;
-    color: #4a5568;
-  }
+  .no-events { padding: 40px; text-align: center; color: #4a5568; }
+  .status-bar { text-align: center; color: #4a5568; font-size: 0.8rem; margin-bottom: 16px; }
 
   /* Legend */
   .legend {
@@ -190,18 +187,8 @@
     margin-top: 16px;
     flex-wrap: wrap;
   }
-  .legend-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 0.75rem;
-    color: #5a6a7a;
-  }
-  .legend-color {
-    width: 12px;
-    height: 12px;
-    border-radius: 3px;
-  }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: #5a6a7a; }
+  .legend-color { width: 12px; height: 12px; border-radius: 3px; }
 
   footer {
     text-align: center;
@@ -218,7 +205,7 @@
     .container { padding: 12px; }
     header h1 { font-size: 1.3rem; }
     .cal-day { min-height: 60px; }
-    .ev-bar { font-size: 0.55rem; padding: 1px 3px; }
+    .ev-bar { font-size: 0.5rem; padding: 1px 2px; }
     .day-num { font-size: 0.65rem; }
     .ev-row { grid-template-columns: 8px 1fr; }
     .ev-dates { grid-column: 2; }
@@ -236,6 +223,8 @@
     <a href="calendar.html" class="active">Calendar</a>
   </nav>
 
+  <div class="status-bar" id="status-bar"></div>
+
   <div class="month-nav">
     <button id="prev-month">&larr; Prev</button>
     <div class="month-label" id="month-label"></div>
@@ -245,11 +234,12 @@
   <div class="cal-grid" id="cal-grid"></div>
 
   <div class="legend">
-    <div class="legend-item"><div class="legend-color" style="background:#c0392b"></div> Priority 1 (Highest)</div>
-    <div class="legend-item"><div class="legend-color" style="background:#8e44ad"></div> Priority 2</div>
-    <div class="legend-item"><div class="legend-color" style="background:#2980b9"></div> Priority 3</div>
-    <div class="legend-item"><div class="legend-color" style="background:#27ae60"></div> Other</div>
-    <div class="legend-item"><div class="legend-color" style="background:#333;border-left:3px solid #f1c40f"></div> Pinned</div>
+    <div class="legend-item"><div class="legend-color" style="background:#2980b9"></div> Standard</div>
+    <div class="legend-item"><div class="legend-color" style="background:#8e44ad"></div> Leaderboard</div>
+    <div class="legend-item"><div class="legend-color" style="background:#27ae60"></div> Daily</div>
+    <div class="legend-item"><div class="legend-color" style="background:#d35400"></div> Battle Pass</div>
+    <div class="legend-item"><div class="legend-color" style="background:#c0392b"></div> Alliance</div>
+    <div class="legend-item"><div class="legend-color" style="background:#333;border-left:3px solid #f1c40f"></div> Cross-Server</div>
   </div>
 
   <div class="event-list" id="event-list">
@@ -266,32 +256,101 @@
 const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const DAY_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
-let events = [];
-let viewYear, viewMonth; // 0-indexed month
+// Known VAF -> friendly name mapping (from game mod)
+const VAF_NAMES = {
+  'factionpve_alliance_leaderboard': 'Alliance Faction LB',
+  'factionpve_rom_attackfed': 'Rom: Hunt Fed',
+  'factionpve_kli_attackrom': 'Kli: Hunt Rom',
+  'factionpve_fed_attackkling': 'Fed: Hunt Kli',
+  '2305_event_m54_gatheringintel_eclipse': "Quark's Exchange Hunt",
+  '2305_event_m54_deltaquad_hirogen': "Quark's Hirogen Hunt",
+  '2202_event_m39_quark_v1': "Quark's Grand Challenge",
+  '2307_event_plc_base_station': "Quark's Power Partners",
+  '2404_event_m65_texasclass': "Quark's Texas Class Hunt",
+  'm87_interim_event_bpoverflow': 'Heroic OFP Overflow',
+  'm49_hostile_hunt': 'Hostile Hunt',
+  'm5_racetoops30_event': 'Ahead of the Curve',
+  'm26_domination': 'Domination',
+  'weekly_cosmiccleanup_sms': 'Cosmic Cleanup',
+  'weekly_swarm_easy_sms': 'Threat From Beyond',
+  'weekly_swarm_heroic_sms': 'Threat From Beyond Heroic',
+  'd22_anomalieshostiles_sms': 'Anomalous Phenomena',
+  'event_m67_introthemirrorverse': 'Mirror Universe',
+  '2024_event_artifacthunt_slb': 'Artifact Hunt LB',
+  'weekly_voyager_sms': 'Voyager Event',
+  'm46_ds9_armada_cardassian_v1': 'DS9 Armada',
+  '2404_event_m65_hostile_jemhadar': "Hostile Jem'Hadar",
+  'm6_events_factionfed_sms': 'Fed Reputation',
+  'm6_events_factionkli_sms': 'Kli Reputation',
+  'm6_events_factionrom_sms': 'Rom Reputation',
+  '2024_event_dailyhh_sms': 'Daily Hostile Hunt',
+  '2024_event_dailyg3mining_sms': 'Daily G3 Mining',
+  '2024_event_dailybuildingresearch_slb': 'Build/Research LB',
+  '2024_event_dailyshipupgrade_sms': 'Ship Upgrade',
+  '2024_event_dailyshipupgrade_slb': 'Ship Upgrade LB',
+  '2024_event_artifacthunt_sms': 'Artifact Hunt',
+  '2024_event_fcupgrade_sms': 'FC Upgrade',
+  'm87_interim_event_bpseason': 'BP Overflow Season',
+  'tc_weekly_season_event': 'Pinnacle of Power',
+  'm77_alliancedonation_bp_sms': 'Unity',
+  'm77_hostilearmadahunt_bp_sms': 'Hostile Armada Hunt',
+  '0408_battlepass_m59_tc': 'Battle Pass',
+  'm85m_auxbp_ship_v1': 'Aux BP Ship',
+};
 
-function priorityClass(p) {
-  if (p === 1) return 'priority-1';
-  if (p === 2) return 'priority-2';
-  if (p === 3) return 'priority-3';
-  return 'priority-default';
+let events = [];
+let viewYear, viewMonth;
+
+function catClass(ev) {
+  const c = ev.category || '';
+  if (c === 'SLB' || c === 'RLB') return 'cat-leaderboard';
+  if (c === 'ALB') return 'cat-alliance';
+  if (c === 'AMS') return 'cat-alliance';
+  if (c === 'SMS') return 'cat-standard';
+  // Fallback for platform entity format
+  const cn = ev.categoryName || '';
+  if (cn === 'leaderboard' || cn === 'stat') return 'cat-leaderboard';
+  if (cn.startsWith('daily')) return 'cat-daily';
+  if (cn.startsWith('battlepass')) return 'cat-battlepass';
+  if (cn.startsWith('alliance')) return 'cat-alliance';
+  if (cn === 'standard') return 'cat-standard';
+  return 'cat-other';
 }
 
-function eventLabel(ev) {
-  const meta = ev.metadata;
-  if (meta && meta.assetFilename && meta.assetFilename !== 'None') {
-    return meta.assetFilename.replace(/_/g, ' ').replace(/\.[^.]+$/, '');
+function cleanVaf(raw) {
+  if (!raw) return null;
+  let vaf = raw;
+  let pos = vaf.indexOf('_visual_asset_filename');
+  if (pos !== -1) vaf = vaf.substring(0, pos);
+  if (VAF_NAMES[vaf]) return VAF_NAMES[vaf];
+  // Strip common prefixes
+  if (vaf.length > 12 && vaf[4] === '_' && vaf.substring(5, 11) === 'event_') vaf = vaf.substring(11);
+  else if (/^m\d/.test(vaf) && vaf.indexOf('_') < 4) vaf = vaf.substring(vaf.indexOf('_') + 1);
+  else if (vaf.startsWith('m6_events_')) vaf = vaf.substring(10);
+  // Strip common suffixes
+  for (const suf of ['_sms', '_slb', '_alb', '_ams', '_rlb', '_v1', '_v2']) {
+    if (vaf.endsWith(suf)) vaf = vaf.substring(0, vaf.length - suf.length);
   }
-  return 'Event #' + ev.newsId;
+  return vaf.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+
+function eventName(ev) {
+  // CDN format: already has cleaned name
+  if (ev.name) return ev.name;
+  // Platform entity format: try VAF
+  const vaf = ev.metadata && ev.metadata.visualAssetFilename;
+  if (vaf) {
+    const name = cleanVaf(vaf);
+    if (name) return name;
+  }
+  if (ev.groupName) return ev.groupName;
+  if (ev.source) return ev.source;
+  return ev.configId || 'Unknown Event';
 }
 
 function fmtDate(ts) {
-  const d = new Date(ts * 1000);
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
-}
-
-function fmtDateShort(ts) {
-  const d = new Date(ts * 1000);
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  if (!ts) return '?';
+  return new Date(ts * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
 }
 
 function sameDay(a, b) {
@@ -300,40 +359,45 @@ function sameDay(a, b) {
 
 function esc(s) { const el = document.createElement('span'); el.textContent = s; return el.innerHTML; }
 
+function getEventTimes(ev) {
+  // CDN format: startTs/endTs/displayTs at top level
+  if (ev.endTs) {
+    const end = ev.displayTs || ev.endTs;
+    const start = ev.startTs || (end - 7 * 86400);
+    return { start, end };
+  }
+  // Platform entity format: schedule object
+  const s = ev.schedule;
+  if (!s) return null;
+  const start = s.start || s.announce;
+  const end = s.end || s.display;
+  if (!start || !end) return null;
+  return { start, end };
+}
+
 function renderCalendar() {
   const grid = document.getElementById('cal-grid');
   document.getElementById('month-label').textContent = MONTH_NAMES[viewMonth] + ' ' + viewYear;
 
   const firstOfMonth = new Date(viewYear, viewMonth, 1);
   const lastOfMonth = new Date(viewYear, viewMonth + 1, 0);
-  const startDay = firstOfMonth.getDay(); // 0=Sun
+  const startDay = firstOfMonth.getDay();
   const daysInMonth = lastOfMonth.getDate();
   const today = new Date();
 
-  // Build day cells
   let html = DAY_NAMES.map(d => '<div class="cal-header">' + d + '</div>').join('');
 
-  // Previous month fill
   const prevMonthLast = new Date(viewYear, viewMonth, 0).getDate();
   for (let i = startDay - 1; i >= 0; i--) {
-    const day = prevMonthLast - i;
-    const date = new Date(viewYear, viewMonth - 1, day);
-    html += dayCell(date, day, true, today);
+    html += dayCell(new Date(viewYear, viewMonth - 1, prevMonthLast - i), prevMonthLast - i, true, today);
   }
-
-  // Current month
   for (let d = 1; d <= daysInMonth; d++) {
     const date = new Date(viewYear, viewMonth, d);
-    const isToday = sameDay(date, today);
-    html += dayCell(date, d, false, today, isToday);
+    html += dayCell(date, d, false, today, sameDay(date, today));
   }
-
-  // Next month fill
-  const totalCells = startDay + daysInMonth;
-  const remaining = (7 - (totalCells % 7)) % 7;
+  const remaining = (7 - ((startDay + daysInMonth) % 7)) % 7;
   for (let d = 1; d <= remaining; d++) {
-    const date = new Date(viewYear, viewMonth + 1, d);
-    html += dayCell(date, d, true, today);
+    html += dayCell(new Date(viewYear, viewMonth + 1, d), d, true, today);
   }
 
   grid.innerHTML = html;
@@ -347,14 +411,15 @@ function dayCell(date, dayNum, otherMonth, today, isToday) {
   const dayStart = new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime() / 1000;
   const dayEnd = dayStart + 86400;
 
-  // Find events active on this day
   let bars = '';
   for (const ev of events) {
-    if (ev.startDate < dayEnd && ev.endDate > dayStart) {
-      const evStart = new Date(ev.startDate * 1000);
-      const evEnd = new Date(ev.endDate * 1000);
+    const t = getEventTimes(ev);
+    if (!t) continue;
+    if (t.start < dayEnd && t.end > dayStart) {
+      const evStart = new Date(t.start * 1000);
+      const evEnd = new Date((t.end - 1) * 1000);
       const isStart = sameDay(date, evStart);
-      const isEnd = sameDay(date, new Date((ev.endDate - 1) * 1000));
+      const isEnd = sameDay(date, evEnd);
       const isSingle = isStart && isEnd;
 
       let pos = 'mid';
@@ -362,10 +427,11 @@ function dayCell(date, dayNum, otherMonth, today, isToday) {
       else if (isStart) pos = 'start';
       else if (isEnd) pos = 'end';
 
-      const label = isStart || date.getDay() === 0 ? esc(eventLabel(ev)) : '&nbsp;';
-      const pc = priorityClass(ev.priority);
-      const pin = ev.pinned ? ' pinned' : '';
-      bars += '<div class="ev-bar ' + pc + pin + ' ' + pos + '" title="' + esc(eventLabel(ev)) + '\n' + fmtDate(ev.startDate) + ' - ' + fmtDate(ev.endDate) + '">' + label + '</div>';
+      const label = isStart || date.getDay() === 0 ? esc(eventName(ev)) : '&nbsp;';
+      const cc = catClass(ev);
+      const cross = ev.metadata && ev.metadata.isCrossServer ? ' cross-server' : '';
+      const tooltip = esc(eventName(ev)) + '\n' + fmtDate(t.start) + ' - ' + fmtDate(t.end) + '\n' + (ev.categoryName || '');
+      bars += '<div class="ev-bar ' + cc + cross + ' ' + pos + '" title="' + tooltip + '">' + label + '</div>';
     }
   }
 
@@ -376,10 +442,9 @@ function renderEventList() {
   const rows = document.getElementById('event-rows');
   const now = Date.now() / 1000;
 
-  // Show active + future events, sorted by start date
   const relevant = events
-    .filter(ev => ev.endDate > now)
-    .sort((a, b) => a.startDate - b.startDate);
+    .filter(ev => { const t = getEventTimes(ev); return t && t.end > now; })
+    .sort((a, b) => (getEventTimes(a).start) - (getEventTimes(b).start));
 
   if (relevant.length === 0) {
     rows.innerHTML = '<div class="no-events">No active or upcoming events</div>';
@@ -388,19 +453,21 @@ function renderEventList() {
 
   let html = '';
   for (const ev of relevant) {
-    const pc = priorityClass(ev.priority);
-    const label = esc(eventLabel(ev));
+    const t = getEventTimes(ev);
+    const cc = catClass(ev);
+    const name = esc(eventName(ev));
     let badges = '';
-    if (ev.pinned) badges += '<span class="badge pinned">PINNED</span>';
-    if (ev.important) badges += '<span class="badge important">IMPORTANT</span>';
+    const catLabel = ev.category || ev.categoryName || '';
+    if (catLabel) badges += '<span class="badge cat-label">' + esc(catLabel) + '</span>';
+    if (ev.metadata && ev.metadata.isCrossServer) badges += '<span class="badge cross">CROSS-SERVER</span>';
 
-    const active = ev.startDate <= now && ev.endDate > now;
+    const active = t.start <= now;
     const status = active ? 'Active' : 'Upcoming';
-    const dateStr = fmtDate(ev.startDate) + ' &mdash; ' + fmtDate(ev.endDate);
+    const dateStr = fmtDate(t.start) + ' &mdash; ' + fmtDate(t.end);
 
     html += '<div class="ev-row">'
-      + '<div class="ev-dot ' + pc + '"></div>'
-      + '<div class="ev-name">' + label + badges + ' <span style="color:#4a5568;font-size:0.75rem">(' + status + ')</span></div>'
+      + '<div class="ev-dot ' + cc + '"></div>'
+      + '<div class="ev-name">' + name + badges + ' <span style="color:#4a5568;font-size:0.75rem">(' + status + ')</span></div>'
       + '<div class="ev-dates">' + dateStr + '</div>'
       + '</div>';
   }
@@ -408,14 +475,33 @@ function renderEventList() {
 }
 
 async function loadData() {
+  const status = document.getElementById('status-bar');
+
   try {
-    const resp = await fetch('data/game_news.json?t=' + Date.now());
+    const resp = await fetch('data/game_events.json?t=' + Date.now());
     if (!resp.ok) throw new Error('HTTP ' + resp.status);
     const data = await resp.json();
-    events = (data.newsItems || []).filter(e => e.startDate && e.endDate);
+    events = data.events || [];
+    const ts = data.capturedAt ? new Date(data.capturedAt * 1000).toLocaleString() : 'unknown';
+    status.textContent = events.length + ' events loaded \u00b7 Last captured: ' + ts;
   } catch (e) {
-    console.error('Failed to load game news:', e);
-    events = [];
+    console.warn('game_events.json not available, falling back to game_news.json');
+    // Fallback to game_news.json
+    try {
+      const resp = await fetch('data/game_news.json?t=' + Date.now());
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const data = await resp.json();
+      events = (data.newsItems || []).filter(n => n.startDate && n.endDate).map(n => ({
+        configId: 'news_' + n.newsId,
+        categoryName: 'standard',
+        schedule: { start: n.startDate, end: n.endDate },
+        metadata: { visualAssetFilename: n.metadata && n.metadata.assetFilename },
+      }));
+      status.textContent = events.length + ' events (from news) \u00b7 Launch game with updated mod for full event data';
+    } catch (e2) {
+      status.textContent = 'No event data available \u00b7 Launch game to capture events';
+      events = [];
+    }
   }
 
   renderCalendar();
@@ -433,7 +519,6 @@ document.getElementById('next-month').addEventListener('click', () => {
   renderCalendar();
 });
 
-// Init to current month
 const now = new Date();
 viewYear = now.getFullYear();
 viewMonth = now.getMonth();

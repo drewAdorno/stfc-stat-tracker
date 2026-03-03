@@ -34,6 +34,12 @@ WATCH_FILES = [
         "remote": f"{EC2_HOST}:/opt/stfc/data/game_news.json",
         "state": STATE_DIR / ".last_game_news_upload",
     },
+    {
+        "name": "game_events.json",
+        "local": Path("C:/Users/drewa/Desktop/stfc/stfc-api/game_events.json"),
+        "remote": f"{EC2_HOST}:/opt/stfc/data/game_events.json",
+        "state": STATE_DIR / ".last_game_events_upload",
+    },
 ]
 
 

@@ -23,3 +23,5 @@ venv/
 CLAUDE.md
 data/game_news.json
 data/.last_game_news_upload
+data/game_events.json
+data/.last_game_events_upload
