@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NCC Alliance Calendar</title>
+<title>NCC Event Calendar</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -17,21 +17,15 @@
 
   .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
 
-  /* Header */
   header {
     text-align: center;
     padding: 30px 0 20px;
     border-bottom: 1px solid #1a2332;
     margin-bottom: 24px;
   }
-  header h1 {
-    font-size: 1.8rem;
-    color: #e2e8f0;
-    letter-spacing: 1px;
-  }
+  header h1 { font-size: 1.8rem; color: #e2e8f0; letter-spacing: 1px; }
   header h1 span { color: #4dabf7; }
 
-  /* Nav */
   nav {
     display: flex;
     justify-content: center;
@@ -49,30 +43,166 @@
     transition: all 0.15s;
   }
   nav a:hover { border-color: #4dabf7; color: #c8d6e5; }
-  nav a.active {
-    background: #4dabf7;
-    color: #0a0e17;
-    border-color: #4dabf7;
+  nav a.active { background: #4dabf7; color: #0a0e17; border-color: #4dabf7; font-weight: 600; }
+
+  /* Month nav */
+  .month-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .month-nav button {
+    background: #111827;
+    border: 1px solid #1e2d3d;
+    color: #8899aa;
+    padding: 6px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.15s;
+  }
+  .month-nav button:hover { border-color: #4dabf7; color: #c8d6e5; }
+  .month-label { font-size: 1.2rem; font-weight: 600; color: #e2e8f0; min-width: 200px; text-align: center; }
+
+  /* Calendar grid */
+  .cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1px;
+    background: #1a2332;
+    border: 1px solid #1a2332;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .cal-header {
+    background: #111827;
+    padding: 10px 4px;
+    text-align: center;
+    font-size: 0.75rem;
     font-weight: 600;
+    color: #4dabf7;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .cal-day {
+    background: #0d1117;
+    min-height: 100px;
+    padding: 4px;
+    position: relative;
+    vertical-align: top;
+  }
+  .cal-day.other-month { background: #080b11; }
+  .cal-day.other-month .day-num { color: #2a3444; }
+  .cal-day.today { background: #0f1a2e; }
+  .cal-day.today .day-num { color: #4dabf7; font-weight: 700; }
+  .day-num {
+    font-size: 0.75rem;
+    color: #5a6a7a;
+    padding: 2px 4px;
+    display: block;
+    margin-bottom: 2px;
   }
 
-  /* Calendar embed */
-  .calendar-wrap {
+  /* Event bars */
+  .ev-bar {
+    display: block;
+    font-size: 0.65rem;
+    padding: 2px 5px;
+    margin: 1px 0;
+    border-radius: 3px;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: default;
+    line-height: 1.4;
+    font-weight: 500;
+  }
+  .ev-bar.priority-1 { background: #c0392b; }
+  .ev-bar.priority-2 { background: #8e44ad; }
+  .ev-bar.priority-3 { background: #2980b9; }
+  .ev-bar.priority-default { background: #27ae60; }
+  .ev-bar.pinned { border-left: 3px solid #f1c40f; }
+  .ev-bar.start { border-radius: 3px 0 0 3px; margin-right: -1px; }
+  .ev-bar.end { border-radius: 0 3px 3px 0; margin-left: -1px; }
+  .ev-bar.mid { border-radius: 0; margin-left: -1px; margin-right: -1px; }
+  .ev-bar.single { border-radius: 3px; }
+
+  /* Event list (below calendar) */
+  .event-list {
+    margin-top: 24px;
     background: #111827;
     border: 1px solid #1e2d3d;
     border-radius: 10px;
-    padding: 16px;
     overflow: hidden;
   }
-  .calendar-wrap iframe {
-    width: 100%;
-    height: 600px;
-    border: 0;
-    border-radius: 6px;
-    filter: invert(0.85) hue-rotate(180deg);
+  .event-list h2 {
+    padding: 14px 18px;
+    font-size: 0.95rem;
+    color: #e2e8f0;
+    border-bottom: 1px solid #1e2d3d;
+  }
+  .ev-row {
+    display: grid;
+    grid-template-columns: 8px 1fr auto;
+    gap: 12px;
+    align-items: center;
+    padding: 10px 18px;
+    border-bottom: 1px solid #0d1117;
+    font-size: 0.85rem;
+  }
+  .ev-row:last-child { border-bottom: none; }
+  .ev-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+  .ev-dot.priority-1 { background: #c0392b; }
+  .ev-dot.priority-2 { background: #8e44ad; }
+  .ev-dot.priority-3 { background: #2980b9; }
+  .ev-dot.priority-default { background: #27ae60; }
+  .ev-name { color: #c8d6e5; }
+  .ev-name .badge {
+    display: inline-block;
+    font-size: 0.65rem;
+    padding: 1px 5px;
+    border-radius: 3px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+  .badge.pinned { background: #f1c40f22; color: #f1c40f; border: 1px solid #f1c40f44; }
+  .badge.important { background: #e74c3c22; color: #e74c3c; border: 1px solid #e74c3c44; }
+  .ev-dates { color: #5a6a7a; font-size: 0.8rem; white-space: nowrap; }
+
+  .no-events {
+    padding: 40px;
+    text-align: center;
+    color: #4a5568;
   }
 
-  /* Footer */
+  /* Legend */
+  .legend {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    color: #5a6a7a;
+  }
+  .legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+  }
+
   footer {
     text-align: center;
     padding: 24px 0;
@@ -87,14 +217,18 @@
   @media (max-width: 600px) {
     .container { padding: 12px; }
     header h1 { font-size: 1.3rem; }
-    .calendar-wrap iframe { height: 450px; }
+    .cal-day { min-height: 60px; }
+    .ev-bar { font-size: 0.55rem; padding: 1px 3px; }
+    .day-num { font-size: 0.65rem; }
+    .ev-row { grid-template-columns: 8px 1fr; }
+    .ev-dates { grid-column: 2; }
   }
 </style>
 </head>
 <body>
 <div class="container">
   <header>
-    <h1>&#x1F680; <span>NCC</span> Alliance Calendar</h1>
+    <h1>&#x1F4C5; <span>NCC</span> Event Calendar</h1>
   </header>
 
   <nav>
@@ -102,13 +236,208 @@
     <a href="calendar.html" class="active">Calendar</a>
   </nav>
 
-  <div class="calendar-wrap">
-    <iframe src="https://calendar.google.com/calendar/embed?src=3c9b8eacf3e7e4cd15837083d7f6a8fc7f314ff25b7a67765f104c8bdf6c92ae%40group.calendar.google.com&ctz=America%2FNew_York" scrolling="no"></iframe>
+  <div class="month-nav">
+    <button id="prev-month">&larr; Prev</button>
+    <div class="month-label" id="month-label"></div>
+    <button id="next-month">Next &rarr;</button>
+  </div>
+
+  <div class="cal-grid" id="cal-grid"></div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-color" style="background:#c0392b"></div> Priority 1 (Highest)</div>
+    <div class="legend-item"><div class="legend-color" style="background:#8e44ad"></div> Priority 2</div>
+    <div class="legend-item"><div class="legend-color" style="background:#2980b9"></div> Priority 3</div>
+    <div class="legend-item"><div class="legend-color" style="background:#27ae60"></div> Other</div>
+    <div class="legend-item"><div class="legend-color" style="background:#333;border-left:3px solid #f1c40f"></div> Pinned</div>
+  </div>
+
+  <div class="event-list" id="event-list">
+    <h2>Active &amp; Upcoming Events</h2>
+    <div id="event-rows"></div>
   </div>
 
   <footer>
-    Data sourced from <a href="https://stfc.pro" target="_blank" rel="noopener">stfc.pro</a>
+    Data captured from game client &middot; Updates on game launch
   </footer>
 </div>
+
+<script>
+const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DAY_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+let events = [];
+let viewYear, viewMonth; // 0-indexed month
+
+function priorityClass(p) {
+  if (p === 1) return 'priority-1';
+  if (p === 2) return 'priority-2';
+  if (p === 3) return 'priority-3';
+  return 'priority-default';
+}
+
+function eventLabel(ev) {
+  const meta = ev.metadata;
+  if (meta && meta.assetFilename && meta.assetFilename !== 'None') {
+    return meta.assetFilename.replace(/_/g, ' ').replace(/\.[^.]+$/, '');
+  }
+  return 'Event #' + ev.newsId;
+}
+
+function fmtDate(ts) {
+  const d = new Date(ts * 1000);
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+}
+
+function fmtDateShort(ts) {
+  const d = new Date(ts * 1000);
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+function sameDay(a, b) {
+  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+}
+
+function esc(s) { const el = document.createElement('span'); el.textContent = s; return el.innerHTML; }
+
+function renderCalendar() {
+  const grid = document.getElementById('cal-grid');
+  document.getElementById('month-label').textContent = MONTH_NAMES[viewMonth] + ' ' + viewYear;
+
+  const firstOfMonth = new Date(viewYear, viewMonth, 1);
+  const lastOfMonth = new Date(viewYear, viewMonth + 1, 0);
+  const startDay = firstOfMonth.getDay(); // 0=Sun
+  const daysInMonth = lastOfMonth.getDate();
+  const today = new Date();
+
+  // Build day cells
+  let html = DAY_NAMES.map(d => '<div class="cal-header">' + d + '</div>').join('');
+
+  // Previous month fill
+  const prevMonthLast = new Date(viewYear, viewMonth, 0).getDate();
+  for (let i = startDay - 1; i >= 0; i--) {
+    const day = prevMonthLast - i;
+    const date = new Date(viewYear, viewMonth - 1, day);
+    html += dayCell(date, day, true, today);
+  }
+
+  // Current month
+  for (let d = 1; d <= daysInMonth; d++) {
+    const date = new Date(viewYear, viewMonth, d);
+    const isToday = sameDay(date, today);
+    html += dayCell(date, d, false, today, isToday);
+  }
+
+  // Next month fill
+  const totalCells = startDay + daysInMonth;
+  const remaining = (7 - (totalCells % 7)) % 7;
+  for (let d = 1; d <= remaining; d++) {
+    const date = new Date(viewYear, viewMonth + 1, d);
+    html += dayCell(date, d, true, today);
+  }
+
+  grid.innerHTML = html;
+}
+
+function dayCell(date, dayNum, otherMonth, today, isToday) {
+  const cls = ['cal-day'];
+  if (otherMonth) cls.push('other-month');
+  if (isToday) cls.push('today');
+
+  const dayStart = new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime() / 1000;
+  const dayEnd = dayStart + 86400;
+
+  // Find events active on this day
+  let bars = '';
+  for (const ev of events) {
+    if (ev.startDate < dayEnd && ev.endDate > dayStart) {
+      const evStart = new Date(ev.startDate * 1000);
+      const evEnd = new Date(ev.endDate * 1000);
+      const isStart = sameDay(date, evStart);
+      const isEnd = sameDay(date, new Date((ev.endDate - 1) * 1000));
+      const isSingle = isStart && isEnd;
+
+      let pos = 'mid';
+      if (isSingle) pos = 'single';
+      else if (isStart) pos = 'start';
+      else if (isEnd) pos = 'end';
+
+      const label = isStart || date.getDay() === 0 ? esc(eventLabel(ev)) : '&nbsp;';
+      const pc = priorityClass(ev.priority);
+      const pin = ev.pinned ? ' pinned' : '';
+      bars += '<div class="ev-bar ' + pc + pin + ' ' + pos + '" title="' + esc(eventLabel(ev)) + '\n' + fmtDate(ev.startDate) + ' - ' + fmtDate(ev.endDate) + '">' + label + '</div>';
+    }
+  }
+
+  return '<div class="' + cls.join(' ') + '"><span class="day-num">' + dayNum + '</span>' + bars + '</div>';
+}
+
+function renderEventList() {
+  const rows = document.getElementById('event-rows');
+  const now = Date.now() / 1000;
+
+  // Show active + future events, sorted by start date
+  const relevant = events
+    .filter(ev => ev.endDate > now)
+    .sort((a, b) => a.startDate - b.startDate);
+
+  if (relevant.length === 0) {
+    rows.innerHTML = '<div class="no-events">No active or upcoming events</div>';
+    return;
+  }
+
+  let html = '';
+  for (const ev of relevant) {
+    const pc = priorityClass(ev.priority);
+    const label = esc(eventLabel(ev));
+    let badges = '';
+    if (ev.pinned) badges += '<span class="badge pinned">PINNED</span>';
+    if (ev.important) badges += '<span class="badge important">IMPORTANT</span>';
+
+    const active = ev.startDate <= now && ev.endDate > now;
+    const status = active ? 'Active' : 'Upcoming';
+    const dateStr = fmtDate(ev.startDate) + ' &mdash; ' + fmtDate(ev.endDate);
+
+    html += '<div class="ev-row">'
+      + '<div class="ev-dot ' + pc + '"></div>'
+      + '<div class="ev-name">' + label + badges + ' <span style="color:#4a5568;font-size:0.75rem">(' + status + ')</span></div>'
+      + '<div class="ev-dates">' + dateStr + '</div>'
+      + '</div>';
+  }
+  rows.innerHTML = html;
+}
+
+async function loadData() {
+  try {
+    const resp = await fetch('data/game_news.json?t=' + Date.now());
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const data = await resp.json();
+    events = (data.newsItems || []).filter(e => e.startDate && e.endDate);
+  } catch (e) {
+    console.error('Failed to load game news:', e);
+    events = [];
+  }
+
+  renderCalendar();
+  renderEventList();
+}
+
+document.getElementById('prev-month').addEventListener('click', () => {
+  viewMonth--;
+  if (viewMonth < 0) { viewMonth = 11; viewYear--; }
+  renderCalendar();
+});
+document.getElementById('next-month').addEventListener('click', () => {
+  viewMonth++;
+  if (viewMonth > 11) { viewMonth = 0; viewYear++; }
+  renderCalendar();
+});
+
+// Init to current month
+const now = new Date();
+viewYear = now.getFullYear();
+viewMonth = now.getMonth();
+loadData();
+</script>
 </body>
 </html>

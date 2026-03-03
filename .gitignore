@@ -21,3 +21,5 @@ data/api_sniff.json
 data/api_sample_response.json
 venv/
 CLAUDE.md
+data/game_news.json
+data/.last_game_news_upload
