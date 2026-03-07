@@ -1,0 +1,22 @@
+[Unit]
+Description=STFC Discord Bot
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/opt/stfc
+ExecStart=/opt/stfc/venv/bin/python discord_bot.py
+Environment=HOME=/home/ubuntu
+Restart=on-failure
+RestartSec=30
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=stfc-discord-bot
+
+[Install]
+WantedBy=multi-user.target
