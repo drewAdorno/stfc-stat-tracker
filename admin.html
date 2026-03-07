@@ -155,19 +155,18 @@
   tr:hover td { background: #111827; }
   td { font-size: 0.9rem; }
 
-  /* Rank badges */
-  .rank {
+  /* Activity badges */
+  .activity-badge {
     display: inline-block;
     padding: 2px 8px;
     border-radius: 4px;
     font-size: 0.78rem;
     font-weight: 600;
   }
-  .rank-admiral    { background: #7c3aed22; color: #a78bfa; border: 1px solid #7c3aed44; }
-  .rank-commodore  { background: #dc262622; color: #f87171; border: 1px solid #dc262644; }
-  .rank-premier    { background: #d9770622; color: #fb923c; border: 1px solid #d9770644; }
-  .rank-operative  { background: #0d946822; color: #34d399; border: 1px solid #0d946844; }
-  .rank-agent      { background: #1d4ed822; color: #60a5fa; border: 1px solid #1d4ed844; }
+  .activity-high   { background: #0d946822; color: #34d399; border: 1px solid #0d946844; }
+  .activity-medium { background: #d9770622; color: #fb923c; border: 1px solid #d9770644; }
+  .activity-low    { background: #dc262622; color: #f87171; border: 1px solid #dc262644; }
+  .activity-none   { background: #4a556822; color: #636e7b; border: 1px solid #4a556844; }
 
   /* Delta colors */
   .delta-pos { color: #34d399; }
@@ -214,21 +213,18 @@
     min-width: 1.5em;
   }
   .mini-card .li-name { flex: 1; }
-  .mini-card .li-rank {
-    margin: 0 8px;
-  }
   .mini-card .li-val {
     color: #636e7b;
     font-variant-numeric: tabular-nums;
   }
 
-  /* Rank distribution */
-  .rank-dist {
+  /* Activity distribution */
+  .activity-dist {
     display: flex;
     gap: 14px;
     flex-wrap: wrap;
   }
-  .rank-dist-item {
+  .activity-dist-item {
     background: #111827;
     border: 1px solid #1e2d3d;
     border-radius: 10px;
@@ -236,12 +232,12 @@
     text-align: center;
     min-width: 120px;
   }
-  .rank-dist-item .rd-count {
+  .activity-dist-item .rd-count {
     font-size: 1.8rem;
     font-weight: 700;
     margin-bottom: 4px;
   }
-  .rank-dist-item .rd-label {
+  .activity-dist-item .rd-label {
     font-size: 0.8rem;
     font-weight: 600;
   }
@@ -423,7 +419,19 @@
     return el.innerHTML;
   }
 
-  function rankClass(r) { return 'rank rank-' + (r || 'agent').toLowerCase(); }
+  function activityClass(score) {
+    if (score >= 60) return 'activity-badge activity-high';
+    if (score >= 30) return 'activity-badge activity-medium';
+    if (score > 0) return 'activity-badge activity-low';
+    return 'activity-badge activity-none';
+  }
+
+  function activityLabel(score) {
+    if (score >= 60) return 'Active';
+    if (score >= 30) return 'Moderate';
+    if (score > 0) return 'Low';
+    return 'None';
+  }
 
   const NUMERIC_FIELDS = [
     'level', 'power', 'helps', 'rss_contrib', 'iso_contrib',
@@ -475,8 +483,6 @@
 
   function render(data, history, inv) {
     const members = data.members || [];
-    const latest = history.length ? history[history.length - 1] : null;
-    const snap1 = getSnapshotDaysAgo(history, 1);
     const snap7 = getSnapshotDaysAgo(history, 7);
     let html = '';
 
@@ -487,10 +493,10 @@
     html += renderInactive(members, history);
 
     // --- 3. New Members ---
-    html += renderNewMembers(members);
+    html += renderNewMembers(members, history);
 
     // --- 4. Members Who Left ---
-    html += renderLeftMembers(members, latest);
+    html += renderLeftMembers(members, history);
 
     // --- 5. Lowest Contributors ---
     html += renderLowestContributors(members, history);
@@ -498,8 +504,8 @@
     // --- 6. Power Movers (7-Day) ---
     html += renderPowerMovers(members, snap7);
 
-    // --- 7. Rank Distribution ---
-    html += renderRankDistribution(members);
+    // --- 7. Activity Distribution ---
+    html += renderActivityDistribution(members);
 
     $('content').innerHTML = html;
   }
@@ -542,12 +548,13 @@
       s += '<div class="empty">No inactive members detected</div>';
     } else {
       s += '<div class="table-wrap"><table><thead><tr>';
-      s += '<th>Name</th><th>Rank</th><th>Level</th><th>Power</th><th>Days Inactive</th>';
+      s += '<th>Name</th><th>Activity</th><th>Level</th><th>Power</th><th>Days Inactive</th>';
       s += '</tr></thead><tbody>';
       for (const m of inactive) {
+        const score = m.activity_score || 0;
         s += `<tr>
           <td>${playerLink(m)}</td>
-          <td><span class="${rankClass(m.rank)}">${esc(m.rank)}</span></td>
+          <td><span class="${activityClass(score)}">${activityLabel(score)}</span></td>
           <td>${esc(m.level)}</td>
           <td>${esc(m.power)}</td>
           <td style="color:#f87171; font-weight:600">${m.daysInactive}</td>
@@ -559,28 +566,40 @@
     return s;
   }
 
-  function renderNewMembers(members) {
+  function renderNewMembers(members, history) {
+    // Derive first-seen date from history (first snapshot containing the player)
+    const sorted = [...history].sort((a, b) => a.date.localeCompare(b.date));
+    const firstSeen = {};
+    for (const snap of sorted) {
+      if (!snap.members) continue;
+      for (const id of Object.keys(snap.members)) {
+        if (!firstSeen[id]) firstSeen[id] = snap.date;
+      }
+    }
+
     const cutoff = new Date();
     cutoff.setDate(cutoff.getDate() - 7);
+    const cutoffStr = cutoff.toISOString().slice(0, 10);
+
     const newMembers = members.filter(m => {
-      if (!m.join_date) return false;
-      return new Date(m.join_date) >= cutoff;
+      const fs = firstSeen[m.id];
+      return fs && fs >= cutoffStr;
     });
+    newMembers.sort((a, b) => (firstSeen[b.id] || '').localeCompare(firstSeen[a.id] || ''));
 
     let s = '<div class="section"><div class="section-header">New Members (Last 7 Days)</div>';
     if (newMembers.length === 0) {
       s += '<div class="empty">No new members in the last 7 days</div>';
     } else {
       s += '<div class="table-wrap"><table><thead><tr>';
-      s += '<th>Name</th><th>Rank</th><th>Level</th><th>Power</th><th>Join Date</th>';
+      s += '<th>Name</th><th>Level</th><th>Power</th><th>First Seen</th>';
       s += '</tr></thead><tbody>';
       for (const m of newMembers) {
         s += `<tr>
           <td>${playerLink(m)}</td>
-          <td><span class="${rankClass(m.rank)}">${esc(m.rank)}</span></td>
           <td>${esc(m.level)}</td>
           <td>${esc(m.power)}</td>
-          <td>${esc(m.join_date)}</td>
+          <td>${esc(firstSeen[m.id])}</td>
         </tr>`;
       }
       s += '</tbody></table></div>';
@@ -589,16 +608,22 @@
     return s;
   }
 
-  function renderLeftMembers(members, latestSnap) {
-    let left = [];
-    if (latestSnap && latestSnap.members) {
-      const currentIds = new Set(members.map(m => m.id));
-      for (const [id, mData] of Object.entries(latestSnap.members)) {
+  function renderLeftMembers(members, history) {
+    const currentIds = new Set(members.map(m => m.id));
+    // Scan all history to find players who were once members but no longer are
+    // Track their last known data and last seen date
+    const leftMap = {}; // id -> { name, level, power, lastSeen }
+    const sorted = [...history].sort((a, b) => a.date.localeCompare(b.date));
+    for (const snap of sorted) {
+      if (!snap.members) continue;
+      for (const [id, mData] of Object.entries(snap.members)) {
         if (!currentIds.has(id)) {
-          left.push({ id, ...mData, lastSeen: latestSnap.date });
+          leftMap[id] = { id, ...mData, lastSeen: snap.date };
         }
       }
     }
+    const left = Object.values(leftMap);
+    left.sort((a, b) => (b.lastSeen || '').localeCompare(a.lastSeen || ''));
 
     let s = '<div class="section"><div class="section-header">Members Who Left</div>';
     if (left.length === 0) {
@@ -609,7 +634,7 @@
       s += '</tr></thead><tbody>';
       for (const m of left) {
         s += `<tr>
-          <td>${esc(m.name)}</td>
+          <td>${playerLink(m)}</td>
           <td>${esc(m.level)}</td>
           <td>${esc(m.power)}</td>
           <td>${esc(m.lastSeen)}</td>
@@ -651,7 +676,6 @@
         const display = cat.valueFn ? formatAbbr(m._sortVal) : esc(m[cat.field]);
         s += `<li>
           <span class="li-name">${playerLink(m)}</span>
-          <span class="li-rank"><span class="${rankClass(m.rank)}">${esc(m.rank)}</span></span>
           <span class="li-val">${display}</span>
         </li>`;
       }
@@ -714,22 +738,28 @@
     return s;
   }
 
-  function renderRankDistribution(members) {
-    const ranks = ['Admiral', 'Commodore', 'Premier', 'Operative', 'Agent'];
-    const counts = {};
-    for (const r of ranks) counts[r] = 0;
+  function renderActivityDistribution(members) {
+    const buckets = [
+      { label: 'Active', min: 60, cls: 'activity-high' },
+      { label: 'Moderate', min: 30, cls: 'activity-medium' },
+      { label: 'Low', min: 1, cls: 'activity-low' },
+      { label: 'None', min: 0, cls: 'activity-none' },
+    ];
+    const counts = buckets.map(() => 0);
     for (const m of members) {
-      const r = m.rank || 'Agent';
-      const key = ranks.find(rk => rk.toLowerCase() === r.toLowerCase()) || 'Agent';
-      counts[key]++;
+      const score = m.activity_score || 0;
+      for (let i = 0; i < buckets.length; i++) {
+        if (score >= buckets[i].min) { counts[i]++; break; }
+      }
     }
 
-    let s = '<div class="section"><div class="section-header">Rank Distribution</div>';
-    s += '<div class="rank-dist">';
-    for (const r of ranks) {
-      s += `<div class="rank-dist-item">
-        <div class="rd-count"><span class="${rankClass(r)}" style="font-size:inherit; padding:0; border:none; background:none">${counts[r]}</span></div>
-        <div class="rd-label"><span class="${rankClass(r)}">${r}</span></div>
+    let s = '<div class="section"><div class="section-header">Activity Distribution</div>';
+    s += '<div class="activity-dist">';
+    for (let i = 0; i < buckets.length; i++) {
+      const b = buckets[i];
+      s += `<div class="activity-dist-item">
+        <div class="rd-count"><span class="activity-badge ${b.cls}" style="font-size:inherit; padding:0; border:none; background:none">${counts[i]}</span></div>
+        <div class="rd-label"><span class="activity-badge ${b.cls}">${b.label}</span></div>
       </div>`;
     }
     s += '</div></div>';
