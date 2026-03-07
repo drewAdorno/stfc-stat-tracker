@@ -5,9 +5,11 @@ Slash commands to query player stats from the SQLite database.
 
 import os
 import sys
+from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
 
+import anthropic
 import discord
 from discord import app_commands
 from dotenv import load_dotenv
@@ -190,11 +192,188 @@ async def player_autocomplete(interaction: discord.Interaction, current: str):
 GUILD_ID = discord.Object(id=1452757186152366122)
 
 intents = discord.Intents.default()
+intents.message_content = True
 client = discord.Client(
     intents=intents,
     activity=discord.Activity(type=discord.ActivityType.watching, name="NCC stats"),
 )
 tree = app_commands.CommandTree(client)
+
+claude = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+
+# Per-channel conversation history (last N messages)
+MAX_HISTORY = 10
+channel_history = defaultdict(list)
+
+SYSTEM_PROMPT = """You are the NCC Alliance Bot for Star Trek Fleet Command (STFC) on Server 716. You help alliance members with game knowledge and alliance stats.
+
+## Your Identity
+- You are the bot for NCC, a competitive alliance on Server 716
+- You can look up player stats, alliance data, and answer STFC game questions
+- Be helpful, friendly, and concise. Use casual gaming tone.
+
+## STFC Game Knowledge
+
+### Resources
+- Parsteel (basic building), Tritanium (mid-tier), Dilithium (premium)
+- Raw versions mined from nodes; refined versions from refinery
+- Isogen: special resource from Armada chests (1*, 2*, 3* tiers)
+- Latinum: premium currency for cosmetics and speedups
+- Alliance resources: RSS Contributed and ISO Contributed track donations
+
+### Ships & Tiers
+- Tier 1-4 ships: Explorer > Mining > Combat > Explorer (triangle)
+- Ship classes: Explorer (blue), Interceptor (red), Battleship (yellow)
+- Key progression ships: Mayflower, Kumari, Kehra, Saladin, Centurion, Horizon, Enterprise, D3/D4, Amalgam, Defiant, B'Rel, Vi'dar (hostile grinding)
+- Faction ships unlock at Ops 20+: Federation, Romulan, Klingon
+- Borg ships: Vi'dar (PvE), Amalgam (PvP)
+
+### Combat & Stats
+- Power: overall account strength (buildings, research, ships, crew)
+- Players Killed: PvP kills
+- Hostiles Killed: PvE kills (missions, dailies, events)
+- Resources Mined: total resources gathered from nodes
+- Resources Raided: resources stolen from other players
+- Helps: alliance help actions (speedups for allies)
+
+### Events
+- Solo events: individual point-based competitions
+- Alliance events: cooperative goals
+- Armadas: group PvE boss fights (Normal, Uncommon, Rare, Epic)
+- Territory Capture: alliance-vs-alliance zone control
+- Alliance Starbase (SLB): cooperative alliance progression
+- Battlepass: seasonal progression track
+
+### Levels & Progression
+- Operations (Ops) level 1-50+ is main progression
+- Higher Ops unlocks new systems, ships, and content
+- Research trees: Combat, Station, Galaxy (exploration)
+
+### Alliance Mechanics
+- Max 100 members per alliance
+- Ranks: Leader, Officers, Members
+- Alliance Starbase levels provide alliance-wide bonuses
+- Territory provides daily resource income
+
+## How to Use Data
+When the user asks about a player or alliance stats, I'll provide relevant data from our database in the context. Use it to give informed answers. If no data is provided for a question, say you don't have that info and suggest using slash commands like /stats, /leaderboard, or /whois.
+
+Keep responses under 2000 characters (Discord limit)."""
+
+
+def _get_alliance_context(conn):
+    """Build a summary of current NCC alliance state for the LLM."""
+    row = conn.execute(
+        "SELECT MAX(date) FROM daily_snapshots WHERE alliance_id = ?",
+        (NCC_ALLIANCE_ID,),
+    ).fetchone()
+    if not row or not row[0]:
+        return ""
+    latest_date = row[0]
+
+    member_count = conn.execute(
+        "SELECT COUNT(*) FROM daily_snapshots WHERE date = ? AND alliance_id = ?",
+        (latest_date, NCC_ALLIANCE_ID),
+    ).fetchone()[0]
+
+    top_power = conn.execute("""
+        SELECT p.name, ds.power, ds.level FROM daily_snapshots ds
+        JOIN players p ON p.player_id = ds.player_id
+        WHERE ds.date = ? AND ds.alliance_id = ?
+        ORDER BY ds.power DESC LIMIT 5
+    """, (latest_date, NCC_ALLIANCE_ID)).fetchall()
+
+    ctx = f"\n## Current NCC Data (as of {latest_date})\n"
+    ctx += f"Members: {member_count}\n"
+    ctx += "Top 5 by power:\n"
+    for name, power, level in top_power:
+        ctx += f"  - {name}: {_format_abbr(power)} power, level {level}\n"
+    return ctx
+
+
+def _get_player_context(conn, player_name):
+    """Try to find and summarize a player's stats."""
+    row = conn.execute(
+        "SELECT player_id, name, alliance_tag FROM players WHERE name LIKE ? COLLATE NOCASE LIMIT 1",
+        (f"%{player_name}%",),
+    ).fetchone()
+    if not row:
+        return ""
+    player_id, name, tag = row
+    snap = get_player_snapshot(conn, player_id)
+    if not snap:
+        return f"\nPlayer {name} [{tag or 'no alliance'}] found but no snapshot data.\n"
+
+    ctx = f"\n## Player: {name} [{tag or 'no alliance'}]\n"
+    for field in TRACKED_FIELDS:
+        val = snap.get(field) or 0
+        label = STAT_LABELS.get(field, field)
+        ctx += f"  {label}: {_format_abbr(val)}\n"
+
+    history = get_player_name_history(conn, player_id)
+    if len(history) > 1:
+        ctx += "  Name history: " + ", ".join(n for n, _, _ in history) + "\n"
+    return ctx
+
+
+async def handle_mention(message):
+    """Handle @bot mentions with Claude AI."""
+    # Strip the mention from the message
+    content = message.content
+    for mention in message.mentions:
+        content = content.replace(f"<@{mention.id}>", "").replace(f"<@!{mention.id}>", "")
+    content = content.strip()
+    if not content:
+        await message.reply("Hey! Ask me anything about STFC or NCC. Try something like: *how is the alliance doing?* or *what's a good way to farm resources?*")
+        return
+
+    # Build DB context
+    db_context = ""
+    conn = get_db()
+    try:
+        db_context += _get_alliance_context(conn)
+        # If the message mentions a player name, pull their stats
+        words = content.lower().split()
+        rows = conn.execute(
+            "SELECT name FROM players WHERE alliance_id = ?", (NCC_ALLIANCE_ID,)
+        ).fetchall()
+        member_names = {r[0].lower(): r[0] for r in rows}
+        for word in words:
+            if word in member_names:
+                db_context += _get_player_context(conn, member_names[word])
+    finally:
+        conn.close()
+
+    # Build message history
+    ch_id = message.channel.id
+    channel_history[ch_id].append({"role": "user", "content": content})
+    if len(channel_history[ch_id]) > MAX_HISTORY:
+        channel_history[ch_id] = channel_history[ch_id][-MAX_HISTORY:]
+
+    system = SYSTEM_PROMPT
+    if db_context:
+        system += "\n" + db_context
+
+    async with message.channel.typing():
+        try:
+            response = claude.messages.create(
+                model="claude-haiku-4-5-20251001",
+                max_tokens=1024,
+                system=system,
+                messages=channel_history[ch_id],
+            )
+            reply = response.content[0].text
+            # Discord message limit
+            if len(reply) > 2000:
+                reply = reply[:1997] + "..."
+        except Exception as e:
+            reply = f"Sorry, I hit an error: {e}"
+
+    channel_history[ch_id].append({"role": "assistant", "content": reply})
+    if len(channel_history[ch_id]) > MAX_HISTORY:
+        channel_history[ch_id] = channel_history[ch_id][-MAX_HISTORY:]
+
+    await message.reply(reply)
 
 
 @client.event
@@ -202,6 +381,14 @@ async def on_ready():
     tree.copy_global_to(guild=GUILD_ID)
     await tree.sync(guild=GUILD_ID)
     print(f"Bot ready as {client.user} — synced slash commands")
+
+
+@client.event
+async def on_message(message):
+    if message.author.bot:
+        return
+    if client.user in message.mentions:
+        await handle_mention(message)
 
 
 # --- /link ---
