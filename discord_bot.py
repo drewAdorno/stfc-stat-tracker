@@ -363,15 +363,16 @@ async def handle_mention(message):
                 db_context += f"\nThe user's Discord name matches player: {name_match[0]} (not formally linked)\n"
                 db_context += _get_player_context(conn, name_match[0])
 
-        # If the message mentions a player name, pull their stats
-        words = content.lower().split()
-        rows = conn.execute(
-            "SELECT name FROM players WHERE alliance_id = ?", (NCC_ALLIANCE_ID,)
-        ).fetchall()
-        member_names = {r[0].lower(): r[0] for r in rows}
-        for word in words:
-            if word in member_names:
-                db_context += _get_player_context(conn, member_names[word])
+        # If the message mentions a player name, pull their stats (all server players)
+        content_lower = content.lower()
+        rows = conn.execute("SELECT name FROM players").fetchall()
+        matched = set()
+        for (name,) in rows:
+            if name.lower() in content_lower and name.lower() not in matched:
+                matched.add(name.lower())
+                db_context += _get_player_context(conn, name)
+                if len(matched) >= 3:
+                    break
     finally:
         conn.close()
 
