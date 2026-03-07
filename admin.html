@@ -262,13 +262,6 @@
 
   /* Inventory */
   .inv-date { color: #636e7b; font-size: 0.85rem; margin-bottom: 10px; }
-  .inv-chart-section { margin-top: 16px; }
-  .inv-chart-section h3 { color: #e2e8f0; font-size: 0.95rem; margin-bottom: 10px; }
-  .spark-row { display: flex; align-items: center; gap: 10px; padding: 4px 0; }
-  .spark-label { width: 160px; font-size: 0.85rem; color: #c8d6e5; flex-shrink: 0; }
-  .spark-svg { width: 200px; height: 45px; flex-shrink: 0; }
-  .spark-val { font-size: 0.85rem; color: #e2e8f0; min-width: 60px; text-align: right; }
-  .spark-delta { font-size: 0.8rem; min-width: 60px; text-align: right; }
 
   /* Loading / Error */
   .loading {
@@ -775,8 +768,7 @@
     }
 
     const snapshots = inv.snapshots || [];
-    const latestSnap = snapshots.length ? snapshots[snapshots.length - 1] : null;
-    const latestDate = latestSnap ? latestSnap.date : '';
+    const latestDate = snapshots.length ? snapshots[snapshots.length - 1].date : '';
     const deltas = inv.deltas || {};
 
     // Sort items by count descending
@@ -801,49 +793,6 @@
       </tr>`;
     }
     s += '</tbody></table></div>';
-
-    // Trend chart if we have multiple snapshots
-    if (snapshots.length >= 2) {
-      s += '<div class="inv-chart-section"><h3>Inventory Trends</h3>';
-      // Get all unique item names and find top 5 by latest count
-      const topItems = items.slice(0, 5).map(i => i[0]);
-      s += '<div class="inv-chart" id="inv-chart"></div>';
-      s += '</div>';
-
-      // Render sparklines after DOM update
-      setTimeout(() => {
-        const el = document.getElementById('inv-chart');
-        if (!el) return;
-        let chartHtml = '';
-        for (const itemName of topItems) {
-          const values = snapshots.map(snap => snap.items[itemName] || 0);
-          const max = Math.max(...values);
-          const min = Math.min(...values);
-          const range = max - min || 1;
-
-          const points = values.map((v, i) => {
-            const x = (i / (values.length - 1)) * 200;
-            const y = 40 - ((v - min) / range) * 35;
-            return `${x},${y}`;
-          }).join(' ');
-
-          const latest = values[values.length - 1];
-          const prev = values.length >= 2 ? values[values.length - 2] : latest;
-          const diff = latest - prev;
-          const cls = diff > 0 ? 'delta-pos' : (diff < 0 ? 'delta-neg' : 'delta-zero');
-
-          chartHtml += `<div class="spark-row">
-            <span class="spark-label">${esc(itemName)}</span>
-            <svg class="spark-svg" viewBox="0 0 200 45" preserveAspectRatio="none">
-              <polyline fill="none" stroke="#4dabf7" stroke-width="1.5" points="${points}"/>
-            </svg>
-            <span class="spark-val">${formatAbbr(latest)}</span>
-            <span class="${cls} spark-delta">${diff > 0 ? '+' : ''}${formatAbbr(diff)}</span>
-          </div>`;
-        }
-        el.innerHTML = chartHtml;
-      }, 0);
-    }
 
     s += '</div>';
     return s;
