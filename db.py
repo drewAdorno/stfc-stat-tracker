@@ -1388,9 +1388,21 @@ def get_player_name_history(conn, player_id):
 # Resource ID → display name mapping.
 # IDs come from the game's protobuf InventoryItem.commonParams.refId.
 RESOURCE_NAMES = {
-    2991010408: "Refined Isogen 1*",
-    2705205969: "Refined Isogen 2*",
-    563579678:  "Refined Isogen 3*",
+    2910180549: "Refined Isogen 1*",
+    3632155109: "Refined Isogen 2*",
+    405275536:  "Refined Isogen 3*",
+    2539513921: "Speed Up 5 Min",
+    3051340822: "Speed Up 15 Min",
+    1000621245: "Speed Up 1 Hour",
+    921609496:  "Alliance Reserves",
+    1774957625: "Collisional Plasma",
+    3407752796: "Subspace Superconductor",
+    183293177:  "Progenitor Core",
+    3446322746: "Progenitor Diode",
+    2234127593: "Progenitor Emitter",
+    1384959993: "Progenitor Reactor",
+    2026143028: "Alliance Tournament Points",
+    3099044371: "Emerald Chain XP",
 }
 
 
