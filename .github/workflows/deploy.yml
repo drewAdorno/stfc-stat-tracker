@@ -52,8 +52,8 @@ jobs:
 
             # Regenerate JSON data files from DB (ensures they exist after deploy)
             venv/bin/python -c "
-            from db import get_db, export_latest_json, export_history_json, export_server_alliances_json, export_server_players_json
-            conn = get_db(); export_latest_json(conn); export_history_json(conn); export_server_alliances_json(conn); export_server_players_json(conn); conn.close()
+            from db import get_db, export_latest_json, export_history_json, export_server_alliances_json, export_server_players_json, export_alliance_inventory_json
+            conn = get_db(); export_latest_json(conn); export_history_json(conn); export_server_alliances_json(conn); export_server_players_json(conn); export_alliance_inventory_json(conn); conn.close()
             "
 
             # Only update nginx config + re-run certbot if the base config changed
