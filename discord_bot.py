@@ -478,10 +478,10 @@ async def territory_reminder_loop():
                     and now_est.date() == takeover_est.date()
                     and now_est.hour >= 12
                     and hours_until > 1):
-                time_str = takeover_est.strftime("%-I:%M %p EST")
+                ts = int(takeover_utc.timestamp())
                 await channel.send(
-                    f"⚔️ **Territory Reminder:** **{sched['name']}** takeover is today at **{time_str}**! "
-                    f"({hours_until:.0f} hours from now)"
+                    f"⚔️ **Territory Reminder:** **{sched['name']}** takeover is today at "
+                    f"<t:{ts}:t> (<t:{ts}:R>)"
                 )
                 _sent_reminders.add(noon_key)
 
@@ -489,9 +489,9 @@ async def territory_reminder_loop():
             hour_key = f"{sched['name']}-1hr-{date_key}"
             if (hour_key not in _sent_reminders
                     and 0 < hours_until <= 1):
-                mins = int(time_until.total_seconds() / 60)
+                ts = int(takeover_utc.timestamp())
                 await channel.send(
-                    f"🚨 **{sched['name']}** takeover starts in **{mins} minutes**! Get ready!"
+                    f"🚨 **{sched['name']}** takeover starts <t:{ts}:R>! Get ready!"
                 )
                 _sent_reminders.add(hour_key)
 
