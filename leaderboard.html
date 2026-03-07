@@ -36,6 +36,26 @@
     margin-top: 6px;
   }
 
+  /* Nav */
+  nav {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 24px;
+  }
+  nav a {
+    background: #111827;
+    border: 1px solid #1e2d3d;
+    color: #8899aa;
+    padding: 6px 16px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: all 0.15s;
+  }
+  nav a:hover { border-color: #4dabf7; color: #c8d6e5; }
+  nav a.active { background: #4dabf7; color: #0a0e17; border-color: #4dabf7; font-weight: 600; }
+
   /* Login */
   #login-gate {
     display: flex;
@@ -366,6 +386,14 @@
     <h1><span>Server 716</span> Leaderboard</h1>
     <div class="updated" id="updated"></div>
   </header>
+
+  <nav>
+    <a href="index">Tracker</a>
+    <a href="calendar">Calendar</a>
+    <a href="server">Server</a>
+    <a href="leaderboard" class="active">Leaderboard</a>
+    <a href="admin">Admin</a>
+  </nav>
 
   <div id="login-gate">
     <div class="login-box">

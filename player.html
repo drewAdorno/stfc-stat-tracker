@@ -23,14 +23,25 @@
     border-bottom: 1px solid #1a2332;
     margin-bottom: 24px;
   }
-  .back-link {
-    display: inline-block;
-    color: #4dabf7;
+  /* Nav */
+  nav {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 24px;
+  }
+  nav a {
+    background: #111827;
+    border: 1px solid #1e2d3d;
+    color: #8899aa;
+    padding: 6px 16px;
+    border-radius: 6px;
     text-decoration: none;
     font-size: 0.85rem;
-    margin-bottom: 12px;
+    transition: all 0.15s;
   }
-  .back-link:hover { text-decoration: underline; }
+  nav a:hover { border-color: #4dabf7; color: #c8d6e5; }
+  nav a.active { background: #4dabf7; color: #0a0e17; border-color: #4dabf7; font-weight: 600; }
   .player-header {
     display: flex;
     align-items: center;
@@ -249,8 +260,15 @@
 </head>
 <body>
 <div class="container">
+  <nav>
+    <a href="index">Tracker</a>
+    <a href="calendar">Calendar</a>
+    <a href="server">Server</a>
+    <a href="leaderboard">Leaderboard</a>
+    <a href="admin">Admin</a>
+  </nav>
+
   <header>
-    <a class="back-link" id="back-link" href="index.html">&larr; Back to Alliance</a>
     <div id="player-header"></div>
   </header>
 
@@ -645,11 +663,6 @@
       } else if (serverPlayersData) {
         // Non-NCC player — use server-wide data
         isNccPlayer = false;
-
-        // Update back link to point to server page
-        const backLink = $('back-link');
-        backLink.href = 'server.html';
-        backLink.innerHTML = '&larr; Back to Server';
 
         // Find player in server_players.json
         const sp = serverPlayersData.players.find(p => p.id === playerId);
