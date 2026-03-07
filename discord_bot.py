@@ -15,17 +15,22 @@ import discord
 from discord import app_commands
 from dotenv import load_dotenv
 
+import random
+
 from db import (
     NCC_ALLIANCE_ID,
     TRACKED_FIELDS,
     _format_abbr,
     get_db,
     get_earliest_snapshot_date,
+    get_latest_two_dates,
     get_linked_player,
+    get_members_for_date,
     get_player_name_history,
     get_player_snapshot,
     get_snapshot_date_ago,
     link_discord,
+    now_est,
     search_players,
     unlink_discord,
 )
@@ -415,6 +420,8 @@ async def on_ready():
     await tree.sync(guild=GUILD_ID)
     print(f"Bot ready as {client.user} — synced slash commands")
     client.loop.create_task(territory_reminder_loop())
+    client.loop.create_task(alliance_alert_loop())
+    client.loop.create_task(daily_report_loop())
 
 
 @client.event
@@ -429,6 +436,8 @@ async def on_message(message):
 
 EST = timezone(timedelta(hours=-5))
 TERRITORY_CHANNEL_ID = 1452766274127138939
+CHAT_CHANNEL_ID = 1452757187188490292
+ACTIVITY_CHANNEL_ID = 1479693128850997258
 
 # Takeover schedule (UTC times from territory.lol)
 # weekday: 0=Mon, 6=Sun
@@ -502,6 +511,228 @@ async def territory_reminder_loop():
         )
 
         await asyncio.sleep(60)  # Check every minute
+
+
+# --- Alliance Alerts (joins, leaves, level-ups) ---
+
+LEVEL_UP_MESSAGES = [
+    "🎉 Congrats! Keep climbing!",
+    "🚀 To boldly go to the next level!",
+    "💪 Nice grind, Commander!",
+    "🔥 Unstoppable!",
+    "⭐ The fleet grows stronger!",
+    "🏆 Another one bites the dust!",
+    "📈 Stonks! Level goes up!",
+]
+
+_last_alert_dates = None
+_sent_alert_keys = set()
+
+
+def _detect_changes(prev_members, curr_members):
+    """Compare two member dicts and return joined, left, level_ups lists."""
+    prev_ids = set(prev_members.keys())
+    curr_ids = set(curr_members.keys())
+
+    joined = []
+    for mid in sorted(curr_ids - prev_ids):
+        m = curr_members[mid]
+        joined.append(m)
+
+    left = []
+    for mid in sorted(prev_ids - curr_ids):
+        m = prev_members[mid]
+        left.append(m)
+
+    level_ups = []
+    for mid in sorted(prev_ids & curr_ids):
+        prev_level = int(prev_members[mid].get("level", 0) or 0)
+        curr_level = int(curr_members[mid].get("level", 0) or 0)
+        if curr_level > prev_level:
+            level_ups.append({
+                **curr_members[mid],
+                "old_level": prev_level,
+                "new_level": curr_level,
+            })
+
+    return {"joined": joined, "left": left, "level_ups": level_ups}
+
+
+async def alliance_alert_loop():
+    """Check for joins, leaves, level-ups every 5 minutes."""
+    global _last_alert_dates, _sent_alert_keys
+    await client.wait_until_ready()
+
+    chat_channel = client.get_channel(CHAT_CHANNEL_ID)
+    activity_channel = client.get_channel(ACTIVITY_CHANNEL_ID)
+    if not chat_channel or not activity_channel:
+        print(f"WARNING: Alert channels not found (chat={CHAT_CHANNEL_ID}, activity={ACTIVITY_CHANNEL_ID})")
+        return
+
+    while not client.is_closed():
+        try:
+            conn = get_db()
+            prev_date, curr_date = get_latest_two_dates(conn)
+            if not prev_date or not curr_date:
+                conn.close()
+                await asyncio.sleep(300)
+                continue
+
+            dates_key = f"{prev_date}:{curr_date}"
+            if dates_key != _last_alert_dates:
+                _last_alert_dates = dates_key
+                _sent_alert_keys = set()
+
+            prev_members = get_members_for_date(conn, prev_date)
+            curr_members = get_members_for_date(conn, curr_date)
+            conn.close()
+
+            if len(curr_members) < 10 or len(prev_members) < 10:
+                await asyncio.sleep(300)
+                continue
+
+            changes = _detect_changes(prev_members, curr_members)
+
+            # Joins → chat + activity
+            for m in changes["joined"]:
+                key = f"join:{m['name']}"
+                if key in _sent_alert_keys:
+                    continue
+                power = _format_abbr(m.get("power", 0))
+                embed = discord.Embed(
+                    title="✅ Member Joined",
+                    description=f"**{m['name']}** — Lv{m.get('level', '?')}, {power} power",
+                    color=0x51CF66,
+                )
+                await chat_channel.send(embed=embed)
+                await activity_channel.send(embed=embed)
+                _sent_alert_keys.add(key)
+
+            # Leaves → activity only
+            for m in changes["left"]:
+                key = f"left:{m['name']}"
+                if key in _sent_alert_keys:
+                    continue
+                power = _format_abbr(m.get("power", 0))
+                embed = discord.Embed(
+                    title="🚪 Member Left",
+                    description=f"**{m['name']}** — was Lv{m.get('level', '?')}, {power} power",
+                    color=0xFF6B6B,
+                )
+                await activity_channel.send(embed=embed)
+                _sent_alert_keys.add(key)
+
+            # Level-ups → chat
+            for m in changes["level_ups"]:
+                key = f"levelup:{m['name']}:{m['new_level']}"
+                if key in _sent_alert_keys:
+                    continue
+                embed = discord.Embed(
+                    title="⬆️ Level Up",
+                    description=f"**{m['name']}** — Lv{m['old_level']} → Lv{m['new_level']}\n\n{random.choice(LEVEL_UP_MESSAGES)}",
+                    color=0x4DABF7,
+                )
+                await chat_channel.send(embed=embed)
+                _sent_alert_keys.add(key)
+
+        except Exception as e:
+            print(f"Alliance alert error: {e}")
+
+        await asyncio.sleep(300)  # Check every 5 minutes
+
+
+# --- Daily Report ---
+
+_last_report_date = None
+
+
+async def daily_report_loop():
+    """Send the daily NCC report once per day at noon EST."""
+    global _last_report_date
+    await client.wait_until_ready()
+
+    activity_channel = client.get_channel(ACTIVITY_CHANNEL_ID)
+    if not activity_channel:
+        print(f"WARNING: Activity channel {ACTIVITY_CHANNEL_ID} not found")
+        return
+
+    while not client.is_closed():
+        now = now_est()
+        today = now.strftime("%Y-%m-%d")
+
+        if now.hour >= 12 and _last_report_date != today:
+            try:
+                conn = get_db()
+                prev_date, curr_date = get_latest_two_dates(conn)
+                if not curr_date:
+                    conn.close()
+                    await asyncio.sleep(300)
+                    continue
+
+                # Get current members
+                curr_members = get_members_for_date(conn, curr_date)
+                if len(curr_members) < 10:
+                    conn.close()
+                    await asyncio.sleep(300)
+                    continue
+
+                # Total power
+                total_power = sum(m.get("power", 0) for m in curr_members.values())
+                member_count = len(curr_members)
+
+                # 7-day comparison
+                row = conn.execute("""
+                    SELECT MAX(date) FROM daily_snapshots
+                    WHERE date <= date(?, '-7 days') AND alliance_id = ?
+                """, (curr_date, NCC_ALLIANCE_ID)).fetchone()
+                comp_date = row[0] if row and row[0] else None
+
+                desc = f"**Members:** {member_count}\n**Total Power:** {_format_abbr(total_power)}"
+
+                if comp_date:
+                    comp_members = get_members_for_date(conn, comp_date)
+                    comp_power = sum(m.get("power", 0) for m in comp_members.values())
+                    power_delta = total_power - comp_power
+                    desc += f" ({'+' if power_delta >= 0 else ''}{_format_abbr(power_delta)} 7d)"
+
+                # Top 5 power gainers (7d)
+                fields = []
+                if comp_date:
+                    comp_members = get_members_for_date(conn, comp_date)
+                    gainers = []
+                    for pid, m in curr_members.items():
+                        if pid in comp_members:
+                            delta = (m.get("power", 0)) - (comp_members[pid].get("power", 0))
+                            gainers.append((m["name"], delta))
+                    gainers.sort(key=lambda x: x[1], reverse=True)
+                    if gainers[:5]:
+                        lines = [f"**{i}.** {n} — +{_format_abbr(d)}" for i, (n, d) in enumerate(gainers[:5], 1) if d > 0]
+                        if lines:
+                            fields.append({"name": "Top Power Gainers (7d)", "value": "\n".join(lines)})
+
+                    # Inactive (0 power change)
+                    inactive = [n for n, d in gainers if d == 0]
+                    if inactive:
+                        fields.append({"name": f"Inactive ({len(inactive)})", "value": ", ".join(inactive[:10])})
+
+                conn.close()
+
+                embed = discord.Embed(
+                    title=f"NCC Daily Report — {today}",
+                    description=desc,
+                    color=0x4DABF7,
+                )
+                embed.set_footer(text="ncctracker.top")
+                for f in fields:
+                    embed.add_field(name=f["name"], value=f["value"], inline=False)
+
+                await activity_channel.send(embed=embed)
+                _last_report_date = today
+
+            except Exception as e:
+                print(f"Daily report error: {e}")
+
+        await asyncio.sleep(300)  # Check every 5 minutes
 
 
 # --- /link ---
