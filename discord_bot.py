@@ -427,9 +427,10 @@ async def on_ready():
     tree.copy_global_to(guild=GUILD_ID)
     await tree.sync(guild=GUILD_ID)
     print(f"Bot ready as {client.user} — synced slash commands")
-    client.loop.create_task(territory_reminder_loop())
-    client.loop.create_task(alliance_alert_loop())
-    client.loop.create_task(daily_report_loop())
+    # Disabled until dedup is more robust — restarts cause duplicate messages
+    # client.loop.create_task(territory_reminder_loop())
+    # client.loop.create_task(alliance_alert_loop())
+    # client.loop.create_task(daily_report_loop())
 
 
 @client.event
