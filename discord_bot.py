@@ -90,6 +90,23 @@ def _format_delta(val):
     return "0"
 
 
+def _lookup_player_id(conn, player: str):
+    """Resolve a player string (from autocomplete or manual input) to a player_id.
+    Could be a direct player_id or a name. Returns player_id or None."""
+    # Check if it's a direct player_id
+    row = conn.execute(
+        "SELECT player_id FROM players WHERE player_id = ?", (player,)
+    ).fetchone()
+    if row:
+        return row[0]
+    # Try name lookup
+    row = conn.execute(
+        "SELECT player_id FROM players WHERE name LIKE ? COLLATE NOCASE LIMIT 1",
+        (player,),
+    ).fetchone()
+    return row[0] if row else None
+
+
 def _resolve_player(conn, player_id, days):
     """Get current + comparison snapshots and deltas for a player+period.
     Returns (current, deltas, comp_date) or (None, None, None)."""
@@ -170,14 +187,20 @@ async def player_autocomplete(interaction: discord.Interaction, current: str):
 
 # --- Bot setup ---
 
+GUILD_ID = discord.Object(id=1452757186152366122)
+
 intents = discord.Intents.default()
-client = discord.Client(intents=intents)
+client = discord.Client(
+    intents=intents,
+    activity=discord.Activity(type=discord.ActivityType.watching, name="NCC stats"),
+)
 tree = app_commands.CommandTree(client)
 
 
 @client.event
 async def on_ready():
-    await tree.sync()
+    tree.copy_global_to(guild=GUILD_ID)
+    await tree.sync(guild=GUILD_ID)
     print(f"Bot ready as {client.user} — synced slash commands")
 
 
@@ -189,28 +212,16 @@ async def on_ready():
 async def cmd_link(interaction: discord.Interaction, player: str):
     conn = get_db()
     try:
-        # player value is player_id from autocomplete, or a name typed manually
-        try:
-            player_id = int(player)
-        except ValueError:
-            row = conn.execute(
-                "SELECT player_id, name FROM players WHERE name LIKE ? COLLATE NOCASE LIMIT 1",
-                (player,),
-            ).fetchone()
-            if not row:
-                await interaction.response.send_message(
-                    f"Player **{player}** not found.", ephemeral=True
-                )
-                return
-            player_id = row[0]
+        player_id = _lookup_player_id(conn, player)
+        if not player_id:
+            await interaction.response.send_message(
+                f"Player **{player}** not found.", ephemeral=True
+            )
+            return
 
-        # Verify player exists
         name_row = conn.execute(
             "SELECT name FROM players WHERE player_id = ?", (player_id,)
         ).fetchone()
-        if not name_row:
-            await interaction.response.send_message("Player not found.", ephemeral=True)
-            return
 
         link_discord(conn, str(interaction.user.id), player_id)
         await interaction.response.send_message(
@@ -273,17 +284,10 @@ async def cmd_me(interaction: discord.Interaction, period: int = 7):
 async def cmd_stats(interaction: discord.Interaction, player: str, period: int = 7):
     conn = get_db()
     try:
-        try:
-            player_id = int(player)
-        except ValueError:
-            row = conn.execute(
-                "SELECT player_id FROM players WHERE name LIKE ? COLLATE NOCASE LIMIT 1",
-                (player,),
-            ).fetchone()
-            if not row:
-                await interaction.response.send_message(f"Player **{player}** not found.")
-                return
-            player_id = row[0]
+        player_id = _lookup_player_id(conn, player)
+        if not player_id:
+            await interaction.response.send_message(f"Player **{player}** not found.")
+            return
 
         current, deltas, comp_date = _resolve_player(conn, player_id, period)
         if not current:
@@ -299,23 +303,20 @@ async def cmd_stats(interaction: discord.Interaction, player: str, period: int =
 
 # --- /leaderboard ---
 
-@tree.command(name="leaderboard", description="Top NCC members by stat")
-@app_commands.describe(stat="Stat to rank by", period="Delta period (0=absolute)", count="Number of players")
+@tree.command(name="leaderboard", description="Top 10 NCC members by stat change")
+@app_commands.describe(stat="Stat to rank by", period="Time period for change")
 @app_commands.choices(stat=STAT_CHOICES, period=PERIOD_CHOICES)
 async def cmd_leaderboard(
     interaction: discord.Interaction,
     stat: str,
-    period: int = 0,
-    count: int = 10,
+    period: int = 7,
 ):
     if stat not in TRACKED_FIELDS:
         await interaction.response.send_message("Invalid stat.", ephemeral=True)
         return
-    count = min(max(count, 1), 25)
 
     conn = get_db()
     try:
-        # Get latest date
         row = conn.execute(
             "SELECT MAX(date) FROM daily_snapshots WHERE alliance_id = ?",
             (NCC_ALLIANCE_ID,),
@@ -326,61 +327,42 @@ async def cmd_leaderboard(
         latest_date = row[0]
 
         if period == 0:
-            # Absolute leaderboard
-            rows = conn.execute(f"""
-                SELECT ds.player_id, p.name, ds.{stat}
-                FROM daily_snapshots ds
-                JOIN players p ON p.player_id = ds.player_id
-                WHERE ds.date = ? AND ds.alliance_id = ?
-                ORDER BY ds.{stat} DESC
-                LIMIT ?
-            """, (latest_date, NCC_ALLIANCE_ID, count)).fetchall()
-
-            label = STAT_LABELS.get(stat, stat)
-            embed = discord.Embed(
-                title=f"Leaderboard — {label}",
-                description=f"Top {count} NCC members (absolute)",
-                color=0xFFD700,
-            )
-            lines = []
-            for i, (pid, name, val) in enumerate(rows, 1):
-                lines.append(f"**{i}.** {name} — {_format_abbr(val or 0)}")
-            embed.add_field(name="\u200b", value="\n".join(lines) or "No data", inline=False)
-
+            comp_row = conn.execute("""
+                SELECT MIN(date) FROM daily_snapshots WHERE alliance_id = ?
+            """, (NCC_ALLIANCE_ID,)).fetchone()
         else:
-            # Delta leaderboard
             comp_row = conn.execute("""
                 SELECT MAX(date) FROM daily_snapshots
                 WHERE date <= date(?, ?) AND alliance_id = ?
             """, (latest_date, f"-{period} days", NCC_ALLIANCE_ID)).fetchone()
-            comp_date = comp_row[0] if comp_row and comp_row[0] else None
+        comp_date = comp_row[0] if comp_row and comp_row[0] else None
 
-            if not comp_date:
-                await interaction.response.send_message("Not enough historical data for this period.")
-                return
+        if not comp_date:
+            await interaction.response.send_message("Not enough historical data for this period.")
+            return
 
-            rows = conn.execute(f"""
-                SELECT curr.player_id, p.name,
-                       COALESCE(curr.{stat}, 0) - COALESCE(prev.{stat}, 0) as delta
-                FROM daily_snapshots curr
-                JOIN players p ON p.player_id = curr.player_id
-                LEFT JOIN daily_snapshots prev
-                    ON prev.player_id = curr.player_id AND prev.date = ?
-                WHERE curr.date = ? AND curr.alliance_id = ?
-                ORDER BY delta DESC
-                LIMIT ?
-            """, (comp_date, latest_date, NCC_ALLIANCE_ID, count)).fetchall()
+        rows = conn.execute(f"""
+            SELECT curr.player_id, p.name,
+                   COALESCE(curr.{stat}, 0) - COALESCE(prev.{stat}, 0) as delta
+            FROM daily_snapshots curr
+            JOIN players p ON p.player_id = curr.player_id
+            LEFT JOIN daily_snapshots prev
+                ON prev.player_id = curr.player_id AND prev.date = ?
+            WHERE curr.date = ? AND curr.alliance_id = ?
+            ORDER BY delta DESC
+            LIMIT 10
+        """, (comp_date, latest_date, NCC_ALLIANCE_ID)).fetchall()
 
-            label = STAT_LABELS.get(stat, stat)
-            embed = discord.Embed(
-                title=f"Leaderboard — {label}",
-                description=f"Top {count} NCC members ({_period_label(period)} change)",
-                color=0xFFD700,
-            )
-            lines = []
-            for i, (pid, name, delta) in enumerate(rows, 1):
-                lines.append(f"**{i}.** {name} — {_format_delta(delta or 0)}")
-            embed.add_field(name="\u200b", value="\n".join(lines) or "No data", inline=False)
+        label = STAT_LABELS.get(stat, stat)
+        embed = discord.Embed(
+            title=f"Leaderboard — {label}",
+            description=f"Top 10 NCC members ({_period_label(period)} change)",
+            color=0xFFD700,
+        )
+        lines = []
+        for i, (pid, name, delta) in enumerate(rows, 1):
+            lines.append(f"**{i}.** {name} — {_format_delta(delta or 0)}")
+        embed.add_field(name="\u200b", value="\n".join(lines) or "No data", inline=False)
 
         await interaction.response.send_message(embed=embed)
     finally:
@@ -398,17 +380,10 @@ async def cmd_compare(interaction: discord.Interaction, player1: str, player2: s
         ids = []
         names = []
         for p in [player1, player2]:
-            try:
-                pid = int(p)
-            except ValueError:
-                row = conn.execute(
-                    "SELECT player_id FROM players WHERE name LIKE ? COLLATE NOCASE LIMIT 1",
-                    (p,),
-                ).fetchone()
-                if not row:
-                    await interaction.response.send_message(f"Player **{p}** not found.")
-                    return
-                pid = row[0]
+            pid = _lookup_player_id(conn, p)
+            if not pid:
+                await interaction.response.send_message(f"Player **{p}** not found.")
+                return
             ids.append(pid)
             name_row = conn.execute("SELECT name FROM players WHERE player_id = ?", (pid,)).fetchone()
             names.append(name_row[0] if name_row else str(pid))
@@ -449,17 +424,10 @@ async def cmd_compare(interaction: discord.Interaction, player1: str, player2: s
 async def cmd_whois(interaction: discord.Interaction, player: str):
     conn = get_db()
     try:
-        try:
-            player_id = int(player)
-        except ValueError:
-            row = conn.execute(
-                "SELECT player_id FROM players WHERE name LIKE ? COLLATE NOCASE LIMIT 1",
-                (player,),
-            ).fetchone()
-            if not row:
-                await interaction.response.send_message(f"Player **{player}** not found.")
-                return
-            player_id = row[0]
+        player_id = _lookup_player_id(conn, player)
+        if not player_id:
+            await interaction.response.send_message(f"Player **{player}** not found.")
+            return
 
         prow = conn.execute(
             "SELECT name, alliance_tag, first_seen, last_seen FROM players WHERE player_id = ?",
@@ -705,6 +673,26 @@ async def cmd_milestones(interaction: discord.Interaction, period: int = 7):
         await interaction.response.send_message(embed=embed)
     finally:
         conn.close()
+
+
+# --- /help ---
+
+@tree.command(name="help", description="List all bot commands")
+async def cmd_help(interaction: discord.Interaction):
+    embed = discord.Embed(title="NCC Tracker Bot", color=0x00BFFF)
+    cmds = [
+        ("/me", "Your stats and deltas"),
+        ("/stats", "Look up any player's stats"),
+        ("/whois", "Player profile with name history"),
+        ("/compare", "Side-by-side comparison of two players"),
+        ("/leaderboard", "Top 10 NCC members by stat change"),
+        ("/activity", "Alliance activity summary"),
+        ("/milestones", "Recent achievements and milestones"),
+        ("/link", "Link your Discord account to your player"),
+        ("/unlink", "Remove your Discord-to-player link"),
+    ]
+    embed.description = "\n".join(f"**{name}** — {desc}" for name, desc in cmds)
+    await interaction.response.send_message(embed=embed, ephemeral=True)
 
 
 # --- Main ---
