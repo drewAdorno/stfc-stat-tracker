@@ -19,6 +19,7 @@ import random
 
 from db import (
     NCC_ALLIANCE_ID,
+    RESOURCE_NAMES,
     TRACKED_FIELDS,
     _format_abbr,
     get_db,
@@ -646,12 +647,66 @@ async def alliance_alert_loop():
 _last_report_date = None
 
 
+def _get_inventory_embed(conn):
+    """Build an embed for the daily alliance inventory report. Returns None if no data."""
+    dates = conn.execute(
+        "SELECT DISTINCT date FROM alliance_inventory ORDER BY date DESC LIMIT 2"
+    ).fetchall()
+    if not dates:
+        return None
+
+    latest_date = dates[0][0]
+    latest_rows = conn.execute(
+        "SELECT refid, count FROM alliance_inventory WHERE date = ?",
+        (latest_date,),
+    ).fetchall()
+    if not latest_rows:
+        return None
+
+    latest_items = {RESOURCE_NAMES.get(refid, str(refid)): count for refid, count in latest_rows}
+
+    # Compute deltas if we have a previous day
+    deltas = {}
+    if len(dates) >= 2:
+        prev_date = dates[1][0]
+        prev_rows = conn.execute(
+            "SELECT refid, count FROM alliance_inventory WHERE date = ?",
+            (prev_date,),
+        ).fetchall()
+        prev_items = {RESOURCE_NAMES.get(refid, str(refid)): count for refid, count in prev_rows}
+        for name, count in latest_items.items():
+            deltas[name] = count - prev_items.get(name, 0)
+        for name, count in prev_items.items():
+            if name not in latest_items:
+                deltas[name] = -count
+
+    # Build embed
+    lines = []
+    for name, count in sorted(latest_items.items(), key=lambda x: x[1], reverse=True):
+        delta = deltas.get(name, 0)
+        delta_str = ""
+        if delta > 0:
+            delta_str = f" (+{_format_abbr(delta)})"
+        elif delta < 0:
+            delta_str = f" ({_format_abbr(delta)})"
+        lines.append(f"**{name}:** {_format_abbr(count)}{delta_str}")
+
+    embed = discord.Embed(
+        title=f"Alliance Inventory — {latest_date}",
+        description="\n".join(lines) or "No items",
+        color=0xE67E22,
+    )
+    embed.set_footer(text="ncctracker.top")
+    return embed
+
+
 async def daily_report_loop():
     """Send the daily NCC report once per day at noon EST."""
     global _last_report_date
     await client.wait_until_ready()
 
     activity_channel = client.get_channel(ACTIVITY_CHANNEL_ID)
+    territory_channel = client.get_channel(TERRITORY_CHANNEL_ID)
     if not activity_channel:
         print(f"WARNING: Activity channel {ACTIVITY_CHANNEL_ID} not found")
         return
@@ -715,6 +770,9 @@ async def daily_report_loop():
                     if inactive:
                         fields.append({"name": f"Inactive ({len(inactive)})", "value": ", ".join(inactive[:10])})
 
+                # Inventory report
+                inv_embed = _get_inventory_embed(conn)
+
                 conn.close()
 
                 embed = discord.Embed(
@@ -727,6 +785,11 @@ async def daily_report_loop():
                     embed.add_field(name=f["name"], value=f["value"], inline=False)
 
                 await activity_channel.send(embed=embed)
+
+                # Inventory to territory channel
+                if inv_embed and territory_channel:
+                    await territory_channel.send(embed=inv_embed)
+
                 _last_report_date = today
 
             except Exception as e:
