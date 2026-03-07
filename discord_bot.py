@@ -342,6 +342,16 @@ async def handle_mention(message):
             if linked_row:
                 db_context += f"\nThe user messaging you is linked to player: {linked_row[0]}\n"
                 db_context += _get_player_context(conn, linked_row[0])
+        else:
+            # Try matching Discord display name to in-game name
+            display_name = message.author.display_name
+            name_match = conn.execute(
+                "SELECT name FROM players WHERE name = ? COLLATE NOCASE AND alliance_id = ?",
+                (display_name, NCC_ALLIANCE_ID),
+            ).fetchone()
+            if name_match:
+                db_context += f"\nThe user's Discord name matches player: {name_match[0]} (not formally linked)\n"
+                db_context += _get_player_context(conn, name_match[0])
 
         # If the message mentions a player name, pull their stats
         words = content.lower().split()
