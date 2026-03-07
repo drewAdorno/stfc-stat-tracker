@@ -413,16 +413,16 @@
   }
 
   function activityClass(score) {
-    if (score >= 60) return 'activity-badge activity-high';
-    if (score >= 30) return 'activity-badge activity-medium';
-    if (score > 0) return 'activity-badge activity-low';
+    if (score >= 80) return 'activity-badge activity-high';
+    if (score >= 60) return 'activity-badge activity-medium';
+    if (score >= 30) return 'activity-badge activity-low';
     return 'activity-badge activity-none';
   }
 
   function activityLabel(score) {
-    if (score >= 60) return 'Active';
-    if (score >= 30) return 'Moderate';
-    if (score > 0) return 'Low';
+    if (score >= 80) return 'Active';
+    if (score >= 60) return 'Moderate';
+    if (score >= 30) return 'Low';
     return 'None';
   }
 
@@ -733,9 +733,9 @@
 
   function renderActivityDistribution(members) {
     const buckets = [
-      { label: 'Active', min: 60, cls: 'activity-high' },
-      { label: 'Moderate', min: 30, cls: 'activity-medium' },
-      { label: 'Low', min: 1, cls: 'activity-low' },
+      { label: 'Active', min: 80, cls: 'activity-high' },
+      { label: 'Moderate', min: 60, cls: 'activity-medium' },
+      { label: 'Low', min: 30, cls: 'activity-low' },
       { label: 'None', min: 0, cls: 'activity-none' },
     ];
     const counts = buckets.map(() => 0);
