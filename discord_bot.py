@@ -644,7 +644,17 @@ async def alliance_alert_loop():
 
 # --- Daily Report ---
 
-_last_report_date = None
+_REPORT_STATE_FILE = Path(__file__).parent / "data" / ".last_bot_report_date"
+
+
+def _load_last_report_date():
+    if _REPORT_STATE_FILE.exists():
+        return _REPORT_STATE_FILE.read_text().strip()
+    return None
+
+
+def _save_last_report_date(date_str):
+    _REPORT_STATE_FILE.write_text(date_str)
 
 
 def _get_inventory_embed(conn):
@@ -702,7 +712,6 @@ def _get_inventory_embed(conn):
 
 async def daily_report_loop():
     """Send the daily NCC report once per day at noon EST."""
-    global _last_report_date
     await client.wait_until_ready()
 
     activity_channel = client.get_channel(ACTIVITY_CHANNEL_ID)
@@ -715,7 +724,7 @@ async def daily_report_loop():
         now = now_est()
         today = now.strftime("%Y-%m-%d")
 
-        if now.hour >= 12 and _last_report_date != today:
+        if now.hour >= 12 and _load_last_report_date() != today:
             try:
                 conn = get_db()
                 prev_date, curr_date = get_latest_two_dates(conn)
@@ -790,7 +799,7 @@ async def daily_report_loop():
                 if inv_embed and territory_channel:
                     await territory_channel.send(embed=inv_embed)
 
-                _last_report_date = today
+                _save_last_report_date(today)
 
             except Exception as e:
                 print(f"Daily report error: {e}")
