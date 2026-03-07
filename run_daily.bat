@@ -18,17 +18,9 @@ if !ERRORLEVEL! neq 0 (
     goto :end
 )
 
-echo Sending hourly alerts... >> "%LOG_FILE%"
-"%PYTHON_EXE%" send_hourly_alerts.py >> "%LOG_FILE%" 2>&1
-if !ERRORLEVEL! neq 0 (
-    echo WARNING: Hourly alerts failed >> "%LOG_FILE%"
-)
-
-echo Sending Discord notification... >> "%LOG_FILE%"
-"%PYTHON_EXE%" send_discord_notification.py >> "%LOG_FILE%" 2>&1
-if !ERRORLEVEL! neq 0 (
-    echo WARNING: Discord notification failed >> "%LOG_FILE%"
-)
+REM Disabled — Discord bot handles alerts and daily report now
+REM "%PYTHON_EXE%" send_hourly_alerts.py >> "%LOG_FILE%" 2>&1
+REM "%PYTHON_EXE%" send_discord_notification.py >> "%LOG_FILE%" 2>&1
 
 :end
 echo Run finished: %date% %time% >> "%LOG_FILE%"
