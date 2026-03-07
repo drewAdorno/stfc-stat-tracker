@@ -3,10 +3,11 @@ Discord bot for STFC Stat Tracker.
 Slash commands to query player stats from the SQLite database.
 """
 
+import asyncio
 import os
 import sys
 from collections import defaultdict
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import anthropic
@@ -413,6 +414,7 @@ async def on_ready():
     tree.copy_global_to(guild=GUILD_ID)
     await tree.sync(guild=GUILD_ID)
     print(f"Bot ready as {client.user} — synced slash commands")
+    client.loop.create_task(territory_reminder_loop())
 
 
 @client.event
@@ -421,6 +423,85 @@ async def on_message(message):
         return
     if client.user in message.mentions:
         await handle_mention(message)
+
+
+# --- Territory Reminders ---
+
+EST = timezone(timedelta(hours=-5))
+TERRITORY_CHANNEL_ID = 1452766274127138939
+
+# Takeover schedule (UTC times from territory.lol)
+# weekday: 0=Mon, 6=Sun
+TERRITORY_SCHEDULE = [
+    {"name": "Parturi", "tier": 1, "weekday_utc": 0, "hour_utc": 0},   # Mon 00:00 UTC = Sun 7:00 PM EST
+    {"name": "Asiti", "tier": 1, "weekday_utc": 2, "hour_utc": 20},    # Wed 20:00 UTC = Wed 3:00 PM EST
+    {"name": "Anzat", "tier": 2, "weekday_utc": 4, "hour_utc": 0},     # Fri 00:00 UTC = Thu 7:00 PM EST
+]
+
+_sent_reminders = set()
+
+
+def _next_takeover(sched, now_utc):
+    """Get the next takeover datetime in UTC for a territory."""
+    # Find next occurrence of this weekday+hour
+    days_ahead = sched["weekday_utc"] - now_utc.weekday()
+    if days_ahead < 0:
+        days_ahead += 7
+    target = now_utc.replace(hour=sched["hour_utc"], minute=0, second=0, microsecond=0) + timedelta(days=days_ahead)
+    if target <= now_utc:
+        target += timedelta(weeks=1)
+    return target
+
+
+async def territory_reminder_loop():
+    """Send territory takeover reminders at noon EST and 1 hour before."""
+    await client.wait_until_ready()
+    channel = client.get_channel(TERRITORY_CHANNEL_ID)
+    if not channel:
+        print(f"WARNING: Territory channel {TERRITORY_CHANNEL_ID} not found")
+        return
+
+    while not client.is_closed():
+        now_utc = datetime.now(timezone.utc)
+        now_est = now_utc.astimezone(EST)
+
+        for sched in TERRITORY_SCHEDULE:
+            takeover_utc = _next_takeover(sched, now_utc)
+            takeover_est = takeover_utc.astimezone(EST)
+            time_until = takeover_utc - now_utc
+            hours_until = time_until.total_seconds() / 3600
+            date_key = takeover_est.strftime("%Y-%m-%d")
+
+            # Noon EST reminder (day of takeover)
+            noon_key = f"{sched['name']}-noon-{date_key}"
+            if (noon_key not in _sent_reminders
+                    and now_est.date() == takeover_est.date()
+                    and now_est.hour >= 12
+                    and hours_until > 1):
+                time_str = takeover_est.strftime("%-I:%M %p EST")
+                await channel.send(
+                    f"⚔️ **Territory Reminder:** **{sched['name']}** takeover is today at **{time_str}**! "
+                    f"({hours_until:.0f} hours from now)"
+                )
+                _sent_reminders.add(noon_key)
+
+            # 1 hour before reminder
+            hour_key = f"{sched['name']}-1hr-{date_key}"
+            if (hour_key not in _sent_reminders
+                    and 0 < hours_until <= 1):
+                mins = int(time_until.total_seconds() / 60)
+                await channel.send(
+                    f"🚨 **{sched['name']}** takeover starts in **{mins} minutes**! Get ready!"
+                )
+                _sent_reminders.add(hour_key)
+
+        # Clean old reminder keys (older than 7 days)
+        cutoff = (now_utc - timedelta(days=7)).strftime("%Y-%m-%d")
+        _sent_reminders.difference_update(
+            {k for k in _sent_reminders if k.split("-")[-1] < cutoff}
+        )
+
+        await asyncio.sleep(60)  # Check every minute
 
 
 # --- /link ---
