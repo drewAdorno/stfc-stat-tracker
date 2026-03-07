@@ -1,7 +1,7 @@
 @echo off
 setlocal enabledelayedexpansion
 
-set PROJECT_DIR=C:\Users\drewa\Desktop\stfc_stat_tracker
+set PROJECT_DIR=C:\Users\drewa\Desktop\stfc\stfc_stat_tracker
 set PYTHON_EXE=C:\Users\drewa\AppData\Local\Programs\Python\Python311\python.exe
 set LOG_FILE=%PROJECT_DIR%\run_daily.log
 

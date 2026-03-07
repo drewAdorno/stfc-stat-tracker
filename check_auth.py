@@ -14,7 +14,7 @@ from pathlib import Path
 import requests
 
 _LOCAL_AUTH = Path(__file__).parent / "auth.json"
-_DEV_AUTH = Path("C:/Users/drewa/Desktop/stfc-api/auth.json")
+_DEV_AUTH = Path("C:/Users/drewa/Desktop/stfc/stfc-api/auth.json")
 AUTH_FILE = _LOCAL_AUTH if _LOCAL_AUTH.exists() else _DEV_AUTH
 
 
