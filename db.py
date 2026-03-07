@@ -87,6 +87,14 @@ CREATE TABLE IF NOT EXISTS daily_stat_changes (
     new_value   INTEGER,
     PRIMARY KEY (date, field)
 );
+
+CREATE TABLE IF NOT EXISTS alliance_inventory (
+    date        TEXT NOT NULL,
+    refid       INTEGER NOT NULL,
+    item_type   INTEGER NOT NULL,
+    count       INTEGER NOT NULL,
+    PRIMARY KEY (date, refid)
+);
 """
 
 
@@ -1371,3 +1379,118 @@ def get_player_name_history(conn, player_id):
         ORDER BY first_date
     """, (player_id,)).fetchall()
     return [(r[0], r[1], r[2]) for r in rows]
+
+
+# ---------------------------------------------------------------------------
+# Alliance Inventory
+# ---------------------------------------------------------------------------
+
+# Resource ID → display name mapping.
+# IDs come from the game's protobuf InventoryItem.commonParams.refId.
+RESOURCE_NAMES = {
+    2991010408: "Refined Isogen 1*",
+    2705205969: "Refined Isogen 2*",
+    563579678:  "Refined Isogen 3*",
+}
+
+
+def ingest_alliance_inventory(conn, inventory_json_path):
+    """Read alliance_inventory.json and insert a daily snapshot.
+
+    The JSON is written by stfc-mod whenever the Alliance Inventory screen
+    is opened in-game.  Format:
+        {"items": [{"refid": int, "type": int, "count": int}, ...],
+         "timestamp": epoch_seconds}
+
+    Only inserts if today's date doesn't already have data (idempotent).
+    Returns the number of items inserted, or 0 if skipped/missing.
+    """
+    inv_path = Path(inventory_json_path)
+    if not inv_path.exists():
+        return 0
+
+    with open(inv_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    items = data.get("items", [])
+    if not items:
+        return 0
+
+    # Use the file's timestamp to determine the date (EST)
+    ts = data.get("timestamp", 0)
+    if ts:
+        dt = datetime.fromtimestamp(ts, tz=EST)
+    else:
+        dt = now_est()
+    date_str = dt.strftime("%Y-%m-%d")
+
+    # Check if we already have data for today
+    existing = conn.execute(
+        "SELECT COUNT(*) FROM alliance_inventory WHERE date = ?",
+        (date_str,),
+    ).fetchone()[0]
+    if existing > 0:
+        return 0
+
+    for item in items:
+        conn.execute(
+            "INSERT OR REPLACE INTO alliance_inventory (date, refid, item_type, count) VALUES (?, ?, ?, ?)",
+            (date_str, item["refid"], item["type"], item["count"]),
+        )
+    conn.commit()
+    return len(items)
+
+
+def export_alliance_inventory_json(conn):
+    """Export alliance inventory history to data/alliance_inventory.json.
+
+    Output format:
+    {
+      "snapshots": [
+        {"date": "2026-03-05", "items": {"Refined Isogen 1*": 739000, ...}},
+        ...
+      ],
+      "latest": {"Refined Isogen 1*": 739000, ...},
+      "deltas": {"Refined Isogen 1*": 12000, ...}  // vs previous day
+    }
+    """
+    dates = conn.execute(
+        "SELECT DISTINCT date FROM alliance_inventory ORDER BY date"
+    ).fetchall()
+
+    if not dates:
+        return
+
+    snapshots = []
+    prev_items = {}
+    for (date,) in dates:
+        rows = conn.execute(
+            "SELECT refid, count FROM alliance_inventory WHERE date = ?",
+            (date,),
+        ).fetchall()
+        items = {}
+        for refid, count in rows:
+            name = RESOURCE_NAMES.get(refid, str(refid))
+            items[name] = count
+        snapshots.append({"date": date, "items": items})
+        prev_items = items
+
+    latest = snapshots[-1]["items"] if snapshots else {}
+    deltas = {}
+    if len(snapshots) >= 2:
+        prev = snapshots[-2]["items"]
+        for key, val in latest.items():
+            deltas[key] = val - prev.get(key, 0)
+        for key, val in prev.items():
+            if key not in latest:
+                deltas[key] = -val
+
+    out = {
+        "snapshots": snapshots,
+        "latest": latest,
+        "deltas": deltas,
+    }
+
+    out_path = DATA_DIR / "alliance_inventory.json"
+    with open(out_path, "w", encoding="utf-8") as f:
+        json.dump(out, f, indent=2, ensure_ascii=False)

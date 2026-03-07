@@ -28,6 +28,7 @@ import requests
 from db import (get_db, upsert_players, log_pull, now_est, export_latest_json,
                 export_history_json, export_server_alliances_json,
                 export_server_players_json, export_server_history_json,
+                ingest_alliance_inventory, export_alliance_inventory_json,
                 NCC_ALLIANCE_ID, _migrate_alliance_ids)
 
 # ---------------------------------------------------------------------------
@@ -37,7 +38,7 @@ from db import (get_db, upsert_players, log_pull, now_est, export_latest_json,
 PLATFORM_BASE = "https://cdn-nv3-live.startrek.digitgaming.com"
 # Auth file: check local project dir first, then Windows dev path
 _LOCAL_AUTH = Path(__file__).parent / "auth.json"
-_DEV_AUTH = Path("C:/Users/drewa/Desktop/stfc-api/auth.json")
+_DEV_AUTH = Path("C:/Users/drewa/Desktop/stfc/stfc-api/auth.json")
 AUTH_FILE = _LOCAL_AUTH if _LOCAL_AUTH.exists() else _DEV_AUTH
 MILITARY_MIGHT_CONFIG = "3fcdb730de6656735924fa085dffb74b1954bf19"
 RESOURCES_RAIDED_CONFIG = "e5422e292629984b1b3126b9aca593a2f7909a58"
@@ -690,6 +691,15 @@ def save_data(all_mapped, total_count):
 
     export_server_alliances_json(conn)
     safe_print(f"Exported {DATA_DIR / 'server_alliances.json'}")
+
+    _local_inv = BASE_DIR / "alliance_inventory.json"
+    _dev_inv = Path("C:/Users/drewa/Desktop/stfc/stfc-api/alliance_inventory.json")
+    inv_path = _local_inv if _local_inv.exists() else _dev_inv
+    inv_count = ingest_alliance_inventory(conn, inv_path)
+    if inv_count:
+        safe_print(f"Ingested {inv_count} alliance inventory items")
+    export_alliance_inventory_json(conn)
+    safe_print(f"Exported {DATA_DIR / 'alliance_inventory.json'}")
 
     export_server_players_json(conn)
     safe_print(f"Exported {DATA_DIR / 'server_players.json'}")

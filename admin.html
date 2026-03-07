@@ -244,6 +244,16 @@
   .player-link { color: #4dabf7; text-decoration: none; }
   .player-link:hover { text-decoration: underline; }
 
+  /* Inventory */
+  .inv-date { color: #636e7b; font-size: 0.85rem; margin-bottom: 10px; }
+  .inv-chart-section { margin-top: 16px; }
+  .inv-chart-section h3 { color: #e2e8f0; font-size: 0.95rem; margin-bottom: 10px; }
+  .spark-row { display: flex; align-items: center; gap: 10px; padding: 4px 0; }
+  .spark-label { width: 160px; font-size: 0.85rem; color: #c8d6e5; flex-shrink: 0; }
+  .spark-svg { width: 200px; height: 45px; flex-shrink: 0; }
+  .spark-val { font-size: 0.85rem; color: #e2e8f0; min-width: 60px; text-align: right; }
+  .spark-delta { font-size: 0.8rem; min-width: 60px; text-align: right; }
+
   /* Loading / Error */
   .loading {
     text-align: center;
@@ -293,7 +303,7 @@
   </div>
 
   <footer style="display:none" id="footer-el">
-    Data sourced from <a href="https://stfc.pro" target="_blank" rel="noopener">stfc.pro</a>
+    Data sourced from Scopely game APIs
     &middot; <a href="index.html">Main Dashboard</a>
   </footer>
 </div>
@@ -403,16 +413,19 @@
     const histP = fetch('data/history.json?t=' + Date.now())
       .then(r => { if (!r.ok) return []; return r.json(); })
       .catch(() => []);
+    const invP = fetch('data/alliance_inventory.json?t=' + Date.now())
+      .then(r => { if (!r.ok) return null; return r.json(); })
+      .catch(() => null);
 
-    Promise.all([dataP, histP])
-      .then(([data, hist]) => {
+    Promise.all([dataP, histP, invP])
+      .then(([data, hist, inv]) => {
         hist.sort((a, b) => a.date.localeCompare(b.date));
         const d = new Date(data.pulled_at);
         $('updated').textContent = 'Last updated: ' + d.toLocaleDateString('en-US', {
           year: 'numeric', month: 'short', day: 'numeric',
           hour: '2-digit', minute: '2-digit'
         });
-        render(data, hist);
+        render(data, hist, inv);
       })
       .catch(err => {
         $('content').innerHTML = `<div class="loading error">Failed to load data: ${esc(err.message)}</div>`;
@@ -432,29 +445,32 @@
     return best;
   }
 
-  function render(data, history) {
+  function render(data, history, inv) {
     const members = data.members || [];
     const latest = history.length ? history[history.length - 1] : null;
     const snap1 = getSnapshotDaysAgo(history, 1);
     const snap7 = getSnapshotDaysAgo(history, 7);
     let html = '';
 
-    // --- 1. Inactive Members ---
+    // --- 1. Alliance Inventory ---
+    html += renderAllianceInventory(inv);
+
+    // --- 2. Inactive Members ---
     html += renderInactive(members, history);
 
-    // --- 2. New Members ---
+    // --- 3. New Members ---
     html += renderNewMembers(members);
 
-    // --- 3. Members Who Left ---
+    // --- 4. Members Who Left ---
     html += renderLeftMembers(members, latest);
 
-    // --- 4. Lowest Contributors ---
+    // --- 5. Lowest Contributors ---
     html += renderLowestContributors(members, history);
 
-    // --- 5. Power Movers (7-Day) ---
+    // --- 6. Power Movers (7-Day) ---
     html += renderPowerMovers(members, snap7);
 
-    // --- 6. Rank Distribution ---
+    // --- 7. Rank Distribution ---
     html += renderRankDistribution(members);
 
     $('content').innerHTML = html;
@@ -689,6 +705,89 @@
       </div>`;
     }
     s += '</div></div>';
+    return s;
+  }
+
+  function renderAllianceInventory(inv) {
+    let s = '<div class="section"><div class="section-header">Alliance Inventory</div>';
+    if (!inv || !inv.latest || Object.keys(inv.latest).length === 0) {
+      s += '<div class="empty">No alliance inventory data yet. Open the Alliance Inventory screen in-game to capture a snapshot.</div>';
+      s += '</div>';
+      return s;
+    }
+
+    const snapshots = inv.snapshots || [];
+    const latestSnap = snapshots.length ? snapshots[snapshots.length - 1] : null;
+    const latestDate = latestSnap ? latestSnap.date : '';
+    const deltas = inv.deltas || {};
+
+    // Sort items by count descending
+    const items = Object.entries(inv.latest).sort((a, b) => b[1] - a[1]);
+
+    s += `<div class="inv-date">Latest snapshot: ${esc(latestDate)} &middot; ${items.length} items</div>`;
+    s += '<div class="table-wrap"><table><thead><tr>';
+    s += '<th>Item</th><th style="text-align:right">Quantity</th><th style="text-align:right">Daily Change</th>';
+    s += '</tr></thead><tbody>';
+    for (const [name, count] of items) {
+      const delta = deltas[name] || 0;
+      let deltaStr = '';
+      let deltaClass = 'delta-zero';
+      if (delta > 0) { deltaStr = '+' + formatAbbr(delta); deltaClass = 'delta-pos'; }
+      else if (delta < 0) { deltaStr = formatAbbr(delta); deltaClass = 'delta-neg'; }
+      else { deltaStr = '-'; }
+
+      s += `<tr>
+        <td>${esc(name)}</td>
+        <td style="text-align:right">${formatAbbr(count)}</td>
+        <td style="text-align:right"><span class="${deltaClass}">${deltaStr}</span></td>
+      </tr>`;
+    }
+    s += '</tbody></table></div>';
+
+    // Trend chart if we have multiple snapshots
+    if (snapshots.length >= 2) {
+      s += '<div class="inv-chart-section"><h3>Inventory Trends</h3>';
+      // Get all unique item names and find top 5 by latest count
+      const topItems = items.slice(0, 5).map(i => i[0]);
+      s += '<div class="inv-chart" id="inv-chart"></div>';
+      s += '</div>';
+
+      // Render sparklines after DOM update
+      setTimeout(() => {
+        const el = document.getElementById('inv-chart');
+        if (!el) return;
+        let chartHtml = '';
+        for (const itemName of topItems) {
+          const values = snapshots.map(snap => snap.items[itemName] || 0);
+          const max = Math.max(...values);
+          const min = Math.min(...values);
+          const range = max - min || 1;
+
+          const points = values.map((v, i) => {
+            const x = (i / (values.length - 1)) * 200;
+            const y = 40 - ((v - min) / range) * 35;
+            return `${x},${y}`;
+          }).join(' ');
+
+          const latest = values[values.length - 1];
+          const prev = values.length >= 2 ? values[values.length - 2] : latest;
+          const diff = latest - prev;
+          const cls = diff > 0 ? 'delta-pos' : (diff < 0 ? 'delta-neg' : 'delta-zero');
+
+          chartHtml += `<div class="spark-row">
+            <span class="spark-label">${esc(itemName)}</span>
+            <svg class="spark-svg" viewBox="0 0 200 45" preserveAspectRatio="none">
+              <polyline fill="none" stroke="#4dabf7" stroke-width="1.5" points="${points}"/>
+            </svg>
+            <span class="spark-val">${formatAbbr(latest)}</span>
+            <span class="${cls} spark-delta">${diff > 0 ? '+' : ''}${formatAbbr(diff)}</span>
+          </div>`;
+        }
+        el.innerHTML = chartHtml;
+      }, 0);
+    }
+
+    s += '</div>';
     return s;
   }
 

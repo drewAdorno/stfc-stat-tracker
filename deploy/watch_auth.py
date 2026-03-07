@@ -14,6 +14,11 @@ import sys
 import time
 from pathlib import Path
 
+# Hide console windows from SCP subprocess calls on Windows
+_SUBPROCESS_KWARGS = {}
+if sys.platform == "win32":
+    _SUBPROCESS_KWARGS["creationflags"] = subprocess.CREATE_NO_WINDOW
+
 PEM = Path("C:/Users/drewa/Downloads/STFC_pem.pem")
 EC2_HOST = "ubuntu@3.16.255.133"
 STATE_DIR = Path(__file__).parent.parent / "data"
@@ -39,6 +44,12 @@ WATCH_FILES = [
         "local": Path("C:/Users/drewa/Desktop/stfc/stfc-api/game_events.json"),
         "remote": f"{EC2_HOST}:/opt/stfc/data/game_events.json",
         "state": STATE_DIR / ".last_game_events_upload",
+    },
+    {
+        "name": "alliance_inventory.json",
+        "local": Path("C:/Users/drewa/Desktop/stfc/stfc-api/alliance_inventory.json"),
+        "remote": f"{EC2_HOST}:/opt/stfc/alliance_inventory.json",
+        "state": STATE_DIR / ".last_alliance_inventory_upload",
     },
 ]
 
@@ -74,7 +85,7 @@ def upload(entry):
     try:
         result = subprocess.run(
             ["scp", "-i", str(PEM), str(entry["local"]), entry["remote"]],
-            capture_output=True, text=True, timeout=30,
+            capture_output=True, text=True, timeout=30, **_SUBPROCESS_KWARGS,
         )
         if result.returncode == 0:
             mtime = get_mtime(entry["local"])
