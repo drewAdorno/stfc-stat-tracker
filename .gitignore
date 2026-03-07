@@ -25,3 +25,10 @@ data/game_news.json
 data/.last_game_news_upload
 data/game_events.json
 data/.last_game_events_upload
+data/.last_alliance_inventory_upload
+data/.last_auth_upload
+data/.scopely_migrated
+data/alliance_inventory.json
+data/stfc_local_backup.db
+data/stfc_prod.db
+deploy/upload_auth.sh
