@@ -78,11 +78,11 @@ def conn():
 
 class TestDiscordLinks:
     def test_link_and_get(self, conn):
-        link_discord(conn, "discord123", 1)
-        assert get_linked_player(conn, "discord123") == 1
+        link_discord(conn, "discord123", "1")
+        assert get_linked_player(conn, "discord123") == "1"
 
     def test_unlink(self, conn):
-        link_discord(conn, "discord123", 1)
+        link_discord(conn, "discord123", "1")
         assert unlink_discord(conn, "discord123") is True
         assert get_linked_player(conn, "discord123") is None
 
@@ -90,9 +90,9 @@ class TestDiscordLinks:
         assert unlink_discord(conn, "nobody") is False
 
     def test_relink_overwrites(self, conn):
-        link_discord(conn, "discord123", 1)
-        link_discord(conn, "discord123", 2)
-        assert get_linked_player(conn, "discord123") == 2
+        link_discord(conn, "discord123", "1")
+        link_discord(conn, "discord123", "2")
+        assert get_linked_player(conn, "discord123") == "2"
 
     def test_get_unlinked(self, conn):
         assert get_linked_player(conn, "discord123") is None
