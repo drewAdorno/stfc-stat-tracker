@@ -33,3 +33,5 @@ data/stfc_local_backup.db
 data/stfc_prod.db
 deploy/upload_auth.sh
 data/.last_bot_report_date
+data/.bot_territory_sent
+data/.bot_alerts_sent

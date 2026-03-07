@@ -4,6 +4,7 @@ Slash commands to query player stats from the SQLite database.
 """
 
 import asyncio
+import json
 import os
 import sys
 from collections import defaultdict
@@ -427,10 +428,9 @@ async def on_ready():
     tree.copy_global_to(guild=GUILD_ID)
     await tree.sync(guild=GUILD_ID)
     print(f"Bot ready as {client.user} — synced slash commands")
-    # Disabled until dedup is more robust — restarts cause duplicate messages
-    # client.loop.create_task(territory_reminder_loop())
-    # client.loop.create_task(alliance_alert_loop())
-    # client.loop.create_task(daily_report_loop())
+    client.loop.create_task(territory_reminder_loop())
+    client.loop.create_task(alliance_alert_loop())
+    client.loop.create_task(daily_report_loop())
 
 
 @client.event
@@ -447,6 +447,26 @@ EST = timezone(timedelta(hours=-5))
 TERRITORY_CHANNEL_ID = 1452766274127138939
 CHAT_CHANNEL_ID = 1452757187188490292
 ACTIVITY_CHANNEL_ID = 1479693128850997258
+_STATE_DIR = Path(__file__).parent / "data"
+
+
+def _load_state(filename, default=None):
+    """Load JSON state from a file in data/."""
+    path = _STATE_DIR / filename
+    if not path.exists():
+        return default if default is not None else {}
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except (json.JSONDecodeError, ValueError):
+        return default if default is not None else {}
+
+
+def _save_state(filename, data):
+    """Save JSON state to a file in data/."""
+    path = _STATE_DIR / filename
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(data, f)
 
 # Takeover schedule (UTC times from territory.lol)
 # weekday: 0=Mon, 6=Sun
@@ -456,12 +476,8 @@ TERRITORY_SCHEDULE = [
     {"name": "Anzat", "tier": 2, "weekday_utc": 4, "hour_utc": 0},     # Fri 00:00 UTC = Thu 7:00 PM EST
 ]
 
-_sent_reminders = set()
-
-
 def _next_takeover(sched, now_utc):
     """Get the next takeover datetime in UTC for a territory."""
-    # Find next occurrence of this weekday+hour
     days_ahead = sched["weekday_utc"] - now_utc.weekday()
     if days_ahead < 0:
         days_ahead += 7
@@ -482,6 +498,7 @@ async def territory_reminder_loop():
     while not client.is_closed():
         now_utc = datetime.now(timezone.utc)
         now_est = now_utc.astimezone(EST)
+        sent = set(_load_state(".bot_territory_sent", []))
 
         for sched in TERRITORY_SCHEDULE:
             takeover_utc = _next_takeover(sched, now_utc)
@@ -490,9 +507,8 @@ async def territory_reminder_loop():
             hours_until = time_until.total_seconds() / 3600
             date_key = takeover_est.strftime("%Y-%m-%d")
 
-            # Noon EST reminder (day of takeover)
             noon_key = f"{sched['name']}-noon-{date_key}"
-            if (noon_key not in _sent_reminders
+            if (noon_key not in sent
                     and now_est.date() == takeover_est.date()
                     and now_est.hour >= 12
                     and hours_until > 1):
@@ -501,25 +517,23 @@ async def territory_reminder_loop():
                     f"⚔️ **Territory Reminder:** **{sched['name']}** takeover is today at "
                     f"<t:{ts}:t> (<t:{ts}:R>)"
                 )
-                _sent_reminders.add(noon_key)
+                sent.add(noon_key)
 
-            # 1 hour before reminder
             hour_key = f"{sched['name']}-1hr-{date_key}"
-            if (hour_key not in _sent_reminders
+            if (hour_key not in sent
                     and 0 < hours_until <= 1):
                 ts = int(takeover_utc.timestamp())
                 await channel.send(
                     f"🚨 **{sched['name']}** takeover starts <t:{ts}:R>! Get ready!"
                 )
-                _sent_reminders.add(hour_key)
+                sent.add(hour_key)
 
-        # Clean old reminder keys (older than 7 days)
+        # Clean old keys (older than 7 days)
         cutoff = (now_utc - timedelta(days=7)).strftime("%Y-%m-%d")
-        _sent_reminders.difference_update(
-            {k for k in _sent_reminders if k.split("-")[-1] < cutoff}
-        )
+        sent = {k for k in sent if k.split("-")[-1] >= cutoff}
+        _save_state(".bot_territory_sent", sorted(sent))
 
-        await asyncio.sleep(60)  # Check every minute
+        await asyncio.sleep(60)
 
 
 # --- Alliance Alerts (joins, leaves, level-ups) ---
@@ -534,10 +548,6 @@ LEVEL_UP_MESSAGES = [
     "📈 Stonks! Level goes up!",
 ]
 
-_last_alert_dates = None
-_sent_alert_keys = set()
-
-
 def _detect_changes(prev_members, curr_members):
     """Compare two member dicts and return joined, left, level_ups lists."""
     prev_ids = set(prev_members.keys())
@@ -545,13 +555,11 @@ def _detect_changes(prev_members, curr_members):
 
     joined = []
     for mid in sorted(curr_ids - prev_ids):
-        m = curr_members[mid]
-        joined.append(m)
+        joined.append(curr_members[mid])
 
     left = []
     for mid in sorted(prev_ids - curr_ids):
-        m = prev_members[mid]
-        left.append(m)
+        left.append(prev_members[mid])
 
     level_ups = []
     for mid in sorted(prev_ids & curr_ids):
@@ -569,7 +577,6 @@ def _detect_changes(prev_members, curr_members):
 
 async def alliance_alert_loop():
     """Check for joins, leaves, level-ups every 5 minutes."""
-    global _last_alert_dates, _sent_alert_keys
     await client.wait_until_ready()
 
     chat_channel = client.get_channel(CHAT_CHANNEL_ID)
@@ -587,10 +594,12 @@ async def alliance_alert_loop():
                 await asyncio.sleep(300)
                 continue
 
+            state = _load_state(".bot_alerts_sent", {"dates": None, "sent": []})
             dates_key = f"{prev_date}:{curr_date}"
-            if dates_key != _last_alert_dates:
-                _last_alert_dates = dates_key
-                _sent_alert_keys = set()
+            if state.get("dates") != dates_key:
+                state = {"dates": dates_key, "sent": []}
+
+            sent = set(state["sent"])
 
             prev_members = get_members_for_date(conn, prev_date)
             curr_members = get_members_for_date(conn, curr_date)
@@ -601,11 +610,11 @@ async def alliance_alert_loop():
                 continue
 
             changes = _detect_changes(prev_members, curr_members)
+            changed = False
 
-            # Joins → chat + activity
             for m in changes["joined"]:
                 key = f"join:{m['name']}"
-                if key in _sent_alert_keys:
+                if key in sent:
                     continue
                 power = _format_abbr(m.get("power", 0))
                 embed = discord.Embed(
@@ -615,12 +624,12 @@ async def alliance_alert_loop():
                 )
                 await chat_channel.send(embed=embed)
                 await activity_channel.send(embed=embed)
-                _sent_alert_keys.add(key)
+                sent.add(key)
+                changed = True
 
-            # Leaves → activity only
             for m in changes["left"]:
                 key = f"left:{m['name']}"
-                if key in _sent_alert_keys:
+                if key in sent:
                     continue
                 power = _format_abbr(m.get("power", 0))
                 embed = discord.Embed(
@@ -629,12 +638,12 @@ async def alliance_alert_loop():
                     color=0xFF6B6B,
                 )
                 await activity_channel.send(embed=embed)
-                _sent_alert_keys.add(key)
+                sent.add(key)
+                changed = True
 
-            # Level-ups → chat
             for m in changes["level_ups"]:
                 key = f"levelup:{m['name']}:{m['new_level']}"
-                if key in _sent_alert_keys:
+                if key in sent:
                     continue
                 embed = discord.Embed(
                     title="⬆️ Level Up",
@@ -642,12 +651,16 @@ async def alliance_alert_loop():
                     color=0x4DABF7,
                 )
                 await chat_channel.send(embed=embed)
-                _sent_alert_keys.add(key)
+                sent.add(key)
+                changed = True
+
+            if changed:
+                _save_state(".bot_alerts_sent", {"dates": dates_key, "sent": sorted(sent)})
 
         except Exception as e:
             print(f"Alliance alert error: {e}")
 
-        await asyncio.sleep(300)  # Check every 5 minutes
+        await asyncio.sleep(300)
 
 
 # --- Daily Report ---
