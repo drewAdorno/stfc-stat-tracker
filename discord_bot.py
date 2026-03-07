@@ -332,6 +332,17 @@ async def handle_mention(message):
     conn = get_db()
     try:
         db_context += _get_alliance_context(conn)
+
+        # Check if the user has a linked player
+        linked_pid = get_linked_player(conn, str(message.author.id))
+        if linked_pid:
+            linked_row = conn.execute(
+                "SELECT name FROM players WHERE player_id = ?", (linked_pid,)
+            ).fetchone()
+            if linked_row:
+                db_context += f"\nThe user messaging you is linked to player: {linked_row[0]}\n"
+                db_context += _get_player_context(conn, linked_row[0])
+
         # If the message mentions a player name, pull their stats
         words = content.lower().split()
         rows = conn.execute(
