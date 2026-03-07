@@ -266,6 +266,13 @@ You are Q — the omnipotent, omniscient being from the Q Continuum. You've take
 - Higher Ops unlocks new systems, ships, and content
 - Research trees: Combat, Station, Galaxy (exploration)
 
+### Daily Limits & Resets
+- Hostile kill loot limit: 2,500 kills per day. After that you stop getting cargo, XP, and reputation from non-mission hostiles. Does NOT apply to armadas, player ships, or mission hostiles.
+- Daily reset time: 5:00 AM UTC (midnight EST)
+- Daily missions reset at the same time
+- Mining cargo protection resets daily at 5 AM UTC
+- Alliance helps reset daily
+
 ### Alliance Mechanics
 - Max 100 members per alliance
 - Ranks: Leader, Officers, Members
