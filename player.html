@@ -110,6 +110,16 @@
     margin-top: 2px;
     min-height: 1.2em;
   }
+  .card .ops-rank {
+    font-size: 0.7rem;
+    color: #636e7b;
+    margin-top: 4px;
+    line-height: 1.3;
+  }
+  .card .ops-rank .rank-num {
+    color: #4dabf7;
+    font-weight: 600;
+  }
 
   /* Delta colors */
   .delta-pos { color: #34d399; }
@@ -373,6 +383,23 @@
   let chart = null;
   let currentStat = 'power';
   let isNccPlayer = true; // set during render
+  let opsRanks = {};  // { statKey: { rank, total } }
+
+  function computeOpsRanks(playerLevel, playerId, allPlayers) {
+    const lvl = typeof playerLevel === 'number' ? playerLevel : parseAbbr(playerLevel);
+    const sameLvl = allPlayers.filter(p => (p.level || 0) === lvl);
+    if (sameLvl.length === 0) return;
+    const me = sameLvl.find(p => p.id === playerId);
+    if (!me) return;
+    const rankStats = ['power', 'helps', 'rss_contrib', 'iso_contrib',
+      'players_killed', 'hostiles_killed', 'resources_mined', 'resources_raided'];
+    for (const key of rankStats) {
+      const myVal = me[key] || 0;
+      // Count how many players have a strictly higher value
+      const above = sameLvl.filter(p => (p[key] || 0) > myVal).length;
+      opsRanks[key] = { rank: above + 1, total: sameLvl.length };
+    }
+  }
 
   function renderChart(dates, player, statKey) {
     const values = dates.map(d => d.value);
@@ -442,13 +469,18 @@
     return points;
   }
 
-  function render(player, history, peerMembers) {
+  function render(player, history, peerMembers, allServerPlayers) {
     if (!player) {
       $('player-header').innerHTML = '';
       $('content').innerHTML = '<div class="loading error">Player not found in current data.</div>';
       return;
     }
     const members = peerMembers;
+
+    // Compute ops-level ranks if server data available
+    if (allServerPlayers && allServerPlayers.length > 0) {
+      computeOpsRanks(parseAbbr(player.level), playerId, allServerPlayers);
+    }
 
     // Collect name history from snapshots
     const nameHistory = [];
@@ -520,7 +552,12 @@
     }
 
     function card(label, value, field) {
-      return `<div class="card"><div class="label">${label}</div><div class="value">${esc(value)}</div><div class="delta">${deltaHtml(value, field)}</div></div>`;
+      let rankHtml = '';
+      const r = opsRanks[field];
+      if (r) {
+        rankHtml = `<div class="ops-rank"><span class="rank-num">#${r.rank}</span> of ${r.total} at Ops ${esc(player.level)}</div>`;
+      }
+      return `<div class="card"><div class="label">${label}</div><div class="value">${esc(value)}</div><div class="delta">${deltaHtml(value, field)}</div>${rankHtml}</div>`;
     }
 
     let html = '';
@@ -659,7 +696,8 @@
         // NCC member — use NCC data as before
         isNccPlayer = true;
         const history = nccHistory.sort((a, b) => a.date.localeCompare(b.date));
-        render(nccPlayer, history, nccMembers);
+        const allPlayers = serverPlayersData ? serverPlayersData.players : [];
+        render(nccPlayer, history, nccMembers, allPlayers);
       } else if (serverPlayersData) {
         // Non-NCC player — use server-wide data
         isNccPlayer = false;
@@ -716,7 +754,7 @@
           .catch(() => [])
           .then(serverHistory => {
             const history = serverHistory.sort((a, b) => a.date.localeCompare(b.date));
-            render(player, history, peers);
+            render(player, history, peers, serverPlayersData.players);
           });
       } else {
         $('player-header').innerHTML = '';
