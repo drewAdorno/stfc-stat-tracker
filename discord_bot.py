@@ -495,43 +495,54 @@ async def territory_reminder_loop():
         print(f"WARNING: Territory channel {TERRITORY_CHANNEL_ID} not found")
         return
 
+    # In-memory dedup survives file I/O failures
+    memory_sent = set()
+
     while not client.is_closed():
-        now_utc = datetime.now(timezone.utc)
-        now_est = now_utc.astimezone(EST)
-        sent = set(_load_state(".bot_territory_sent", []))
+        try:
+            now_utc = datetime.now(timezone.utc)
+            now_est = now_utc.astimezone(EST)
+            sent = set(_load_state(".bot_territory_sent", []))
+            sent |= memory_sent  # merge file + memory dedup
 
-        for sched in TERRITORY_SCHEDULE:
-            takeover_utc = _next_takeover(sched, now_utc)
-            takeover_est = takeover_utc.astimezone(EST)
-            time_until = takeover_utc - now_utc
-            hours_until = time_until.total_seconds() / 3600
-            date_key = takeover_est.strftime("%Y-%m-%d")
+            for sched in TERRITORY_SCHEDULE:
+                takeover_utc = _next_takeover(sched, now_utc)
+                takeover_est = takeover_utc.astimezone(EST)
+                time_until = takeover_utc - now_utc
+                hours_until = time_until.total_seconds() / 3600
+                date_key = takeover_est.strftime("%Y-%m-%d")
 
-            noon_key = f"{sched['name']}-noon-{date_key}"
-            if (noon_key not in sent
-                    and now_est.date() == takeover_est.date()
-                    and now_est.hour >= 12
-                    and hours_until > 1):
-                ts = int(takeover_utc.timestamp())
-                await channel.send(
-                    f"⚔️ **Territory Reminder:** **{sched['name']}** takeover is today at "
-                    f"<t:{ts}:t> (<t:{ts}:R>)"
-                )
-                sent.add(noon_key)
+                noon_key = f"{sched['name']}-noon-{date_key}"
+                if (noon_key not in sent
+                        and now_est.date() == takeover_est.date()
+                        and now_est.hour >= 12
+                        and hours_until > 1):
+                    ts = int(takeover_utc.timestamp())
+                    memory_sent.add(noon_key)  # mark before send so crash can't resend
+                    await channel.send(
+                        f"⚔️ **Territory Reminder:** **{sched['name']}** takeover is today at "
+                        f"<t:{ts}:t> (<t:{ts}:R>)"
+                    )
+                    sent.add(noon_key)
 
-            hour_key = f"{sched['name']}-1hr-{date_key}"
-            if (hour_key not in sent
-                    and 0 < hours_until <= 1):
-                ts = int(takeover_utc.timestamp())
-                await channel.send(
-                    f"🚨 **{sched['name']}** takeover starts <t:{ts}:R>! Get ready!"
-                )
-                sent.add(hour_key)
+                hour_key = f"{sched['name']}-1hr-{date_key}"
+                if (hour_key not in sent
+                        and 0 < hours_until <= 1):
+                    ts = int(takeover_utc.timestamp())
+                    memory_sent.add(hour_key)
+                    await channel.send(
+                        f"🚨 **{sched['name']}** takeover starts <t:{ts}:R>! Get ready!"
+                    )
+                    sent.add(hour_key)
 
-        # Clean old keys (older than 7 days)
-        cutoff = (now_utc - timedelta(days=7)).strftime("%Y-%m-%d")
-        sent = {k for k in sent if "-".join(k.split("-")[-3:]) >= cutoff}
-        _save_state(".bot_territory_sent", sorted(sent))
+            # Clean old keys (older than 7 days)
+            cutoff = (now_utc - timedelta(days=7)).strftime("%Y-%m-%d")
+            sent = {k for k in sent if "-".join(k.split("-")[-3:]) >= cutoff}
+            memory_sent = {k for k in memory_sent if "-".join(k.split("-")[-3:]) >= cutoff}
+            _save_state(".bot_territory_sent", sorted(sent))
+
+        except Exception as e:
+            print(f"Territory reminder error: {e}")
 
         await asyncio.sleep(60)
 
@@ -585,6 +596,8 @@ async def alliance_alert_loop():
         print(f"WARNING: Alert channels not found (chat={CHAT_CHANNEL_ID}, activity={ACTIVITY_CHANNEL_ID})")
         return
 
+    MAX_ALERTS_PER_CYCLE = 15  # circuit breaker: skip if too many changes (likely bad data)
+
     while not client.is_closed():
         try:
             conn = get_db()
@@ -610,12 +623,20 @@ async def alliance_alert_loop():
                 continue
 
             changes = _detect_changes(prev_members, curr_members)
-            changed = False
 
-            for m in changes["joined"]:
+            # Count unsent alerts; skip cycle if too many (likely bad data)
+            unsent_joins = [m for m in changes["joined"] if f"join:{m['name']}" not in sent]
+            unsent_lefts = [m for m in changes["left"] if f"left:{m['name']}" not in sent]
+            unsent_lvlups = [m for m in changes["level_ups"] if f"levelup:{m['name']}:{m['new_level']}" not in sent]
+            total_unsent = len(unsent_joins) + len(unsent_lefts) + len(unsent_lvlups)
+
+            if total_unsent > MAX_ALERTS_PER_CYCLE:
+                print(f"Alliance alerts: {total_unsent} unsent alerts exceeds cap of {MAX_ALERTS_PER_CYCLE}, skipping (likely bad data)")
+                await asyncio.sleep(300)
+                continue
+
+            for m in unsent_joins:
                 key = f"join:{m['name']}"
-                if key in sent:
-                    continue
                 power = _format_abbr(m.get("power", 0))
                 embed = discord.Embed(
                     title="✅ Member Joined",
@@ -625,12 +646,10 @@ async def alliance_alert_loop():
                 await chat_channel.send(embed=embed)
                 await activity_channel.send(embed=embed)
                 sent.add(key)
-                changed = True
+                _save_state(".bot_alerts_sent", {"dates": dates_key, "sent": sorted(sent)})
 
-            for m in changes["left"]:
+            for m in unsent_lefts:
                 key = f"left:{m['name']}"
-                if key in sent:
-                    continue
                 power = _format_abbr(m.get("power", 0))
                 embed = discord.Embed(
                     title="🚪 Member Left",
@@ -639,12 +658,10 @@ async def alliance_alert_loop():
                 )
                 await activity_channel.send(embed=embed)
                 sent.add(key)
-                changed = True
+                _save_state(".bot_alerts_sent", {"dates": dates_key, "sent": sorted(sent)})
 
-            for m in changes["level_ups"]:
+            for m in unsent_lvlups:
                 key = f"levelup:{m['name']}:{m['new_level']}"
-                if key in sent:
-                    continue
                 embed = discord.Embed(
                     title="⬆️ Level Up",
                     description=f"**{m['name']}** — Lv{m['old_level']} → Lv{m['new_level']}\n\n{random.choice(LEVEL_UP_MESSAGES)}",
@@ -652,9 +669,6 @@ async def alliance_alert_loop():
                 )
                 await chat_channel.send(embed=embed)
                 sent.add(key)
-                changed = True
-
-            if changed:
                 _save_state(".bot_alerts_sent", {"dates": dates_key, "sent": sorted(sent)})
 
         except Exception as e:
@@ -747,6 +761,9 @@ async def daily_report_loop():
 
         if now.hour >= 12 and _load_last_report_date() != today:
             try:
+                # Mark as sent FIRST to prevent spam on send failure
+                _save_last_report_date(today)
+
                 conn = get_db()
                 prev_date, curr_date = get_latest_two_dates(conn)
                 if not curr_date:
@@ -819,8 +836,6 @@ async def daily_report_loop():
                 # Inventory to territory channel
                 if inv_embed and territory_channel:
                     await territory_channel.send(embed=inv_embed)
-
-                _save_last_report_date(today)
 
             except Exception as e:
                 print(f"Daily report error: {e}")
