@@ -530,7 +530,7 @@ async def territory_reminder_loop():
 
         # Clean old keys (older than 7 days)
         cutoff = (now_utc - timedelta(days=7)).strftime("%Y-%m-%d")
-        sent = {k for k in sent if k.split("-")[-1] >= cutoff}
+        sent = {k for k in sent if "-".join(k.split("-")[-3:]) >= cutoff}
         _save_state(".bot_territory_sent", sorted(sent))
 
         await asyncio.sleep(60)
