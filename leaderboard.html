@@ -351,6 +351,7 @@
   }
   .badge-hot { background: #7f1d1d; color: #fca5a5; }
   .badge-warm { background: #78350f; color: #fcd34d; }
+  .badge-cool { background: #1a3a2a; color: #86efac; }
   .badge-cold { background: #1e3a5f; color: #93c5fd; }
 
   /* Result count */
@@ -537,7 +538,8 @@
 
   // Precomputed data
   let allianceMemberCounts = {};
-  let avgPowerDelta7d = 0;
+  let allianceAvgActivity = {};
+  let avgActivityScore = 0;
 
   const DELTA_FIELDS = [
     'level', 'power', 'helps', 'rss_contrib', 'iso_contrib',
@@ -572,14 +574,32 @@
       }
     }
 
-    // Average power delta for "high activity" filter
-    let totalDelta = 0;
-    let count = 0;
+    // Average activity score per alliance (for weak/inactive alliance detection)
+    allianceAvgActivity = {};
+    const allianceActivitySums = {};
+    const allianceActivityCounts = {};
     for (const p of playerData.players) {
-      const d = p.power_delta_7d || 0;
-      if (d > 0) { totalDelta += d; count++; }
+      if (p.alliance_tag) {
+        const a = p.activity_score || 0;
+        allianceActivitySums[p.alliance_tag] = (allianceActivitySums[p.alliance_tag] || 0) + a;
+        allianceActivityCounts[p.alliance_tag] = (allianceActivityCounts[p.alliance_tag] || 0) + 1;
+      }
     }
-    avgPowerDelta7d = count > 0 ? totalDelta / count : 0;
+    for (const tag in allianceActivitySums) {
+      allianceAvgActivity[tag] = allianceActivitySums[tag] / allianceActivityCounts[tag];
+    }
+
+    // Server-wide average activity score
+    {
+      let totalActivity = 0;
+      let actCount = 0;
+      for (const p of playerData.players) {
+        const a = p.activity_score || 0;
+        if (a > 0) { totalActivity += a; actCount++; }
+      }
+      avgActivityScore = actCount > 0 ? totalActivity / actCount : 0;
+    }
+
   }
 
   function renderPage() {
@@ -803,20 +823,27 @@
 
   // ===== TAB 2: Recruiting / Sniping Board =====
   function computeRecruitScore(p) {
-    // Gather all players' power deltas and levels for percentile calculation
-    // (uses cached values computed once)
-    const powerDelta = p[getDeltaKey('power', 7)] || 0;
-    const powerPct = powerDelta > 0 ? Math.min(powerDelta / (avgPowerDelta7d * 3), 1) : 0;
-    const levelPct = Math.min((p.level || 0) / 50, 1);
-    const noAllianceBonus = (!p.alliance_tag || p.alliance_tag === '') ? 1 : 0;
-    const movedBonus = p.moved ? 1 : 0;
+    const activityPct = Math.min((p.activity_score || 0) / 100, 1);
 
-    return (powerPct * 0.4) + (levelPct * 0.3) + (noAllianceBonus * 0.2) + (movedBonus * 0.1);
+    // Availability: no alliance = 1.0, weak alliance scales up, strong alliance = 0.0
+    let availability = 0;
+    if (!p.alliance_tag || p.alliance_tag === '') {
+      availability = 1;
+    } else {
+      const memberCount = allianceMemberCounts[p.alliance_tag] || 0;
+      const allyAvgActivity = allianceAvgActivity[p.alliance_tag] || 0;
+      const smallPct = Math.max(0, 1 - (memberCount / 20));
+      const inactivePct = allyAvgActivity < avgActivityScore ? 1 - Math.max(0, allyAvgActivity / avgActivityScore) : 0;
+      availability = Math.max(smallPct, inactivePct);
+    }
+
+    return (activityPct * 0.6) + (availability * 0.4);
   }
 
   function scoreBadge(score) {
     if (score >= 0.6) return '<span class="badge badge-hot">HOT</span>';
-    if (score >= 0.3) return '<span class="badge badge-warm">WARM</span>';
+    if (score >= 0.45) return '<span class="badge badge-warm">WARM</span>';
+    if (score >= 0.3) return '<span class="badge badge-cool">COOL</span>';
     return '<span class="badge badge-cold">COLD</span>';
   }
 
@@ -824,9 +851,8 @@
   function testNoAlliance(p) { return !p.alliance_tag || p.alliance_tag === ''; }
   function testSmallAlliance(p) { return p.alliance_tag && (allianceMemberCounts[p.alliance_tag] || 0) < 10; }
   function testRecentlyMoved(p) { return p.moved === true; }
-  function testHighActivity(p, period) {
-    const dk = getDeltaKey('power', period);
-    return (p[dk] || 0) > avgPowerDelta7d;
+  function testHighActivity(p) {
+    return (p.activity_score || 0) > avgActivityScore;
   }
   function testHighLevel(p, minLevel) { return (p.level || 0) >= minLevel; }
 
@@ -839,7 +865,7 @@
       noAlliance:    basePlayers.filter(p => testNoAlliance(p)).length,
       smallAlliance: basePlayers.filter(p => testSmallAlliance(p)).length,
       recentlyMoved: basePlayers.filter(p => testRecentlyMoved(p)).length,
-      highActivity:  basePlayers.filter(p => testHighActivity(p, recPeriod)).length,
+      highActivity:  basePlayers.filter(p => testHighActivity(p)).length,
       highLevel:     basePlayers.filter(p => testHighLevel(p, recMinLevel)).length,
     };
 
@@ -849,7 +875,7 @@
     if (recFilters.noAlliance) players = players.filter(p => testNoAlliance(p));
     if (recFilters.smallAlliance) players = players.filter(p => testSmallAlliance(p));
     if (recFilters.recentlyMoved) players = players.filter(p => testRecentlyMoved(p));
-    if (recFilters.highActivity) players = players.filter(p => testHighActivity(p, recPeriod));
+    if (recFilters.highActivity) players = players.filter(p => testHighActivity(p));
     if (recFilters.highLevel) players = players.filter(p => testHighLevel(p, recMinLevel));
     if (recMinPower > 0) players = players.filter(p => (p.power || 0) >= recMinPower);
 
