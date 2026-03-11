@@ -4,218 +4,660 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NCC Event Calendar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #07111f;
+    --panel: rgba(10, 20, 37, 0.88);
+    --panel-strong: rgba(16, 29, 50, 0.96);
+    --border: rgba(120, 154, 195, 0.18);
+    --text: #e7eefb;
+    --muted: #8fa2bf;
+    --dim: #60738f;
+    --cyan: #71d7ff;
+    --gold: #ffd36a;
+    --green: #73f0b8;
+    --pink: #ff8ee3;
+    --shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    background: #0a0e17;
-    color: #c8d6e5;
+    font-family: 'Instrument Sans', sans-serif;
+    color: var(--text);
     min-height: 100vh;
     line-height: 1.5;
+    background:
+      radial-gradient(circle at 15% 20%, rgba(63, 140, 255, 0.18), transparent 34%),
+      radial-gradient(circle at 85% 18%, rgba(255, 211, 106, 0.14), transparent 28%),
+      radial-gradient(circle at 50% 100%, rgba(53, 120, 201, 0.14), transparent 32%),
+      linear-gradient(180deg, #05101d 0%, #091625 38%, #07111f 100%);
   }
 
-  .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.24;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 28px 28px;
+    mask-image: linear-gradient(180deg, rgba(0,0,0,0.7), transparent 90%);
+  }
+
+  .container {
+    width: min(1520px, calc(100vw - 32px));
+    margin: 0 auto;
+    padding: 24px 0 44px;
+  }
 
   header {
-    text-align: center;
-    padding: 30px 0 20px;
-    border-bottom: 1px solid #1a2332;
-    margin-bottom: 24px;
+    position: relative;
+    padding: 34px 32px 30px;
+    margin-bottom: 18px;
+    border: 1px solid var(--border);
+    border-radius: 28px;
+    overflow: hidden;
+    background:
+      linear-gradient(135deg, rgba(10, 24, 43, 0.94), rgba(11, 23, 38, 0.82)),
+      var(--panel-strong);
+    box-shadow: var(--shadow);
   }
-  header h1 { font-size: 1.8rem; color: #e2e8f0; letter-spacing: 1px; }
-  header h1 span { color: #4dabf7; }
+
+  header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(125deg, rgba(113, 215, 255, 0.12), transparent 35%),
+      linear-gradient(315deg, rgba(255, 211, 106, 0.09), transparent 34%);
+    pointer-events: none;
+  }
+
+  .kicker {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+    padding: 7px 12px;
+    border: 1px solid rgba(113, 215, 255, 0.24);
+    border-radius: 999px;
+    color: var(--cyan);
+    font-family: 'Chakra Petch', sans-serif;
+    font-size: 0.82rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    background: rgba(8, 20, 36, 0.5);
+  }
+
+  .hero-grid {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) minmax(320px, 0.9fr);
+    gap: 24px;
+    align-items: end;
+  }
+
+  h1 {
+    font-family: 'Chakra Petch', sans-serif;
+    font-size: clamp(2.2rem, 4.5vw, 4.25rem);
+    line-height: 0.95;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  h1 span { color: var(--cyan); }
+
+  .hero-copy p {
+    max-width: 760px;
+    color: var(--muted);
+    font-size: 1rem;
+  }
+
+  .hero-side {
+    display: grid;
+    gap: 12px;
+  }
+
+  .signal-card {
+    padding: 16px 18px;
+    border-radius: 22px;
+    border: 1px solid var(--border);
+    background: rgba(7, 16, 29, 0.72);
+    backdrop-filter: blur(12px);
+  }
+
+  .signal-label {
+    color: var(--dim);
+    font-size: 0.74rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-bottom: 6px;
+  }
+
+  .signal-value {
+    font-family: 'Chakra Petch', sans-serif;
+    font-size: 1.15rem;
+    color: var(--text);
+  }
 
   nav {
     display: flex;
     justify-content: center;
-    gap: 6px;
-    margin-bottom: 24px;
-  }
-  nav a {
-    background: #111827;
-    border: 1px solid #1e2d3d;
-    color: #8899aa;
-    padding: 6px 16px;
-    border-radius: 6px;
-    text-decoration: none;
-    font-size: 0.85rem;
-    transition: all 0.15s;
-  }
-  nav a:hover { border-color: #4dabf7; color: #c8d6e5; }
-  nav a.active { background: #4dabf7; color: #0a0e17; border-color: #4dabf7; font-weight: 600; }
-
-  /* Month nav */
-  .month-nav {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 16px;
-    margin-bottom: 20px;
-  }
-  .month-nav button {
-    background: #111827;
-    border: 1px solid #1e2d3d;
-    color: #8899aa;
-    padding: 6px 14px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    transition: all 0.15s;
-  }
-  .month-nav button:hover { border-color: #4dabf7; color: #c8d6e5; }
-  .month-label { font-size: 1.2rem; font-weight: 600; color: #e2e8f0; min-width: 200px; text-align: center; }
-
-  /* Calendar grid */
-  .cal-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 1px;
-    background: #1a2332;
-    border: 1px solid #1a2332;
-    border-radius: 10px;
-    overflow: hidden;
-  }
-  .cal-header {
-    background: #111827;
-    padding: 10px 4px;
-    text-align: center;
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: #4dabf7;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
-  .cal-day {
-    background: #0d1117;
-    min-height: 100px;
-    padding: 4px;
-    position: relative;
-    vertical-align: top;
-  }
-  .cal-day.other-month { background: #080b11; }
-  .cal-day.other-month .day-num { color: #2a3444; }
-  .cal-day.today { background: #0f1a2e; }
-  .cal-day.today .day-num { color: #4dabf7; font-weight: 700; }
-  .day-num {
-    font-size: 0.75rem;
-    color: #5a6a7a;
-    padding: 2px 4px;
-    display: block;
-    margin-bottom: 2px;
-  }
-
-  /* Event bars */
-  .ev-bar {
-    display: block;
-    font-size: 0.6rem;
-    padding: 1px 4px;
-    margin: 1px 0;
-    border-radius: 3px;
-    color: #fff;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    cursor: default;
-    line-height: 1.4;
-    font-weight: 500;
-  }
-  .ev-bar.cat-standard { background: #2980b9; }
-  .ev-bar.cat-leaderboard { background: #8e44ad; }
-  .ev-bar.cat-daily { background: #27ae60; }
-  .ev-bar.cat-battlepass { background: #d35400; }
-  .ev-bar.cat-alliance { background: #c0392b; }
-  .ev-bar.cat-other { background: #34495e; }
-  .ev-bar.cross-server { border-left: 3px solid #f1c40f; }
-  .ev-bar.start { border-radius: 3px 0 0 3px; margin-right: -1px; }
-  .ev-bar.end { border-radius: 0 3px 3px 0; margin-left: -1px; }
-  .ev-bar.mid { border-radius: 0; margin-left: -1px; margin-right: -1px; }
-  .ev-bar.single { border-radius: 3px; }
-
-  /* Event list */
-  .event-list {
-    margin-top: 24px;
-    background: #111827;
-    border: 1px solid #1e2d3d;
-    border-radius: 10px;
-    overflow: hidden;
-  }
-  .event-list h2 {
-    padding: 14px 18px;
-    font-size: 0.95rem;
-    color: #e2e8f0;
-    border-bottom: 1px solid #1e2d3d;
-  }
-  .ev-row {
-    display: grid;
-    grid-template-columns: 8px 1fr auto;
-    gap: 12px;
-    align-items: center;
-    padding: 10px 18px;
-    border-bottom: 1px solid #0d1117;
-    font-size: 0.85rem;
-  }
-  .ev-row:last-child { border-bottom: none; }
-  .ev-dot { width: 8px; height: 8px; border-radius: 50%; }
-  .ev-dot.cat-standard { background: #2980b9; }
-  .ev-dot.cat-leaderboard { background: #8e44ad; }
-  .ev-dot.cat-daily { background: #27ae60; }
-  .ev-dot.cat-battlepass { background: #d35400; }
-  .ev-dot.cat-alliance { background: #c0392b; }
-  .ev-dot.cat-other { background: #34495e; }
-  .ev-name { color: #c8d6e5; }
-  .ev-name .badge {
-    display: inline-block;
-    font-size: 0.65rem;
-    padding: 1px 5px;
-    border-radius: 3px;
-    margin-left: 6px;
-    vertical-align: middle;
-  }
-  .badge.cat-label { background: #ffffff11; color: #8899aa; border: 1px solid #ffffff22; }
-  .badge.cross { background: #f1c40f22; color: #f1c40f; border: 1px solid #f1c40f44; }
-  .ev-dates { color: #5a6a7a; font-size: 0.8rem; white-space: nowrap; }
-
-  .no-events { padding: 40px; text-align: center; color: #4a5568; }
-  .status-bar { text-align: center; color: #4a5568; font-size: 0.8rem; margin-bottom: 16px; }
-
-  /* Legend */
-  .legend {
-    display: flex;
-    justify-content: center;
-    gap: 16px;
-    margin-top: 16px;
+    gap: 8px;
     flex-wrap: wrap;
+    margin: 0 0 18px;
   }
-  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: #5a6a7a; }
-  .legend-color { width: 12px; height: 12px; border-radius: 3px; }
+
+  nav a {
+    padding: 9px 16px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: rgba(11, 22, 39, 0.78);
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.88rem;
+    transition: 0.16s ease;
+  }
+
+  nav a:hover,
+  nav a.active {
+    color: var(--text);
+    border-color: rgba(113, 215, 255, 0.36);
+    background: rgba(28, 62, 110, 0.55);
+  }
+
+  .control-shell,
+  .summary-shell,
+  .week-shell,
+  .agenda-shell {
+    border: 1px solid var(--border);
+    background: var(--panel);
+    backdrop-filter: blur(12px);
+    box-shadow: var(--shadow);
+  }
+
+  .control-shell {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 16px;
+    align-items: center;
+    padding: 16px 18px;
+    border-radius: 24px;
+    margin-bottom: 18px;
+  }
+
+  .week-nav {
+    display: inline-flex;
+    gap: 8px;
+  }
+
+  .week-nav button {
+    min-width: 112px;
+    padding: 10px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: rgba(13, 24, 42, 0.8);
+    color: var(--text);
+    font-family: inherit;
+    cursor: pointer;
+    transition: 0.15s ease;
+  }
+
+  .week-nav button:hover:not(:disabled) {
+    border-color: rgba(113, 215, 255, 0.36);
+    color: var(--cyan);
+  }
+
+  .week-nav button:disabled {
+    opacity: 0.42;
+    cursor: not-allowed;
+  }
+
+  .week-heading {
+    text-align: center;
+  }
+
+  .week-heading .eyebrow {
+    color: var(--dim);
+    font-size: 0.75rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .week-heading .range {
+    font-family: 'Chakra Petch', sans-serif;
+    font-size: clamp(1.4rem, 2.6vw, 2rem);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .week-heading .subline {
+    color: var(--muted);
+    font-size: 0.9rem;
+    margin-top: 2px;
+  }
+
+  .capture-pill {
+    justify-self: end;
+    padding: 11px 14px;
+    border-radius: 18px;
+    border: 1px solid rgba(255, 211, 106, 0.22);
+    background: rgba(35, 29, 14, 0.42);
+    color: #f6ddb0;
+    font-size: 0.83rem;
+    text-align: right;
+  }
+
+  .summary-shell {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    padding: 14px;
+    border-radius: 24px;
+    margin-bottom: 18px;
+  }
+
+  .summary-card {
+    padding: 14px 16px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.04);
+    background: linear-gradient(180deg, rgba(17, 30, 50, 0.9), rgba(12, 22, 37, 0.7));
+  }
+
+  .summary-card .label {
+    color: var(--dim);
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    font-size: 0.7rem;
+    margin-bottom: 6px;
+  }
+
+  .summary-card .value {
+    font-family: 'Chakra Petch', sans-serif;
+    font-size: 1.5rem;
+    color: var(--text);
+  }
+
+  .summary-card .detail {
+    color: var(--muted);
+    font-size: 0.84rem;
+    margin-top: 4px;
+  }
+
+  .week-shell {
+    padding: 18px;
+    border-radius: 28px;
+    margin-bottom: 18px;
+  }
+
+  .section-heading,
+  .agenda-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .section-heading h2,
+  .agenda-heading h2 {
+    font-family: 'Chakra Petch', sans-serif;
+    font-size: 1.35rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .section-heading p,
+  .agenda-heading p {
+    color: var(--muted);
+    font-size: 0.92rem;
+  }
+
+  .week-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .day-column {
+    display: flex;
+    flex-direction: column;
+    min-height: 320px;
+    border-radius: 22px;
+    border: 1px solid var(--border);
+    background:
+      linear-gradient(180deg, rgba(15, 28, 47, 0.95), rgba(9, 18, 31, 0.88));
+    overflow: hidden;
+  }
+
+  .day-column.today {
+    border-color: rgba(113, 215, 255, 0.42);
+    box-shadow: inset 0 0 0 1px rgba(113, 215, 255, 0.16);
+  }
+
+  .day-head {
+    padding: 16px 16px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    background: linear-gradient(180deg, rgba(24, 42, 70, 0.72), rgba(14, 26, 45, 0.42));
+  }
+
+  .day-name {
+    font-family: 'Chakra Petch', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .day-date {
+    color: var(--muted);
+    font-size: 0.86rem;
+    margin-top: 2px;
+  }
+
+  .day-count {
+    display: inline-flex;
+    align-items: center;
+    margin-top: 10px;
+    padding: 4px 9px;
+    border-radius: 999px;
+    background: rgba(113, 215, 255, 0.08);
+    color: var(--cyan);
+    font-size: 0.74rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .day-events {
+    display: grid;
+    gap: 10px;
+    padding: 12px;
+    height: 100%;
+    align-content: start;
+  }
+
+  .event-card,
+  .empty-card {
+    border-radius: 18px;
+    border: 1px solid rgba(255,255,255,0.06);
+    overflow: hidden;
+  }
+
+  .event-card {
+    padding: 14px 14px 13px;
+    background: rgba(6, 13, 24, 0.86);
+    position: relative;
+  }
+
+  .event-card::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 3px;
+    background: var(--cyan);
+    opacity: 0.9;
+  }
+
+  .event-card.type-sms::before { background: #71d7ff; }
+  .event-card.type-slb::before { background: #ff8ee3; }
+  .event-card.type-rlb::before { background: #ffd36a; }
+  .event-card.type-alb::before,
+  .event-card.type-ams::before { background: #73f0b8; }
+  .event-card.type-other::before { background: #a7b3c8; }
+
+  .event-topline {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .type-badge,
+  .status-badge,
+  .level-badge,
+  .series-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 8px;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .type-badge.type-sms { background: rgba(113, 215, 255, 0.12); color: var(--cyan); }
+  .type-badge.type-slb { background: rgba(255, 142, 227, 0.14); color: var(--pink); }
+  .type-badge.type-rlb { background: rgba(255, 211, 106, 0.14); color: var(--gold); }
+  .type-badge.type-alb,
+  .type-badge.type-ams { background: rgba(115, 240, 184, 0.12); color: var(--green); }
+  .type-badge.type-other { background: rgba(164, 177, 199, 0.14); color: #c8d6ea; }
+
+  .status-badge {
+    border: 1px solid rgba(255,255,255,0.08);
+    color: var(--muted);
+    background: rgba(255,255,255,0.02);
+  }
+
+  .event-title {
+    font-size: 0.96rem;
+    font-weight: 600;
+    line-height: 1.2;
+    margin-bottom: 10px;
+  }
+
+  .meta-line {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+
+  .level-badge {
+    color: var(--gold);
+    background: rgba(255, 211, 106, 0.1);
+  }
+
+  .series-badge {
+    color: var(--muted);
+    background: rgba(255,255,255,0.05);
+  }
+
+  .activity-copy {
+    color: var(--muted);
+    font-size: 0.84rem;
+  }
+
+  .empty-card {
+    display: grid;
+    place-items: center;
+    min-height: 112px;
+    color: var(--dim);
+    font-size: 0.82rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: rgba(8, 14, 24, 0.7);
+    border-style: dashed;
+  }
+
+  .agenda-shell {
+    padding: 18px;
+    border-radius: 28px;
+  }
+
+  .agenda-table-wrap {
+    overflow-x: auto;
+    border-radius: 22px;
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 980px;
+    background: rgba(8, 16, 28, 0.9);
+  }
+
+  thead th {
+    padding: 14px 14px;
+    text-align: left;
+    position: sticky;
+    top: 0;
+    background: rgba(12, 24, 42, 0.97);
+    color: var(--dim);
+    font-size: 0.73rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+  }
+
+  tbody td {
+    padding: 16px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    vertical-align: top;
+    font-size: 0.92rem;
+  }
+
+  tbody tr:hover { background: rgba(19, 36, 61, 0.42); }
+  tbody tr:last-child td { border-bottom: none; }
+
+  .date-cell {
+    min-width: 160px;
+    font-family: 'Chakra Petch', sans-serif;
+    letter-spacing: 0.04em;
+  }
+
+  .title-cell strong {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 0.98rem;
+  }
+
+  .row-sub {
+    color: var(--dim);
+    font-size: 0.82rem;
+  }
+
+  .activity-cell {
+    color: var(--muted);
+    max-width: 420px;
+  }
+
+  .status-bar {
+    margin-top: 16px;
+    color: var(--dim);
+    font-size: 0.85rem;
+    text-align: center;
+  }
+
+  .empty-state {
+    padding: 42px 18px;
+    text-align: center;
+    color: var(--muted);
+  }
 
   footer {
     text-align: center;
-    padding: 24px 0;
-    margin-top: 28px;
-    border-top: 1px solid #1a2332;
-    font-size: 0.8rem;
-    color: #4a5568;
+    margin-top: 20px;
+    color: var(--dim);
+    font-size: 0.82rem;
   }
-  footer a { color: #4dabf7; text-decoration: none; }
-  footer a:hover { text-decoration: underline; }
 
-  @media (max-width: 600px) {
-    .container { padding: 12px; }
-    header h1 { font-size: 1.3rem; }
-    .cal-day { min-height: 60px; }
-    .ev-bar { font-size: 0.5rem; padding: 1px 2px; }
-    .day-num { font-size: 0.65rem; }
-    .ev-row { grid-template-columns: 8px 1fr; }
-    .ev-dates { grid-column: 2; }
+  @media (max-width: 1200px) {
+    .hero-grid,
+    .summary-shell {
+      grid-template-columns: 1fr;
+    }
+
+    .capture-pill {
+      justify-self: stretch;
+      text-align: left;
+    }
+
+    .week-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 760px) {
+    .container {
+      width: min(100vw - 20px, 1520px);
+      padding-top: 12px;
+    }
+
+    header,
+    .control-shell,
+    .week-shell,
+    .agenda-shell {
+      border-radius: 22px;
+    }
+
+    header {
+      padding: 26px 18px 22px;
+    }
+
+    .control-shell {
+      grid-template-columns: 1fr;
+      text-align: center;
+    }
+
+    .week-nav {
+      justify-content: center;
+    }
+
+    .capture-pill {
+      justify-self: center;
+      text-align: center;
+    }
+
+    .section-heading,
+    .agenda-heading {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .week-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .day-column {
+      min-height: auto;
+    }
   }
 </style>
 </head>
 <body>
 <div class="container">
   <header>
-    <h1>&#x1F4C5; <span>NCC</span> Event Calendar</h1>
+    <div class="kicker">Weekly Ops Board</div>
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <h1><span>NCC</span> Event Calendar</h1>
+        <p>
+          Rebuilt for the way Scopely data actually arrives here: one tactical week at a time.
+          Instead of a full month grid, this board focuses on the currently captured seven-day window
+          and turns it into a readable ops schedule.
+        </p>
+      </div>
+      <div class="hero-side">
+        <div class="signal-card">
+          <div class="signal-label">Display Mode</div>
+          <div class="signal-value">1 Week Per Capture</div>
+        </div>
+        <div class="signal-card">
+          <div class="signal-label">Data Feed</div>
+          <div class="signal-value" id="feed-status">Awaiting event data</div>
+        </div>
+      </div>
+    </div>
   </header>
 
   <nav>
@@ -226,306 +668,558 @@
     <a href="admin">Admin</a>
   </nav>
 
-  <div class="status-bar" id="status-bar"></div>
+  <section class="control-shell">
+    <div class="week-nav">
+      <button id="prev-week" type="button">&larr; Prev Week</button>
+      <button id="next-week" type="button">Next Week &rarr;</button>
+    </div>
+    <div class="week-heading">
+      <div class="eyebrow">Captured Window</div>
+      <div class="range" id="week-range">Loading...</div>
+      <div class="subline" id="week-subline">Finding the best seven-day slice</div>
+    </div>
+    <div class="capture-pill" id="capture-pill">No capture yet</div>
+  </section>
 
-  <div class="month-nav">
-    <button id="prev-month">&larr; Prev</button>
-    <div class="month-label" id="month-label"></div>
-    <button id="next-month">Next &rarr;</button>
-  </div>
+  <section class="summary-shell">
+    <div class="summary-card">
+      <div class="label">Events In Week</div>
+      <div class="value" id="summary-events">0</div>
+      <div class="detail" id="summary-focus">No tactical events loaded</div>
+    </div>
+    <div class="summary-card">
+      <div class="label">Daily Peak</div>
+      <div class="value" id="summary-peak">-</div>
+      <div class="detail" id="summary-peak-detail">No events scheduled</div>
+    </div>
+    <div class="summary-card">
+      <div class="label">Leaderboard Count</div>
+      <div class="value" id="summary-leaderboard">0</div>
+      <div class="detail">SLB, RLB, ALB, AMS entries in this week</div>
+    </div>
+    <div class="summary-card">
+      <div class="label">Primary Lane</div>
+      <div class="value" id="summary-primary">-</div>
+      <div class="detail" id="summary-primary-detail">Waiting on event types</div>
+    </div>
+  </section>
 
-  <div class="cal-grid" id="cal-grid"></div>
+  <section class="week-shell">
+    <div class="section-heading">
+      <div>
+        <h2>Day By Day</h2>
+        <p>Each column shows the events active that day, filtered to the current captured week.</p>
+      </div>
+    </div>
+    <div class="week-grid" id="week-grid"></div>
+  </section>
 
-  <div class="legend">
-    <div class="legend-item"><div class="legend-color" style="background:#2980b9"></div> Standard</div>
-    <div class="legend-item"><div class="legend-color" style="background:#8e44ad"></div> Leaderboard</div>
-    <div class="legend-item"><div class="legend-color" style="background:#27ae60"></div> Daily</div>
-    <div class="legend-item"><div class="legend-color" style="background:#d35400"></div> Battle Pass</div>
-    <div class="legend-item"><div class="legend-color" style="background:#c0392b"></div> Alliance</div>
-    <div class="legend-item"><div class="legend-color" style="background:#333;border-left:3px solid #f1c40f"></div> Cross-Server</div>
-  </div>
-
-  <div class="event-list" id="event-list">
-    <h2>Active &amp; Upcoming Events</h2>
-    <div id="event-rows"></div>
-  </div>
+  <section class="agenda-shell">
+    <div class="agenda-heading">
+      <div>
+        <h2>Week Agenda</h2>
+        <p>Dense table view for quick scanning: type, level, date, title, and activity.</p>
+      </div>
+    </div>
+    <div class="agenda-table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Level</th>
+            <th>Title</th>
+            <th>Activity</th>
+          </tr>
+        </thead>
+        <tbody id="agenda-body"></tbody>
+      </table>
+    </div>
+    <div class="status-bar" id="status-bar"></div>
+  </section>
 
   <footer>
-    Data captured from game client &middot; Updates on game launch
+    Data captured from game client and shown as a focused weekly ops board.
   </footer>
 </div>
 
 <script>
-const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-const DAY_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const DAY_SECONDS = 86400;
+const WEEK_SECONDS = DAY_SECONDS * 7;
+const LONG_EVENT_THRESHOLD_DAYS = 10;
 
-// Known VAF -> friendly name mapping (from game mod)
 const VAF_NAMES = {
-  'factionpve_alliance_leaderboard': 'Alliance Faction LB',
-  'factionpve_rom_attackfed': 'Rom: Hunt Fed',
-  'factionpve_kli_attackrom': 'Kli: Hunt Rom',
-  'factionpve_fed_attackkling': 'Fed: Hunt Kli',
-  '2305_event_m54_gatheringintel_eclipse': "Quark's Exchange Hunt",
-  '2305_event_m54_deltaquad_hirogen': "Quark's Hirogen Hunt",
-  '2202_event_m39_quark_v1': "Quark's Grand Challenge",
-  '2307_event_plc_base_station': "Quark's Power Partners",
-  '2404_event_m65_texasclass': "Quark's Texas Class Hunt",
-  'm87_interim_event_bpoverflow': 'Heroic OFP Overflow',
-  'm49_hostile_hunt': 'Hostile Hunt',
-  'm5_racetoops30_event': 'Ahead of the Curve',
-  'm26_domination': 'Domination',
-  'weekly_cosmiccleanup_sms': 'Cosmic Cleanup',
-  'weekly_swarm_easy_sms': 'Threat From Beyond',
-  'weekly_swarm_heroic_sms': 'Threat From Beyond Heroic',
-  'd22_anomalieshostiles_sms': 'Anomalous Phenomena',
-  'event_m67_introthemirrorverse': 'Mirror Universe',
-  '2024_event_artifacthunt_slb': 'Artifact Hunt LB',
-  'weekly_voyager_sms': 'Voyager Event',
-  'm46_ds9_armada_cardassian_v1': 'DS9 Armada',
-  '2404_event_m65_hostile_jemhadar': "Hostile Jem'Hadar",
-  'm6_events_factionfed_sms': 'Fed Reputation',
-  'm6_events_factionkli_sms': 'Kli Reputation',
-  'm6_events_factionrom_sms': 'Rom Reputation',
-  '2024_event_dailyhh_sms': 'Daily Hostile Hunt',
-  '2024_event_dailyg3mining_sms': 'Daily G3 Mining',
-  '2024_event_dailybuildingresearch_slb': 'Build/Research LB',
+  factionpve_alliance_leaderboard: 'Alliance Faction LB',
+  factionpve_rom_attackfed: 'Rom: Hunt Fed',
+  factionpve_kli_attackrom: 'Kli: Hunt Rom',
+  factionpve_fed_attackkling: 'Fed: Hunt Kli',
+  weekly_cosmiccleanup_sms: 'Cosmic Cleanup',
+  weekly_swarm_easy_sms: 'Threat From Beyond',
+  weekly_swarm_heroic_sms: 'Threat From Beyond Heroic',
+  m49_hostile_hunt: 'Unleash the Wrath',
+  m5_racetoops30_event: 'Ahead of the Curve',
+  m77_alliancedonation_bp_sms: 'Unity',
+  tc_weekly_season_event: 'Pinnacle of Power',
+  m6_events_factionfed_sms: 'Federation Reputation Event',
+  m6_events_factionrom_sms: 'Romulan Reputation Event',
+  m6_events_factionkli_sms: 'Klingon Reputation Event',
+  '2024_event_dailybuildingresearch_sms': 'Limited Time Building and Research Upgrade',
+  '2024_event_dailybuildingresearch_slb': 'Build / Research Leaderboard',
   '2024_event_dailyshipupgrade_sms': 'Ship Upgrade',
-  '2024_event_dailyshipupgrade_slb': 'Ship Upgrade LB',
-  '2024_event_artifacthunt_sms': 'Artifact Hunt',
-  '2024_event_fcupgrade_sms': 'FC Upgrade',
-  'm87_interim_event_bpseason': 'BP Overflow Season',
-  'tc_weekly_season_event': 'Pinnacle of Power',
-  'm77_alliancedonation_bp_sms': 'Unity',
-  'm77_hostilearmadahunt_bp_sms': 'Hostile Armada Hunt',
-  '0408_battlepass_m59_tc': 'Battle Pass',
-  'm85m_auxbp_ship_v1': 'Aux BP Ship',
+  '2024_event_dailyshipupgrade_slb': 'Ship Upgrade Leaderboard',
+  '2024_event_dailyhh_sms': 'Hostile Hunt',
+  event_m69_alliancehelp: 'Daily Ferengi Exchange: Unity'
 };
 
-let events = [];
-let viewYear, viewMonth;
+const EVENT_HINTS = [
+  { test: /khanquest meta/i, level: '20-50', activity: 'Complete KQ events' },
+  { test: /augment/i, level: '20-50', activity: 'Destroy augment exile hostiles' },
+  { test: /syndicate advancement/i, level: '20-50', activity: 'Earn syndicate XP' },
+  { test: /standing orders/i, level: '20-50', activity: 'Collect final daily goal' },
+  { test: /unleash the wrath|hostile hunt|danger zone|will of khan|orchestrated chaos|final weapon/i, level: '20-50', activity: 'Destroy hostiles' },
+  { test: /building and research|domination/i, level: '20-50', activity: 'Gain power through buildings and research' },
+  { test: /ship upgrade/i, level: '20-50', activity: 'Upgrade ships' },
+  { test: /reputation event/i, level: '20-50', activity: 'Earn faction reputation' },
+  { test: /unity/i, level: '20-50', activity: 'Complete alliance help objectives' },
+  { test: /field operations/i, level: '20-50', activity: 'Complete field operations objectives' },
+  { test: /hijacked/i, level: '26-50', activity: 'Dock hijacked ships or splicers' },
+  { test: /wavebreaker/i, level: '30-50', activity: 'Defeat wave defense hostiles' },
+  { test: /power advancement|ahead of the curve/i, level: '20-50', activity: 'Gain power' },
+  { test: /mission key/i, level: '20-50', activity: 'Complete mission key objectives' }
+];
 
-function catClass(ev) {
-  const c = ev.category || '';
-  if (c === 'SLB' || c === 'RLB') return 'cat-leaderboard';
-  if (c === 'ALB') return 'cat-alliance';
-  if (c === 'AMS') return 'cat-alliance';
-  if (c === 'SMS') return 'cat-standard';
-  // Fallback for platform entity format
-  const cn = ev.categoryName || '';
-  if (cn === 'leaderboard' || cn === 'stat') return 'cat-leaderboard';
-  if (cn.startsWith('daily')) return 'cat-daily';
-  if (cn.startsWith('battlepass')) return 'cat-battlepass';
-  if (cn.startsWith('alliance')) return 'cat-alliance';
-  if (cn === 'standard') return 'cat-standard';
-  return 'cat-other';
+let allEvents = [];
+let currentWeekStart = null;
+let captureTs = null;
+let usingFallbackFeed = false;
+
+function esc(value) {
+  const el = document.createElement('span');
+  el.textContent = value == null ? '' : String(value);
+  return el.innerHTML;
 }
 
-function cleanVaf(raw) {
-  if (!raw) return null;
-  let vaf = raw;
-  let pos = vaf.indexOf('_visual_asset_filename');
-  if (pos !== -1) vaf = vaf.substring(0, pos);
-  if (VAF_NAMES[vaf]) return VAF_NAMES[vaf];
-  // Strip common prefixes
-  if (vaf.length > 12 && vaf[4] === '_' && vaf.substring(5, 11) === 'event_') vaf = vaf.substring(11);
-  else if (/^m\d/.test(vaf) && vaf.indexOf('_') < 4) vaf = vaf.substring(vaf.indexOf('_') + 1);
-  else if (vaf.startsWith('m6_events_')) vaf = vaf.substring(10);
-  // Strip common suffixes
-  for (const suf of ['_sms', '_slb', '_alb', '_ams', '_rlb', '_v1', '_v2']) {
-    if (vaf.endsWith(suf)) vaf = vaf.substring(0, vaf.length - suf.length);
-  }
-  return vaf.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+function startOfDay(ts) {
+  const d = new Date(ts * 1000);
+  d.setHours(0, 0, 0, 0);
+  return Math.floor(d.getTime() / 1000);
 }
 
-function eventName(ev) {
-  // CDN format: already has cleaned name
-  if (ev.name) return ev.name;
-  // Platform entity format: try VAF
-  const vaf = ev.metadata && ev.metadata.visualAssetFilename;
-  if (vaf) {
-    const name = cleanVaf(vaf);
-    if (name) return name;
-  }
-  if (ev.groupName) return ev.groupName;
-  if (ev.source) return ev.source;
-  return ev.configId || 'Unknown Event';
+function startOfWeek(ts) {
+  const dayTs = startOfDay(ts);
+  const day = new Date(dayTs * 1000).getDay();
+  return dayTs - (day * DAY_SECONDS);
 }
 
-function fmtDate(ts) {
-  if (!ts) return '?';
-  return new Date(ts * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+function isSameDay(dateA, dateB) {
+  return dateA.getFullYear() === dateB.getFullYear()
+    && dateA.getMonth() === dateB.getMonth()
+    && dateA.getDate() === dateB.getDate();
 }
 
-function sameDay(a, b) {
-  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+function formatDateShort(ts) {
+  const d = new Date(ts * 1000);
+  return MONTH_NAMES[d.getMonth()] + ' ' + d.getDate();
 }
 
-function esc(s) { const el = document.createElement('span'); el.textContent = s; return el.innerHTML; }
-
-function getEventTimes(ev) {
-  // CDN format: startTs/endTs/displayTs at top level
-  if (ev.endTs) {
-    const end = ev.displayTs || ev.endTs;
-    const start = ev.startTs || (end - 7 * 86400);
-    return { start, end };
-  }
-  // Platform entity format: schedule object
-  const s = ev.schedule;
-  if (!s) return null;
-  const start = s.start || s.announce;
-  const end = s.end || s.display;
-  if (!start || !end) return null;
-  return { start, end };
+function formatDateTime(ts) {
+  if (!ts) return 'Unknown';
+  return new Date(ts * 1000).toLocaleString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit'
+  });
 }
 
-function renderCalendar() {
-  const grid = document.getElementById('cal-grid');
-  document.getElementById('month-label').textContent = MONTH_NAMES[viewMonth] + ' ' + viewYear;
+function normalizeVaf(raw) {
+  if (!raw) return '';
+  return String(raw).replace(/_visual_asset_filename$/i, '');
+}
 
-  const firstOfMonth = new Date(viewYear, viewMonth, 1);
-  const lastOfMonth = new Date(viewYear, viewMonth + 1, 0);
-  const startDay = firstOfMonth.getDay();
-  const daysInMonth = lastOfMonth.getDate();
-  const today = new Date();
+function titleFromVaf(vaf) {
+  if (!vaf) return null;
+  const clean = normalizeVaf(vaf);
+  if (VAF_NAMES[clean]) return VAF_NAMES[clean];
 
-  let html = DAY_NAMES.map(d => '<div class="cal-header">' + d + '</div>').join('');
-
-  const prevMonthLast = new Date(viewYear, viewMonth, 0).getDate();
-  for (let i = startDay - 1; i >= 0; i--) {
-    html += dayCell(new Date(viewYear, viewMonth - 1, prevMonthLast - i), prevMonthLast - i, true, today);
-  }
-  for (let d = 1; d <= daysInMonth; d++) {
-    const date = new Date(viewYear, viewMonth, d);
-    html += dayCell(date, d, false, today, sameDay(date, today));
-  }
-  const remaining = (7 - ((startDay + daysInMonth) % 7)) % 7;
-  for (let d = 1; d <= remaining; d++) {
-    html += dayCell(new Date(viewYear, viewMonth + 1, d), d, true, today);
+  let text = clean;
+  if (text.length > 12 && text[4] === '_' && text.substring(5, 11) === 'event_') {
+    text = text.substring(11);
+  } else if (/^m\d/i.test(text) && text.indexOf('_') > 0 && text.indexOf('_') < 5) {
+    text = text.substring(text.indexOf('_') + 1);
+  } else if (text.startsWith('m6_events_')) {
+    text = text.substring(10);
   }
 
-  grid.innerHTML = html;
+  text = text.replace(/_(sms|slb|alb|ams|rlb|v\d+)$/i, '');
+  return text.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 }
 
-function dayCell(date, dayNum, otherMonth, today, isToday) {
-  const cls = ['cal-day'];
-  if (otherMonth) cls.push('other-month');
-  if (isToday) cls.push('today');
+function cleanTitle(name, fallbackVaf) {
+  let title = name || titleFromVaf(fallbackVaf) || 'Unknown Event';
+  title = title.replace(/\s+-\s+(SMS|SLB|RLB|ALB|AMS)$/i, '');
+  title = title.replace(/^KQ:\s*/i, 'KQ ');
+  title = title.replace(/\s{2,}/g, ' ').trim();
+  return title;
+}
 
-  const dayStart = new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime() / 1000;
-  const dayEnd = dayStart + 86400;
+function inferType(raw) {
+  const direct = raw.type || raw.category || raw.categoryName || '';
+  if (direct) return String(direct).toUpperCase();
+  const name = raw.name || '';
+  const match = name.match(/\b(SMS|SLB|RLB|ALB|AMS)\b/i);
+  return match ? match[1].toUpperCase() : 'OTHER';
+}
 
-  let bars = '';
-  for (const ev of events) {
-    const t = getEventTimes(ev);
-    if (!t) continue;
-    if (t.start < dayEnd && t.end > dayStart) {
-      const evStart = new Date(t.start * 1000);
-      const evEnd = new Date((t.end - 1) * 1000);
-      const isStart = sameDay(date, evStart);
-      const isEnd = sameDay(date, evEnd);
-      const isSingle = isStart && isEnd;
+function eventTypeClass(type) {
+  const normalized = String(type || 'OTHER').toLowerCase();
+  if (['sms', 'slb', 'rlb', 'alb', 'ams'].includes(normalized)) return 'type-' + normalized;
+  return 'type-other';
+}
 
-      let pos = 'mid';
-      if (isSingle) pos = 'single';
-      else if (isStart) pos = 'start';
-      else if (isEnd) pos = 'end';
-
-      const label = isStart || date.getDay() === 0 ? esc(eventName(ev)) : '&nbsp;';
-      const cc = catClass(ev);
-      const cross = ev.metadata && ev.metadata.isCrossServer ? ' cross-server' : '';
-      const tooltip = esc(eventName(ev)) + '\n' + fmtDate(t.start) + ' - ' + fmtDate(t.end) + '\n' + (ev.categoryName || '');
-      bars += '<div class="ev-bar ' + cc + cross + ' ' + pos + '" title="' + tooltip + '">' + label + '</div>';
+function getTimes(raw) {
+  if (raw.startTs || raw.endTs || raw.displayTs) {
+    const start = Number(raw.startTs || ((raw.displayTs || raw.endTs || 0) - WEEK_SECONDS));
+    const activeEnd = Number(raw.displayTs || raw.endTs || 0);
+    const claimEnd = Number(raw.endTs || activeEnd);
+    if (start && activeEnd) {
+      return { start, end: activeEnd, claimEnd };
     }
   }
 
-  return '<div class="' + cls.join(' ') + '"><span class="day-num">' + dayNum + '</span>' + bars + '</div>';
+  const schedule = raw.schedule || {};
+  const start = Number(schedule.start || schedule.announce || 0);
+  const end = Number(schedule.display || schedule.end || 0);
+  if (start && end) {
+    return { start, end, claimEnd: Number(schedule.end || end) };
+  }
+
+  return null;
 }
 
-function renderEventList() {
-  const rows = document.getElementById('event-rows');
-  const now = Date.now() / 1000;
+function overlapsRange(event, start, end) {
+  return event.start < end && event.end > start;
+}
 
-  const relevant = events
-    .filter(ev => { const t = getEventTimes(ev); return t && t.end > now; })
-    .sort((a, b) => (getEventTimes(a).start) - (getEventTimes(b).start));
+function dedupeEvents(events) {
+  const seen = new Set();
+  return events.filter(event => {
+    const key = [event.title, event.type, event.start, event.end, event.series].join('|');
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
 
-  if (relevant.length === 0) {
-    rows.innerHTML = '<div class="no-events">No active or upcoming events</div>';
+function inferHints(event) {
+  for (const hint of EVENT_HINTS) {
+    if (hint.test.test(event.title) || hint.test.test(event.rawName) || hint.test.test(event.vafName)) {
+      return hint;
+    }
+  }
+  return null;
+}
+
+function normalizeRawEvents(data) {
+  const sourceEvents = Array.isArray(data.events)
+    ? data.events
+    : Object.values(data.bySeries || {}).flat();
+
+  return dedupeEvents(sourceEvents.map((raw, index) => {
+    const times = getTimes(raw);
+    if (!times) return null;
+
+    const type = inferType(raw);
+    const vafName = normalizeVaf(raw.vaf || (raw.metadata && raw.metadata.visualAssetFilename));
+    const title = cleanTitle(raw.name, vafName);
+    const hints = inferHints({ title, rawName: raw.name || '', vafName });
+
+    return {
+      id: raw.configId || raw.newsId || (title + '-' + index),
+      rawName: raw.name || '',
+      title,
+      type,
+      typeClass: eventTypeClass(type),
+      series: raw.series || raw.groupName || 'Captured Event',
+      start: times.start,
+      end: times.end,
+      claimEnd: times.claimEnd,
+      displayTs: Number(raw.displayTs || 0),
+      vafName,
+      level: raw.levelRange || (hints && hints.level) || '--',
+      activity: raw.activity || (hints && hints.activity) || 'Objective unavailable in current feed'
+    };
+  }).filter(Boolean));
+}
+
+function normalizeNewsItems(data) {
+  return (data.newsItems || [])
+    .filter(item => item.startDate && item.endDate)
+    .map((item, index) => {
+      const title = cleanTitle(item.title || item.headline || item.newsTitle || '', item.metadata && item.metadata.assetFilename);
+      const vafName = normalizeVaf(item.metadata && item.metadata.assetFilename);
+      const hints = inferHints({ title, rawName: title, vafName });
+      return {
+        id: 'news-' + (item.newsId || index),
+        rawName: title,
+        title,
+        type: 'OTHER',
+        typeClass: 'type-other',
+        series: 'News Feed',
+        start: Number(item.startDate),
+        end: Number(item.endDate),
+        claimEnd: Number(item.endDate),
+        displayTs: Number(item.endDate),
+        vafName,
+        level: (hints && hints.level) || '--',
+        activity: (hints && hints.activity) || 'Captured from fallback news feed'
+      };
+    });
+}
+
+function isWeeklyCandidate(event, weekStartTs) {
+  const weekEndTs = weekStartTs + WEEK_SECONDS;
+  if (!overlapsRange(event, weekStartTs, weekEndTs)) return false;
+
+  const durationDays = Math.max(1, Math.ceil((event.end - event.start) / DAY_SECONDS));
+  const startInside = event.start >= weekStartTs && event.start < weekEndTs;
+  const endInside = event.end > weekStartTs && event.end <= weekEndTs;
+  const displayInside = event.displayTs >= weekStartTs && event.displayTs < weekEndTs;
+
+  return durationDays <= LONG_EVENT_THRESHOLD_DAYS || startInside || endInside || displayInside;
+}
+
+function weeklyEventsFor(weekStartTs) {
+  return allEvents
+    .filter(event => isWeeklyCandidate(event, weekStartTs))
+    .sort((a, b) => a.start - b.start || a.title.localeCompare(b.title));
+}
+
+function activeDaysForWeek(event, weekStartTs) {
+  const result = [];
+  for (let i = 0; i < 7; i++) {
+    const dayStartTs = weekStartTs + (i * DAY_SECONDS);
+    const dayEndTs = dayStartTs + DAY_SECONDS;
+    if (overlapsRange(event, dayStartTs, dayEndTs)) {
+      result.push(i);
+    }
+  }
+  return result;
+}
+
+function formatWeekOccurrence(days, weekStartTs) {
+  if (!days.length) return 'Outside selected week';
+  const sorted = [...days].sort((a, b) => a - b);
+  const ranges = [];
+  let start = sorted[0];
+  let prev = sorted[0];
+
+  for (let i = 1; i < sorted.length; i++) {
+    if (sorted[i] === prev + 1) {
+      prev = sorted[i];
+      continue;
+    }
+    ranges.push([start, prev]);
+    start = sorted[i];
+    prev = sorted[i];
+  }
+  ranges.push([start, prev]);
+
+  return ranges.map(([first, last]) => {
+    const firstDate = new Date((weekStartTs + first * DAY_SECONDS) * 1000);
+    const lastDate = new Date((weekStartTs + last * DAY_SECONDS) * 1000);
+    const firstLabel = MONTH_NAMES[firstDate.getMonth()] + ' ' + firstDate.getDate();
+    if (first === last) return firstLabel;
+    if (firstDate.getMonth() === lastDate.getMonth()) {
+      return firstLabel + '-' + lastDate.getDate();
+    }
+    return firstLabel + ' - ' + MONTH_NAMES[lastDate.getMonth()] + ' ' + lastDate.getDate();
+  }).join(', ');
+}
+
+function weekRangeLabel(weekStartTs) {
+  return formatDateShort(weekStartTs) + ' - ' + formatDateShort(weekStartTs + (6 * DAY_SECONDS));
+}
+
+function updateControls(weekEvents) {
+  const weekEndTs = currentWeekStart + WEEK_SECONDS;
+  document.getElementById('week-range').textContent = weekRangeLabel(currentWeekStart);
+  document.getElementById('week-subline').textContent =
+    weekEvents.length
+      ? weekEvents.length + ' focused events inside this captured week'
+      : 'No captured events match this seven-day window';
+
+  document.getElementById('capture-pill').textContent = captureTs
+    ? 'Last captured: ' + formatDateTime(captureTs)
+    : 'No capture timestamp available';
+
+  const hasEarlier = allEvents.some(event => isWeeklyCandidate(event, currentWeekStart - WEEK_SECONDS));
+  const hasLater = allEvents.some(event => isWeeklyCandidate(event, weekEndTs));
+  document.getElementById('prev-week').disabled = !hasEarlier;
+  document.getElementById('next-week').disabled = !hasLater;
+}
+
+function renderSummary(weekEvents) {
+  const leaderboardCount = weekEvents.filter(event => ['SLB', 'RLB', 'ALB', 'AMS'].includes(event.type)).length;
+  const typeCounts = {};
+  const dayCounts = Array.from({ length: 7 }, () => 0);
+
+  weekEvents.forEach(event => {
+    typeCounts[event.type] = (typeCounts[event.type] || 0) + 1;
+    activeDaysForWeek(event, currentWeekStart).forEach(day => {
+      dayCounts[day] += 1;
+    });
+  });
+
+  const primaryEntry = Object.entries(typeCounts).sort((a, b) => b[1] - a[1])[0];
+  const peakCount = Math.max(0, ...dayCounts);
+  const peakDayIndex = dayCounts.indexOf(peakCount);
+
+  document.getElementById('summary-events').textContent = weekEvents.length;
+  document.getElementById('summary-focus').textContent = usingFallbackFeed
+    ? 'Fallback news feed in use'
+    : 'Filtered out long-running overflow clutter';
+  document.getElementById('summary-leaderboard').textContent = leaderboardCount;
+  document.getElementById('summary-primary').textContent = primaryEntry ? primaryEntry[0] : '-';
+  document.getElementById('summary-primary-detail').textContent = primaryEntry
+    ? primaryEntry[1] + ' events in the dominant lane'
+    : 'No event types in selected week';
+  document.getElementById('summary-peak').textContent = peakCount ? DAY_NAMES[peakDayIndex] : '-';
+  document.getElementById('summary-peak-detail').textContent = peakCount
+    ? peakCount + ' events stacked on ' + DAY_NAMES[peakDayIndex]
+    : 'No events scheduled this week';
+}
+
+function renderWeekGrid(weekEvents) {
+  const grid = document.getElementById('week-grid');
+  const nowTs = Date.now() / 1000;
+  const today = new Date();
+
+  grid.innerHTML = Array.from({ length: 7 }, (_, dayIndex) => {
+    const date = new Date((currentWeekStart + dayIndex * DAY_SECONDS) * 1000);
+    const events = weekEvents.filter(event => activeDaysForWeek(event, currentWeekStart).includes(dayIndex));
+    const isToday = isSameDay(date, today);
+
+    const cards = events.length
+      ? events.map(event => {
+        const activeNow = event.start <= nowTs && event.claimEnd > nowTs;
+        return (
+          '<article class="event-card ' + event.typeClass + '">' +
+            '<div class="event-topline">' +
+              '<span class="type-badge ' + event.typeClass + '">' + esc(event.type) + '</span>' +
+              '<span class="status-badge">' + (activeNow ? 'Active' : 'Scheduled') + '</span>' +
+            '</div>' +
+            '<div class="event-title">' + esc(event.title) + '</div>' +
+            '<div class="meta-line">' +
+              '<span class="level-badge">' + esc(event.level) + '</span>' +
+              '<span class="series-badge">' + esc(event.series) + '</span>' +
+            '</div>' +
+            '<div class="activity-copy">' + esc(event.activity) + '</div>' +
+          '</article>'
+        );
+      }).join('')
+      : '<div class="empty-card">No tracked events</div>';
+
+    return (
+      '<section class="day-column' + (isToday ? ' today' : '') + '">' +
+        '<div class="day-head">' +
+          '<div class="day-name">' + DAY_NAMES[dayIndex] + '</div>' +
+          '<div class="day-date">' + formatDateShort(currentWeekStart + dayIndex * DAY_SECONDS) + '</div>' +
+          '<div class="day-count">' + events.length + ' event' + (events.length === 1 ? '' : 's') + '</div>' +
+        '</div>' +
+        '<div class="day-events">' + cards + '</div>' +
+      '</section>'
+    );
+  }).join('');
+}
+
+function renderAgenda(weekEvents) {
+  const body = document.getElementById('agenda-body');
+  if (!weekEvents.length) {
+    body.innerHTML = '<tr><td colspan="5"><div class="empty-state">No events were captured for this weekly slice.</div></td></tr>';
     return;
   }
 
-  let html = '';
-  for (const ev of relevant) {
-    const t = getEventTimes(ev);
-    const cc = catClass(ev);
-    const name = esc(eventName(ev));
-    let badges = '';
-    const catLabel = ev.category || ev.categoryName || '';
-    if (catLabel) badges += '<span class="badge cat-label">' + esc(catLabel) + '</span>';
-    if (ev.metadata && ev.metadata.isCrossServer) badges += '<span class="badge cross">CROSS-SERVER</span>';
+  body.innerHTML = weekEvents.map(event => {
+    const activeDays = activeDaysForWeek(event, currentWeekStart);
+    const windowLabel = formatWeekOccurrence(activeDays, currentWeekStart);
+    return (
+      '<tr>' +
+        '<td class="date-cell">' + esc(windowLabel) + '</td>' +
+        '<td><span class="type-badge ' + event.typeClass + '">' + esc(event.type) + '</span></td>' +
+        '<td>' + esc(event.level) + '</td>' +
+        '<td class="title-cell">' +
+          '<strong>' + esc(event.title) + '</strong>' +
+          '<div class="row-sub">' + esc(event.series) + ' | starts ' + esc(formatDateTime(event.start)) + '</div>' +
+        '</td>' +
+        '<td class="activity-cell">' + esc(event.activity) + '</td>' +
+      '</tr>'
+    );
+  }).join('');
+}
 
-    const active = t.start <= now;
-    const status = active ? 'Active' : 'Upcoming';
-    const dateStr = fmtDate(t.start) + ' &mdash; ' + fmtDate(t.end);
+function renderCurrentWeek() {
+  const weekEvents = weeklyEventsFor(currentWeekStart);
+  updateControls(weekEvents);
+  renderSummary(weekEvents);
+  renderWeekGrid(weekEvents);
+  renderAgenda(weekEvents);
 
-    html += '<div class="ev-row">'
-      + '<div class="ev-dot ' + cc + '"></div>'
-      + '<div class="ev-name">' + name + badges + ' <span style="color:#4a5568;font-size:0.75rem">(' + status + ')</span></div>'
-      + '<div class="ev-dates">' + dateStr + '</div>'
-      + '</div>';
-  }
-  rows.innerHTML = html;
+  document.getElementById('status-bar').textContent = usingFallbackFeed
+    ? 'Using data/game_news.json fallback. Activity and level hints may be partial.'
+    : 'Using data/game_events.json. Weekly view hides long-duration overflow noise unless it intersects the captured week directly.';
 }
 
 async function loadData() {
-  const status = document.getElementById('status-bar');
+  const feedStatus = document.getElementById('feed-status');
 
   try {
-    const resp = await fetch('data/game_events.json?t=' + Date.now());
-    if (!resp.ok) throw new Error('HTTP ' + resp.status);
-    const data = await resp.json();
-    events = data.events || [];
-    const ts = data.capturedAt ? new Date(data.capturedAt * 1000).toLocaleString() : 'unknown';
-    status.textContent = events.length + ' events loaded \u00b7 Last captured: ' + ts;
-  } catch (e) {
-    console.warn('game_events.json not available, falling back to game_news.json');
-    // Fallback to game_news.json
-    try {
-      const resp = await fetch('data/game_news.json?t=' + Date.now());
-      if (!resp.ok) throw new Error('HTTP ' + resp.status);
-      const data = await resp.json();
-      events = (data.newsItems || []).filter(n => n.startDate && n.endDate).map(n => ({
-        configId: 'news_' + n.newsId,
-        categoryName: 'standard',
-        schedule: { start: n.startDate, end: n.endDate },
-        metadata: { visualAssetFilename: n.metadata && n.metadata.assetFilename },
-      }));
-      status.textContent = events.length + ' events (from news) \u00b7 Launch game with updated mod for full event data';
-    } catch (e2) {
-      status.textContent = 'No event data available \u00b7 Launch game to capture events';
-      events = [];
-    }
+    const response = await fetch('data/game_events.json?t=' + Date.now());
+    if (!response.ok) throw new Error('HTTP ' + response.status);
+    const data = await response.json();
+    allEvents = normalizeRawEvents(data);
+    captureTs = Number(data.capturedAt || 0) || Math.floor(Date.now() / 1000);
+    usingFallbackFeed = false;
+    feedStatus.textContent = allEvents.length + ' events from game_events.json';
+  } catch (error) {
+    console.warn('game_events.json unavailable, trying game_news.json', error);
+    const response = await fetch('data/game_news.json?t=' + Date.now());
+    if (!response.ok) throw new Error('No event feed available');
+    const data = await response.json();
+    allEvents = normalizeNewsItems(data);
+    captureTs = Number(data.capturedAt || 0) || Math.floor(Date.now() / 1000);
+    usingFallbackFeed = true;
+    feedStatus.textContent = allEvents.length + ' items from game_news.json';
   }
 
-  renderCalendar();
-  renderEventList();
+  const anchorTs = captureTs || (allEvents[0] && allEvents[0].start) || Math.floor(Date.now() / 1000);
+  currentWeekStart = startOfWeek(anchorTs);
+  renderCurrentWeek();
 }
 
-document.getElementById('prev-month').addEventListener('click', () => {
-  viewMonth--;
-  if (viewMonth < 0) { viewMonth = 11; viewYear--; }
-  renderCalendar();
-});
-document.getElementById('next-month').addEventListener('click', () => {
-  viewMonth++;
-  if (viewMonth > 11) { viewMonth = 0; viewYear++; }
-  renderCalendar();
+document.getElementById('prev-week').addEventListener('click', () => {
+  currentWeekStart -= WEEK_SECONDS;
+  renderCurrentWeek();
 });
 
-const now = new Date();
-viewYear = now.getFullYear();
-viewMonth = now.getMonth();
-loadData();
+document.getElementById('next-week').addEventListener('click', () => {
+  currentWeekStart += WEEK_SECONDS;
+  renderCurrentWeek();
+});
+
+loadData().catch(error => {
+  console.error(error);
+  document.getElementById('feed-status').textContent = 'No event feed available';
+  document.getElementById('status-bar').textContent = 'Launch the game or update the mod so game_events.json can be captured.';
+  document.getElementById('week-range').textContent = 'No Data';
+  document.getElementById('week-subline').textContent = 'Could not load data/game_events.json or data/game_news.json';
+  document.getElementById('agenda-body').innerHTML =
+    '<tr><td colspan="5"><div class="empty-state">No event data available.</div></td></tr>';
+  document.getElementById('week-grid').innerHTML =
+    '<div class="empty-state" style="grid-column:1 / -1;">No weekly event data available.</div>';
+});
 </script>
 </body>
 </html>
