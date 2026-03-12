@@ -642,19 +642,19 @@
       <div class="hero-copy">
         <h1><span>NCC</span> Event Calendar</h1>
         <p>
-          Rebuilt for the way Scopely data actually arrives here: one tactical week at a time.
-          Instead of a full month grid, this board focuses on the currently captured seven-day window
-          and turns it into a readable ops schedule.
+          This board is running from a manually entered weekly schedule for now.
+          Instead of waiting on `events.json`, it turns the dates you give directly into a readable
+          seven-day ops calendar, including split schedules like Mar 9,12 or Mar 9-10,14-15.
         </p>
       </div>
       <div class="hero-side">
         <div class="signal-card">
           <div class="signal-label">Display Mode</div>
-          <div class="signal-value">1 Week Per Capture</div>
+          <div class="signal-value">Manual Week Feed</div>
         </div>
         <div class="signal-card">
           <div class="signal-label">Data Feed</div>
-          <div class="signal-value" id="feed-status">Awaiting event data</div>
+          <div class="signal-value" id="feed-status">Loading manual schedule</div>
         </div>
       </div>
     </div>
@@ -739,16 +739,52 @@
   </section>
 
   <footer>
-    Data captured from game client and shown as a focused weekly ops board.
+    Weekly event schedule entered directly and shown as a focused ops board.
   </footer>
 </div>
 
 <script>
 const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const MONTH_INDEX = MONTH_NAMES.reduce((map, month, index) => {
+  map[month.toLowerCase()] = index;
+  return map;
+}, {});
 const DAY_SECONDS = 86400;
 const WEEK_SECONDS = DAY_SECONDS * 7;
 const LONG_EVENT_THRESHOLD_DAYS = 10;
+const MANUAL_EVENT_YEAR = new Date().getFullYear();
+const MANUAL_EVENT_SERIES = 'Manual Weekly Feed';
+
+const MANUAL_WEEK_EVENTS = [
+  { type: 'SMS', level: '20-50', date: 'Mar 9,12', title: 'BP Domination', activity: 'Gain power via research/buildings/drydocks' },
+  { type: 'SMS', level: '20-29', date: 'Mar 10', title: 'BP Supply Line Scramble', activity: 'Dock ore/crystal/gas or mine parsteel/tritanium/dilithium' },
+  { type: 'SMS', level: '30-50', date: 'Mar 10', title: 'BP Supply Line Scramble', activity: 'Mine common/uncommon/rare/epic transogen' },
+  { type: 'SMS', level: '20-50', date: 'Mar 11,15', title: 'BP Active Augments', activity: 'Destroy augment exile hostiles' },
+  { type: 'SMS', level: '20-50', date: 'Mar 13', title: 'BP Crossfire', activity: 'Destroy hostiles or attack players' },
+  { type: 'SMS', level: '20-50', date: 'Mar 14', title: 'BP Danger Zone', activity: 'Destroy hostiles' },
+  { type: 'SMS', level: '20-29', date: 'Mar 9', title: "KQ Khan's Supply War", activity: 'Extract corrupted + decoded data' },
+  { type: 'SMS', level: '30-50', date: 'Mar 9', title: "KQ Khan's Supply War", activity: 'Mine transogen' },
+  { type: 'SMS', level: '20-50', date: 'Mar 10', title: 'KQ Orchestrated Chaos', activity: 'Destroy hostiles' },
+  { type: 'SMS', level: '20-50', date: 'Mar 11', title: 'KQ Augments Ascendant', activity: 'Destroy augment exiles' },
+  { type: 'SMS', level: '20-25', date: 'Mar 12', title: 'KQ Hidden Design', activity: 'Complete away teams' },
+  { type: 'SMS', level: '26-50', date: 'Mar 12', title: 'KQ Hidden Design', activity: 'Complete priority one away teams' },
+  { type: 'SMS', level: '20-29', date: 'Mar 13', title: 'KQ Strength Above All', activity: 'Defeat players (Nausicaa)' },
+  { type: 'SMS', level: '30-39', date: 'Mar 13', title: 'KQ Strength Above All', activity: 'Defeat players (Yesop)' },
+  { type: 'SMS', level: '40-50', date: 'Mar 13', title: 'KQ Strength Above All', activity: 'Defeat players (Dudu)' },
+  { type: 'SMS', level: '20-50', date: 'Mar 14', title: 'KQ Will of Khan', activity: 'Destroy hostiles' },
+  { type: 'SMS', level: '20-50', date: 'Mar 15', title: 'KQ Divide and Conquer', activity: 'Destroy FKR hostiles' },
+  { type: 'SMS', level: '20-50', date: 'Mar 9-15', title: 'Khanquest Meta Pt2', activity: 'Complete KQ events' },
+  { type: 'RLB', level: '20-50', date: 'Mar 9-13', title: 'Unleash the Wrath', activity: 'Destroy hostiles' },
+  { type: 'SMS', level: '20-50', date: 'Mar 9-10,14-15', title: 'Forged by Khan (Heroic)', activity: 'Recruit/tier Khan officers' },
+  { type: 'SLB', level: '40-50', date: 'Mar 10,15', title: 'Barrier Resilience', activity: 'Mitigate damage with Apex Barrier' },
+  { type: 'SLB', level: '20-39', date: 'Mar 10,15', title: 'Focused Fire', activity: 'Deal damage' },
+  { type: 'SMS', level: '30-50', date: 'Mar 11', title: 'Wavebreaker', activity: 'Defeat wave defense hostiles' },
+  { type: 'SMS', level: '20-50', date: 'Mar 11-12', title: 'Syndicate Advancement', activity: 'Earn syndicate XP' },
+  { type: 'SMS', level: '20-50', date: 'Mar 12-14', title: 'Standing Orders', activity: 'Collect final daily goal' },
+  { type: 'SLB', level: '26-50', date: 'Mar 12-13', title: 'Hijacked Harvest', activity: 'Dock hijacked splicers' },
+  { type: 'SMS', level: '20-50', date: 'Mar 15', title: 'Power Advancement', activity: 'Gain power' }
+];
 
 const VAF_NAMES = {
   factionpve_alliance_leaderboard: 'Alliance Faction LB',
@@ -803,6 +839,12 @@ function esc(value) {
 
 function startOfDay(ts) {
   const d = new Date(ts * 1000);
+  d.setHours(0, 0, 0, 0);
+  return Math.floor(d.getTime() / 1000);
+}
+
+function dayTsFor(year, monthIndex, day) {
+  const d = new Date(year, monthIndex, day);
   d.setHours(0, 0, 0, 0);
   return Math.floor(d.getTime() / 1000);
 }
@@ -900,13 +942,16 @@ function getTimes(raw) {
 }
 
 function overlapsRange(event, start, end) {
+  if (Array.isArray(event.activeDates) && event.activeDates.length) {
+    return event.activeDates.some(dayTs => dayTs >= start && dayTs < end);
+  }
   return event.start < end && event.end > start;
 }
 
 function dedupeEvents(events) {
   const seen = new Set();
   return events.filter(event => {
-    const key = [event.title, event.type, event.start, event.end, event.series].join('|');
+    const key = [event.title, event.type, event.start, event.end, event.series, event.level, event.activity].join('|');
     if (seen.has(key)) return false;
     seen.add(key);
     return true;
@@ -920,6 +965,80 @@ function inferHints(event) {
     }
   }
   return null;
+}
+
+function parseDateSpec(dateSpec, year) {
+  const activeDates = [];
+  let currentMonthIndex = null;
+
+  String(dateSpec || '')
+    .split(',')
+    .map(part => part.trim())
+    .filter(Boolean)
+    .forEach(part => {
+      const match = part.match(/^(?:(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+)?(\d{1,2})(?:\s*-\s*(?:(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+)?(\d{1,2}))?$/i);
+      if (!match) return;
+
+      const [, startMonthLabel, startDayRaw, endMonthLabel, endDayRaw] = match;
+      if (startMonthLabel) {
+        currentMonthIndex = MONTH_INDEX[startMonthLabel.toLowerCase()];
+      }
+      if (currentMonthIndex == null) return;
+
+      const startMonthIndex = currentMonthIndex;
+      const endMonthIndex = endMonthLabel
+        ? MONTH_INDEX[endMonthLabel.toLowerCase()]
+        : startMonthIndex;
+      const startDay = Number(startDayRaw);
+      const endDay = Number(endDayRaw || startDayRaw);
+
+      if (startMonthIndex === endMonthIndex) {
+        for (let day = startDay; day <= endDay; day++) {
+          activeDates.push(dayTsFor(year, startMonthIndex, day));
+        }
+        return;
+      }
+
+      const cursor = new Date(year, startMonthIndex, startDay);
+      const endDate = new Date(year, endMonthIndex, endDay);
+      cursor.setHours(0, 0, 0, 0);
+      endDate.setHours(0, 0, 0, 0);
+      while (cursor <= endDate) {
+        activeDates.push(Math.floor(cursor.getTime() / 1000));
+        cursor.setDate(cursor.getDate() + 1);
+      }
+    });
+
+  return [...new Set(activeDates)].sort((a, b) => a - b);
+}
+
+function normalizeManualEvents(entries) {
+  return dedupeEvents(entries.map((raw, index) => {
+    const activeDates = parseDateSpec(raw.date, MANUAL_EVENT_YEAR);
+    if (!activeDates.length) return null;
+
+    const type = String(raw.type || 'OTHER').toUpperCase();
+    const start = activeDates[0];
+    const end = activeDates[activeDates.length - 1] + DAY_SECONDS;
+
+    return {
+      id: 'manual-' + (index + 1),
+      rawName: raw.title || '',
+      title: raw.title || 'Untitled Event',
+      type,
+      typeClass: eventTypeClass(type),
+      series: MANUAL_EVENT_SERIES,
+      start,
+      end,
+      claimEnd: end,
+      displayTs: end,
+      vafName: '',
+      level: raw.level || '--',
+      activity: raw.activity || 'Objective unavailable',
+      activeDates,
+      dateLabel: raw.date || ''
+    };
+  }).filter(Boolean));
 }
 
 function normalizeRawEvents(data) {
@@ -998,6 +1117,13 @@ function weeklyEventsFor(weekStartTs) {
 }
 
 function activeDaysForWeek(event, weekStartTs) {
+  if (Array.isArray(event.activeDates) && event.activeDates.length) {
+    return event.activeDates
+      .map(dayTs => Math.floor((dayTs - weekStartTs) / DAY_SECONDS))
+      .filter(dayIndex => dayIndex >= 0 && dayIndex < 7)
+      .sort((a, b) => a - b);
+  }
+
   const result = [];
   for (let i = 0; i < 7; i++) {
     const dayStartTs = weekStartTs + (i * DAY_SECONDS);
@@ -1080,7 +1206,7 @@ function renderSummary(weekEvents) {
   document.getElementById('summary-events').textContent = weekEvents.length;
   document.getElementById('summary-focus').textContent = usingFallbackFeed
     ? 'Fallback news feed in use'
-    : 'Filtered out long-running overflow clutter';
+    : 'Weekly schedule entered manually';
   document.getElementById('summary-leaderboard').textContent = leaderboardCount;
   document.getElementById('summary-primary').textContent = primaryEntry ? primaryEntry[0] : '-';
   document.getElementById('summary-primary-detail').textContent = primaryEntry
@@ -1169,32 +1295,18 @@ function renderCurrentWeek() {
 
   document.getElementById('status-bar').textContent = usingFallbackFeed
     ? 'Using data/game_news.json fallback. Activity and level hints may be partial.'
-    : 'Using data/game_events.json. Weekly view hides long-duration overflow noise unless it intersects the captured week directly.';
+    : 'Using the manually entered weekly event list for this ops board.';
 }
 
 async function loadData() {
   const feedStatus = document.getElementById('feed-status');
 
-  try {
-    const response = await fetch('data/game_events.json?t=' + Date.now());
-    if (!response.ok) throw new Error('HTTP ' + response.status);
-    const data = await response.json();
-    allEvents = normalizeRawEvents(data);
-    captureTs = Number(data.capturedAt || 0) || Math.floor(Date.now() / 1000);
-    usingFallbackFeed = false;
-    feedStatus.textContent = allEvents.length + ' events from game_events.json';
-  } catch (error) {
-    console.warn('game_events.json unavailable, trying game_news.json', error);
-    const response = await fetch('data/game_news.json?t=' + Date.now());
-    if (!response.ok) throw new Error('No event feed available');
-    const data = await response.json();
-    allEvents = normalizeNewsItems(data);
-    captureTs = Number(data.capturedAt || 0) || Math.floor(Date.now() / 1000);
-    usingFallbackFeed = true;
-    feedStatus.textContent = allEvents.length + ' items from game_news.json';
-  }
+  allEvents = normalizeManualEvents(MANUAL_WEEK_EVENTS);
+  captureTs = Math.floor(Date.now() / 1000);
+  usingFallbackFeed = false;
+  feedStatus.textContent = allEvents.length + ' manually entered events';
 
-  const anchorTs = captureTs || (allEvents[0] && allEvents[0].start) || Math.floor(Date.now() / 1000);
+  const anchorTs = (allEvents[0] && allEvents[0].start) || captureTs || Math.floor(Date.now() / 1000);
   currentWeekStart = startOfWeek(anchorTs);
   renderCurrentWeek();
 }
@@ -1211,10 +1323,10 @@ document.getElementById('next-week').addEventListener('click', () => {
 
 loadData().catch(error => {
   console.error(error);
-  document.getElementById('feed-status').textContent = 'No event feed available';
-  document.getElementById('status-bar').textContent = 'Launch the game or update the mod so game_events.json can be captured.';
+  document.getElementById('feed-status').textContent = 'No manual event feed available';
+  document.getElementById('status-bar').textContent = 'Add the weekly events directly in calendar.html to populate the board.';
   document.getElementById('week-range').textContent = 'No Data';
-  document.getElementById('week-subline').textContent = 'Could not load data/game_events.json or data/game_news.json';
+  document.getElementById('week-subline').textContent = 'Could not build the manual weekly event feed';
   document.getElementById('agenda-body').innerHTML =
     '<tr><td colspan="5"><div class="empty-state">No event data available.</div></td></tr>';
   document.getElementById('week-grid').innerHTML =
