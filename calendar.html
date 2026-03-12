@@ -186,7 +186,7 @@
 
   .control-shell {
     display: grid;
-    grid-template-columns: auto 1fr auto;
+    grid-template-columns: auto 1fr minmax(210px, auto) auto;
     gap: 16px;
     align-items: center;
     padding: 16px 18px;
@@ -256,6 +256,34 @@
     text-align: right;
   }
 
+  .filter-shell {
+    display: grid;
+    gap: 6px;
+    min-width: 210px;
+  }
+
+  .filter-shell label {
+    color: var(--dim);
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .filter-shell input {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    background: rgba(13, 24, 42, 0.8);
+    color: var(--text);
+    font: inherit;
+  }
+
+  .filter-hint {
+    color: var(--dim);
+    font-size: 0.76rem;
+  }
+
   .summary-shell {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -296,6 +324,7 @@
     padding: 18px;
     border-radius: 28px;
     margin-bottom: 18px;
+    overflow-x: auto;
   }
 
   .section-heading,
@@ -323,8 +352,139 @@
 
   .week-grid {
     display: grid;
-    grid-template-columns: repeat(7, minmax(0, 1fr));
+    grid-template-columns: minmax(220px, 0.95fr) repeat(7, minmax(110px, 1fr));
     gap: 10px;
+    min-width: 1020px;
+    align-items: stretch;
+  }
+
+  .schedule-corner,
+  .schedule-day,
+  .schedule-label,
+  .schedule-bar {
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.06);
+    background: rgba(9, 18, 31, 0.86);
+  }
+
+  .schedule-corner,
+  .schedule-day {
+    padding: 14px 14px 12px;
+  }
+
+  .schedule-corner {
+    color: var(--dim);
+    font-size: 0.75rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .schedule-day {
+    background: linear-gradient(180deg, rgba(24, 42, 70, 0.72), rgba(14, 26, 45, 0.42));
+  }
+
+  .schedule-day.today {
+    border-color: rgba(113, 215, 255, 0.42);
+    box-shadow: inset 0 0 0 1px rgba(113, 215, 255, 0.16);
+  }
+
+  .schedule-day-name {
+    font-family: 'Chakra Petch', sans-serif;
+    font-size: 0.96rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .schedule-day-date {
+    color: var(--muted);
+    font-size: 0.82rem;
+    margin-top: 2px;
+  }
+
+  .schedule-label {
+    display: grid;
+    gap: 8px;
+    padding: 14px 14px 13px;
+    text-align: left;
+    color: var(--text);
+    font: inherit;
+    cursor: pointer;
+    transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+  }
+
+  .schedule-label:hover,
+  .schedule-label:focus-visible,
+  .schedule-bar:hover,
+  .schedule-bar:focus-visible {
+    transform: translateY(-1px);
+    border-color: color-mix(in srgb, var(--accent, var(--cyan)) 42%, rgba(255,255,255,0.08));
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.24);
+    outline: none;
+  }
+
+  .schedule-label-title {
+    font-size: 0.96rem;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  .schedule-label-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .schedule-label-copy {
+    color: var(--muted);
+    font-size: 0.82rem;
+  }
+
+  .schedule-bar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-height: 92px;
+    padding: 12px 14px;
+    text-align: left;
+    color: var(--text);
+    font: inherit;
+    cursor: pointer;
+    overflow: hidden;
+    background:
+      linear-gradient(135deg, color-mix(in srgb, var(--accent, var(--cyan)) 24%, rgba(9, 18, 31, 0.92)), rgba(9, 18, 31, 0.96)),
+      rgba(9, 18, 31, 0.92);
+  }
+
+  .schedule-bar::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 4px;
+    background: var(--accent, var(--cyan));
+  }
+
+  .schedule-bar-copy {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  .schedule-bar-title {
+    font-size: 0.92rem;
+    font-weight: 600;
+    line-height: 1.16;
+  }
+
+  .schedule-bar-sub {
+    color: var(--muted);
+    font-size: 0.78rem;
+    line-height: 1.25;
+  }
+
+  .schedule-bar.single-day {
+    min-height: 82px;
   }
 
   .day-column {
@@ -430,8 +590,7 @@
   .type-badge,
   .status-badge,
   .level-badge,
-  .series-badge,
-  .format-badge {
+  .series-badge {
     display: inline-flex;
     align-items: center;
     padding: 4px 8px;
@@ -479,37 +638,9 @@
     background: rgba(255,255,255,0.05);
   }
 
-  .format-badge {
-    color: #b8c7de;
-    background: rgba(113, 215, 255, 0.08);
-  }
-
   .activity-copy {
     color: var(--muted);
     font-size: 0.84rem;
-  }
-
-  .event-trail {
-    display: grid;
-    grid-template-columns: repeat(7, minmax(0, 1fr));
-    gap: 4px;
-    margin: 12px 0 10px;
-  }
-
-  .trail-segment {
-    height: 8px;
-    border-radius: 999px;
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.04);
-  }
-
-  .trail-segment.active {
-    background: color-mix(in srgb, var(--accent, var(--cyan)) 78%, rgba(255,255,255,0.08));
-    border-color: color-mix(in srgb, var(--accent, var(--cyan)) 65%, rgba(255,255,255,0.08));
-  }
-
-  .trail-segment.current {
-    box-shadow: 0 0 0 1px rgba(255,255,255,0.18);
   }
 
   .event-footline {
@@ -748,13 +879,13 @@
       grid-template-columns: 1fr;
     }
 
+    .control-shell {
+      grid-template-columns: 1fr 1fr;
+    }
+
     .capture-pill {
       justify-self: stretch;
       text-align: left;
-    }
-
-    .week-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 
@@ -789,18 +920,15 @@
       text-align: center;
     }
 
+    .filter-shell {
+      min-width: 0;
+      width: 100%;
+    }
+
     .section-heading,
     .agenda-heading {
       flex-direction: column;
       align-items: flex-start;
-    }
-
-    .week-grid {
-      grid-template-columns: 1fr;
-    }
-
-    .day-column {
-      min-height: auto;
     }
   }
 </style>
@@ -849,6 +977,11 @@
       <div class="range" id="week-range">Loading...</div>
       <div class="subline" id="week-subline">Loading the current seven-day schedule</div>
     </div>
+    <div class="filter-shell">
+      <label for="ops-filter">Ops Level Filter</label>
+      <input id="ops-filter" type="number" min="1" max="70" inputmode="numeric" placeholder="Enter your ops level">
+      <div class="filter-hint" id="ops-filter-hint">Showing all ops brackets</div>
+    </div>
     <div class="capture-pill" id="capture-pill">No schedule loaded</div>
   </section>
 
@@ -878,8 +1011,8 @@
   <section class="week-shell">
     <div class="section-heading">
       <div>
-        <h2>Day By Day</h2>
-        <p>Each column shows the events running on that date. Click any card to open the full scoring brief.</p>
+        <h2>Week Schedule</h2>
+        <p>Each row is one event. Bars stretch across the days it runs, and clicking anywhere opens the full event summary.</p>
       </div>
     </div>
     <div class="week-grid" id="week-grid"></div>
@@ -889,7 +1022,7 @@
     <div class="agenda-heading">
       <div>
         <h2>Week Agenda</h2>
-        <p>Dense table view for quick scanning. Click a row to open the full scoring brief.</p>
+        <p>Dense table view for quick scanning. Click a row to open the full event summary.</p>
       </div>
     </div>
     <div class="agenda-table-wrap">
@@ -934,6 +1067,7 @@ const WEEK_SECONDS = DAY_SECONDS * 7;
 const LONG_EVENT_THRESHOLD_DAYS = 10;
 const MANUAL_EVENT_YEAR = new Date().getFullYear();
 const MANUAL_EVENT_SERIES = 'Manual Weekly Feed';
+const OPS_FILTER_KEY = 'stfc-calendar-ops-level';
 
 const MANUAL_WEEK_EVENTS = [
   { series: 'BP Event', type: 'SMS', format: 'Solo Milestone', level: '20-50', date: 'Mar 9,12', title: 'Domination', activity: 'Gain power through research, defense platforms, buildings, and drydocks.', summary: 'Score in this event by Gaining Power via Research, Defense Platforms, Buildings and Drydocks.' },
@@ -1009,6 +1143,7 @@ let allEvents = [];
 let currentWeekStart = null;
 let captureTs = null;
 let usingFallbackFeed = false;
+let opsLevelFilter = '';
 
 function esc(value) {
   const el = document.createElement('span');
@@ -1093,6 +1228,19 @@ function cleanTitle(name, fallbackVaf) {
   title = title.replace(/^KQ:\s*/i, 'KQ ');
   title = title.replace(/\s{2,}/g, ' ').trim();
   return title;
+}
+
+function parseLevelRange(level) {
+  const match = String(level || '').match(/(\d+)\s*-\s*(\d+)/);
+  if (!match) return null;
+  return { min: Number(match[1]), max: Number(match[2]) };
+}
+
+function eventMatchesOpsLevel(event, opsLevel) {
+  if (!opsLevel) return true;
+  const range = parseLevelRange(event.level);
+  if (!range) return true;
+  return opsLevel >= range.min && opsLevel <= range.max;
 }
 
 function inferType(raw) {
@@ -1356,6 +1504,27 @@ function formatWeekOccurrence(days, weekStartTs) {
   }).join(', ');
 }
 
+function contiguousRuns(days) {
+  if (!days.length) return [];
+  const sorted = [...days].sort((a, b) => a - b);
+  const runs = [];
+  let start = sorted[0];
+  let prev = sorted[0];
+
+  for (let i = 1; i < sorted.length; i++) {
+    if (sorted[i] === prev + 1) {
+      prev = sorted[i];
+      continue;
+    }
+    runs.push([start, prev]);
+    start = sorted[i];
+    prev = sorted[i];
+  }
+
+  runs.push([start, prev]);
+  return runs;
+}
+
 function hashString(value) {
   let hash = 0;
   for (let i = 0; i < value.length; i++) {
@@ -1368,37 +1537,6 @@ function hashString(value) {
 function accentStyle(event) {
   const hue = 190 + (hashString(event.colorKey || event.title || event.id) % 120);
   return '--accent: hsl(' + hue + ' 78% 68%)';
-}
-
-function eventDayPosition(event, dayStartTs) {
-  if (!Array.isArray(event.activeDates)) return null;
-  const index = event.activeDates.indexOf(dayStartTs);
-  if (index === -1) return null;
-  return index + 1;
-}
-
-function statusLabelFor(event, dayStartTs, isToday) {
-  if (isToday) return 'Today';
-  const totalDays = (event.activeDates && event.activeDates.length) || 1;
-  if (totalDays > 1) {
-    const position = eventDayPosition(event, dayStartTs);
-    if (position) return position + ' of ' + totalDays;
-    return totalDays + ' dates';
-  }
-  return 'Single-day';
-}
-
-function renderEventTrail(event, weekStartTs, currentDayStartTs) {
-  return (
-    '<div class="event-trail" aria-hidden="true">' +
-      Array.from({ length: 7 }, (_, idx) => {
-        const dayStartTs = weekStartTs + (idx * DAY_SECONDS);
-        const active = Array.isArray(event.activeDates) && event.activeDates.includes(dayStartTs);
-        const current = dayStartTs === currentDayStartTs;
-        return '<span class="trail-segment' + (active ? ' active' : '') + (current ? ' current' : '') + '"></span>';
-      }).join('') +
-    '</div>'
-  );
 }
 
 function getEventById(eventId) {
@@ -1423,7 +1561,6 @@ function openEventModal(eventId) {
     '</div>' +
     '<div class="modal-meta">' +
       '<span class="type-badge ' + event.typeClass + '">' + esc(event.type) + '</span>' +
-      '<span class="format-badge">' + esc(event.format || 'Event') + '</span>' +
       '<span class="level-badge">' + esc(event.level) + '</span>' +
     '</div>';
 
@@ -1432,7 +1569,6 @@ function openEventModal(eventId) {
       '<div class="modal-label">This Week</div>' +
       '<div class="modal-copy">' + esc(weekLabel) + '</div>' +
       '<div class="modal-copy muted" style="margin-top:6px;">Original schedule: ' + esc(event.dateLabel || weekLabel) + '</div>' +
-      renderEventTrail(event, currentWeekStart, 0) +
     '</div>' +
     '<div class="modal-card">' +
       '<div class="modal-label">How To Score</div>' +
@@ -1457,6 +1593,10 @@ function closeEventModal() {
   document.body.classList.remove('modal-open');
 }
 
+function filteredEventsForOps(events) {
+  return events.filter(event => eventMatchesOpsLevel(event, Number(opsLevelFilter || 0)));
+}
+
 function weekRangeLabel(weekStartTs) {
   return formatDateShort(weekStartTs) + ' - ' + formatDateShort(weekStartTs + (6 * DAY_SECONDS));
 }
@@ -1472,6 +1612,10 @@ function updateControls(weekEvents) {
   document.getElementById('capture-pill').textContent = captureTs
     ? 'Manual load: ' + formatDateTime(captureTs)
     : 'No schedule timestamp available';
+
+  document.getElementById('ops-filter-hint').textContent = opsLevelFilter
+    ? 'Showing events for ops ' + opsLevelFilter
+    : 'Showing all ops brackets';
 
   const hasEarlier = allEvents.some(event => isWeeklyCandidate(event, currentWeekStart - WEEK_SECONDS));
   const hasLater = allEvents.some(event => isWeeklyCandidate(event, weekEndTs));
@@ -1496,9 +1640,9 @@ function renderSummary(weekEvents) {
   const peakDayIndex = dayCounts.indexOf(peakCount);
 
   document.getElementById('summary-events').textContent = weekEvents.length;
-  document.getElementById('summary-focus').textContent = usingFallbackFeed
-    ? 'Fallback news feed in use'
-    : 'Weekly schedule entered manually';
+  document.getElementById('summary-focus').textContent = opsLevelFilter
+    ? 'Filtered for ops ' + opsLevelFilter
+    : (usingFallbackFeed ? 'Fallback news feed in use' : 'Weekly schedule entered manually');
   document.getElementById('summary-leaderboard').textContent = leaderboardCount;
   document.getElementById('summary-primary').textContent = primaryEntry ? primaryEntry[0] : '-';
   document.getElementById('summary-primary-detail').textContent = primaryEntry
@@ -1514,48 +1658,53 @@ function renderWeekGrid(weekEvents) {
   const grid = document.getElementById('week-grid');
   const today = new Date();
 
-  grid.innerHTML = Array.from({ length: 7 }, (_, dayIndex) => {
-    const dayStartTs = currentWeekStart + dayIndex * DAY_SECONDS;
-    const date = new Date(dayStartTs * 1000);
-    const events = weekEvents.filter(event => activeDaysForWeek(event, currentWeekStart).includes(dayIndex));
-    const isToday = isSameDay(date, today);
+  if (!weekEvents.length) {
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1 / -1;">No events match this week and ops filter.</div>';
+    return;
+  }
 
-    const cards = events.length
-      ? events.map(event => {
-        return (
-          '<button type="button" class="event-card ' + event.typeClass + '" data-event-id="' + esc(event.id) + '" style="' + accentStyle(event) + '">' +
-            '<div class="event-topline">' +
-              '<span class="type-badge ' + event.typeClass + '">' + esc(event.type) + '</span>' +
-              '<span class="status-badge">' + esc(statusLabelFor(event, dayStartTs, isToday)) + '</span>' +
-            '</div>' +
-            '<div class="event-title">' + esc(event.title) + '</div>' +
-            '<div class="meta-line">' +
-              '<span class="level-badge">' + esc(event.level) + '</span>' +
-              '<span class="series-badge">' + esc(event.series) + '</span>' +
-              '<span class="format-badge">' + esc(event.format || 'Event') + '</span>' +
-            '</div>' +
-            '<div class="activity-copy">' + esc(event.activity) + '</div>' +
-            renderEventTrail(event, currentWeekStart, dayStartTs) +
-            '<div class="event-footline">' +
-              '<span class="event-datechip">' + esc(event.dateLabel || formatDateShort(dayStartTs)) + '</span>' +
-              '<span class="event-open">Open Brief</span>' +
-            '</div>' +
-          '</button>'
-        );
-      }).join('')
-      : '<div class="empty-card">No tracked events</div>';
+  const headerCells = [
+    '<div class="schedule-corner" style="grid-column:1;grid-row:1;">Event</div>',
+    ...Array.from({ length: 7 }, (_, dayIndex) => {
+      const dayStartTs = currentWeekStart + dayIndex * DAY_SECONDS;
+      const date = new Date(dayStartTs * 1000);
+      const isToday = isSameDay(date, today);
+      return (
+        '<div class="schedule-day' + (isToday ? ' today' : '') + '" style="grid-column:' + (dayIndex + 2) + ';grid-row:1;">' +
+          '<div class="schedule-day-name">' + DAY_NAMES[dayIndex] + '</div>' +
+          '<div class="schedule-day-date">' + formatDateShort(dayStartTs) + '</div>' +
+        '</div>'
+      );
+    })
+  ].join('');
 
-    return (
-      '<section class="day-column' + (isToday ? ' today' : '') + '">' +
-        '<div class="day-head">' +
-          '<div class="day-name">' + DAY_NAMES[dayIndex] + '</div>' +
-          '<div class="day-date">' + formatDateShort(currentWeekStart + dayIndex * DAY_SECONDS) + '</div>' +
-          '<div class="day-count">' + events.length + ' event' + (events.length === 1 ? '' : 's') + '</div>' +
+  const rows = weekEvents.map((event, eventIndex) => {
+    const row = eventIndex + 2;
+    const activeDays = activeDaysForWeek(event, currentWeekStart);
+    const runs = contiguousRuns(activeDays);
+    const label =
+      '<button type="button" class="schedule-label" data-event-id="' + esc(event.id) + '" style="grid-column:1;grid-row:' + row + ';' + accentStyle(event) + '">' +
+        '<div class="schedule-label-title">' + esc(event.title) + '</div>' +
+        '<div class="schedule-label-meta">' +
+          '<span class="type-badge ' + event.typeClass + '">' + esc(event.type) + '</span>' +
+          '<span class="level-badge">' + esc(event.level) + '</span>' +
         '</div>' +
-        '<div class="day-events">' + cards + '</div>' +
-      '</section>'
-    );
+        '<div class="schedule-label-copy">' + esc(event.activity) + '</div>' +
+      '</button>';
+
+    const bars = runs.map(([startDay, endDay], runIndex) => (
+      '<button type="button" class="schedule-bar' + (startDay === endDay ? ' single-day' : '') + '" data-event-id="' + esc(event.id) + '" style="grid-column:' + (startDay + 2) + ' / ' + (endDay + 3) + ';grid-row:' + row + ';' + accentStyle(event) + '">' +
+        '<div class="schedule-bar-copy">' +
+          '<div class="schedule-bar-title">' + esc(event.title) + '</div>' +
+          '<div class="schedule-bar-sub">' + esc(event.dateLabel) + ' | ' + esc(event.level) + (runIndex > 0 ? ' | continued run' : '') + '</div>' +
+        '</div>' +
+      '</button>'
+    )).join('');
+
+    return label + bars;
   }).join('');
+
+  grid.innerHTML = headerCells + rows;
 }
 
 function renderAgenda(weekEvents) {
@@ -1575,7 +1724,7 @@ function renderAgenda(weekEvents) {
         '<td>' + esc(event.level) + '</td>' +
         '<td class="title-cell">' +
           '<strong>' + esc(event.title) + '</strong>' +
-          '<div class="row-sub">' + esc(event.series) + ' | ' + esc(event.format || 'Event') + '</div>' +
+          '<div class="row-sub">' + esc(event.series) + '</div>' +
         '</td>' +
         '<td class="activity-cell">' + esc(event.activity) + '</td>' +
       '</tr>'
@@ -1585,14 +1734,17 @@ function renderAgenda(weekEvents) {
 
 function renderCurrentWeek() {
   const weekEvents = weeklyEventsFor(currentWeekStart);
-  updateControls(weekEvents);
-  renderSummary(weekEvents);
-  renderWeekGrid(weekEvents);
-  renderAgenda(weekEvents);
+  const filteredEvents = filteredEventsForOps(weekEvents);
+  updateControls(filteredEvents);
+  renderSummary(filteredEvents);
+  renderWeekGrid(filteredEvents);
+  renderAgenda(filteredEvents);
 
   document.getElementById('status-bar').textContent = usingFallbackFeed
     ? 'Using data/game_news.json fallback. Activity and level hints may be partial.'
-    : 'Cards are mapped to each date they run. Click a card or agenda row for the full scoring brief.';
+    : (opsLevelFilter
+        ? 'Showing the weekly schedule for ops ' + opsLevelFilter + '. Click a bar or agenda row for the full event summary.'
+        : 'Showing the full weekly schedule. Enter an ops level to filter the board and agenda.');
 }
 
 async function loadData() {
@@ -1602,6 +1754,8 @@ async function loadData() {
   captureTs = Math.floor(Date.now() / 1000);
   usingFallbackFeed = false;
   feedStatus.textContent = allEvents.length + ' manually entered events';
+  opsLevelFilter = localStorage.getItem(OPS_FILTER_KEY) || '';
+  document.getElementById('ops-filter').value = opsLevelFilter;
 
   const anchorTs = (allEvents[0] && allEvents[0].start) || captureTs || Math.floor(Date.now() / 1000);
   currentWeekStart = startOfWeek(anchorTs);
@@ -1615,6 +1769,18 @@ document.getElementById('prev-week').addEventListener('click', () => {
 
 document.getElementById('next-week').addEventListener('click', () => {
   currentWeekStart += WEEK_SECONDS;
+  renderCurrentWeek();
+});
+
+document.getElementById('ops-filter').addEventListener('input', event => {
+  const digits = String(event.target.value || '').replace(/[^\d]/g, '').slice(0, 2);
+  event.target.value = digits;
+  opsLevelFilter = digits;
+  if (digits) {
+    localStorage.setItem(OPS_FILTER_KEY, digits);
+  } else {
+    localStorage.removeItem(OPS_FILTER_KEY);
+  }
   renderCurrentWeek();
 });
 
