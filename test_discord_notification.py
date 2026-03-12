@@ -344,7 +344,7 @@ class TestBuildEmbed:
     def test_title_contains_date(self, members, history):
         latest = {"members": members, "summary": {}}
         embed = sdn.build_embed(latest, history)
-        today = datetime.now().strftime("%Y-%m-%d")
+        today = sdn.now_est().strftime("%Y-%m-%d")
         assert today in embed["title"]
 
     def test_footer_text(self, members, history):
