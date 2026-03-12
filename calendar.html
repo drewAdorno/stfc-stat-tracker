@@ -391,9 +391,15 @@
   }
 
   .event-card {
+    width: 100%;
     padding: 14px 14px 13px;
     background: rgba(6, 13, 24, 0.86);
     position: relative;
+    text-align: left;
+    color: var(--text);
+    font: inherit;
+    cursor: pointer;
+    transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
   }
 
   .event-card::before {
@@ -401,16 +407,17 @@
     position: absolute;
     inset: 0 0 auto 0;
     height: 3px;
-    background: var(--cyan);
+    background: var(--accent, var(--cyan));
     opacity: 0.9;
   }
 
-  .event-card.type-sms::before { background: #71d7ff; }
-  .event-card.type-slb::before { background: #ff8ee3; }
-  .event-card.type-rlb::before { background: #ffd36a; }
-  .event-card.type-alb::before,
-  .event-card.type-ams::before { background: #73f0b8; }
-  .event-card.type-other::before { background: #a7b3c8; }
+  .event-card:hover,
+  .event-card:focus-visible {
+    transform: translateY(-2px);
+    border-color: color-mix(in srgb, var(--accent, var(--cyan)) 40%, rgba(255,255,255,0.08));
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.26);
+    outline: none;
+  }
 
   .event-topline {
     display: flex;
@@ -423,7 +430,8 @@
   .type-badge,
   .status-badge,
   .level-badge,
-  .series-badge {
+  .series-badge,
+  .format-badge {
     display: inline-flex;
     align-items: center;
     padding: 4px 8px;
@@ -471,9 +479,57 @@
     background: rgba(255,255,255,0.05);
   }
 
+  .format-badge {
+    color: #b8c7de;
+    background: rgba(113, 215, 255, 0.08);
+  }
+
   .activity-copy {
     color: var(--muted);
     font-size: 0.84rem;
+  }
+
+  .event-trail {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 4px;
+    margin: 12px 0 10px;
+  }
+
+  .trail-segment {
+    height: 8px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.04);
+  }
+
+  .trail-segment.active {
+    background: color-mix(in srgb, var(--accent, var(--cyan)) 78%, rgba(255,255,255,0.08));
+    border-color: color-mix(in srgb, var(--accent, var(--cyan)) 65%, rgba(255,255,255,0.08));
+  }
+
+  .trail-segment.current {
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.18);
+  }
+
+  .event-footline {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    align-items: center;
+    margin-top: 4px;
+    color: var(--dim);
+    font-size: 0.76rem;
+  }
+
+  .event-datechip {
+    color: #d8e6f8;
+  }
+
+  .event-open {
+    color: var(--accent, var(--cyan));
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
   }
 
   .empty-card {
@@ -528,6 +584,7 @@
 
   tbody tr:hover { background: rgba(19, 36, 61, 0.42); }
   tbody tr:last-child td { border-bottom: none; }
+  tbody tr[data-event-id] { cursor: pointer; }
 
   .date-cell {
     min-width: 160px;
@@ -556,6 +613,120 @@
     color: var(--dim);
     font-size: 0.85rem;
     text-align: center;
+  }
+
+  .modal-shell[hidden] {
+    display: none;
+  }
+
+  .modal-shell {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    display: grid;
+    place-items: center;
+    padding: 22px;
+  }
+
+  .modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(3, 8, 16, 0.72);
+    backdrop-filter: blur(10px);
+  }
+
+  .modal-panel {
+    position: relative;
+    z-index: 1;
+    width: min(760px, calc(100vw - 24px));
+    max-height: min(88vh, 940px);
+    overflow: auto;
+    border-radius: 28px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background:
+      radial-gradient(circle at top right, color-mix(in srgb, var(--accent, var(--cyan)) 18%, transparent), transparent 34%),
+      linear-gradient(180deg, rgba(14, 26, 43, 0.98), rgba(8, 16, 28, 0.97));
+    box-shadow: 0 30px 90px rgba(0, 0, 0, 0.45);
+  }
+
+  .modal-head {
+    padding: 22px 22px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .modal-kicker {
+    color: var(--accent, var(--cyan));
+    font-size: 0.78rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .modal-title-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .modal-title {
+    font-family: 'Chakra Petch', sans-serif;
+    font-size: clamp(1.5rem, 4vw, 2.3rem);
+    line-height: 0.98;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .modal-close {
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.04);
+    color: var(--text);
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .modal-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+  }
+
+  .modal-body {
+    display: grid;
+    gap: 18px;
+    padding: 18px 22px 22px;
+  }
+
+  .modal-card {
+    padding: 16px 16px 14px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.06);
+    background: rgba(255,255,255,0.03);
+  }
+
+  .modal-label {
+    color: var(--dim);
+    font-size: 0.74rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    margin-bottom: 7px;
+  }
+
+  .modal-copy {
+    color: var(--text);
+    font-size: 0.98rem;
+  }
+
+  .modal-copy.muted {
+    color: var(--muted);
+  }
+
+  body.modal-open {
+    overflow: hidden;
   }
 
   .empty-state {
@@ -674,11 +845,11 @@
       <button id="next-week" type="button">Next Week &rarr;</button>
     </div>
     <div class="week-heading">
-      <div class="eyebrow">Captured Window</div>
+      <div class="eyebrow">Weekly Window</div>
       <div class="range" id="week-range">Loading...</div>
-      <div class="subline" id="week-subline">Finding the best seven-day slice</div>
+      <div class="subline" id="week-subline">Loading the current seven-day schedule</div>
     </div>
-    <div class="capture-pill" id="capture-pill">No capture yet</div>
+    <div class="capture-pill" id="capture-pill">No schedule loaded</div>
   </section>
 
   <section class="summary-shell">
@@ -708,7 +879,7 @@
     <div class="section-heading">
       <div>
         <h2>Day By Day</h2>
-        <p>Each column shows the events active that day, filtered to the current captured week.</p>
+        <p>Each column shows the events running on that date. Click any card to open the full scoring brief.</p>
       </div>
     </div>
     <div class="week-grid" id="week-grid"></div>
@@ -718,7 +889,7 @@
     <div class="agenda-heading">
       <div>
         <h2>Week Agenda</h2>
-        <p>Dense table view for quick scanning: type, level, date, title, and activity.</p>
+        <p>Dense table view for quick scanning. Click a row to open the full scoring brief.</p>
       </div>
     </div>
     <div class="agenda-table-wrap">
@@ -743,6 +914,14 @@
   </footer>
 </div>
 
+<div class="modal-shell" id="event-modal" hidden>
+  <div class="modal-backdrop" id="modal-backdrop"></div>
+  <div class="modal-panel" id="modal-panel">
+    <div class="modal-head" id="modal-head"></div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
 <script>
 const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -757,33 +936,33 @@ const MANUAL_EVENT_YEAR = new Date().getFullYear();
 const MANUAL_EVENT_SERIES = 'Manual Weekly Feed';
 
 const MANUAL_WEEK_EVENTS = [
-  { type: 'SMS', level: '20-50', date: 'Mar 9,12', title: 'BP Domination', activity: 'Gain power via research/buildings/drydocks' },
-  { type: 'SMS', level: '20-29', date: 'Mar 10', title: 'BP Supply Line Scramble', activity: 'Dock ore/crystal/gas or mine parsteel/tritanium/dilithium' },
-  { type: 'SMS', level: '30-50', date: 'Mar 10', title: 'BP Supply Line Scramble', activity: 'Mine common/uncommon/rare/epic transogen' },
-  { type: 'SMS', level: '20-50', date: 'Mar 11,15', title: 'BP Active Augments', activity: 'Destroy augment exile hostiles' },
-  { type: 'SMS', level: '20-50', date: 'Mar 13', title: 'BP Crossfire', activity: 'Destroy hostiles or attack players' },
-  { type: 'SMS', level: '20-50', date: 'Mar 14', title: 'BP Danger Zone', activity: 'Destroy hostiles' },
-  { type: 'SMS', level: '20-29', date: 'Mar 9', title: "KQ Khan's Supply War", activity: 'Extract corrupted + decoded data' },
-  { type: 'SMS', level: '30-50', date: 'Mar 9', title: "KQ Khan's Supply War", activity: 'Mine transogen' },
-  { type: 'SMS', level: '20-50', date: 'Mar 10', title: 'KQ Orchestrated Chaos', activity: 'Destroy hostiles' },
-  { type: 'SMS', level: '20-50', date: 'Mar 11', title: 'KQ Augments Ascendant', activity: 'Destroy augment exiles' },
-  { type: 'SMS', level: '20-25', date: 'Mar 12', title: 'KQ Hidden Design', activity: 'Complete away teams' },
-  { type: 'SMS', level: '26-50', date: 'Mar 12', title: 'KQ Hidden Design', activity: 'Complete priority one away teams' },
-  { type: 'SMS', level: '20-29', date: 'Mar 13', title: 'KQ Strength Above All', activity: 'Defeat players (Nausicaa)' },
-  { type: 'SMS', level: '30-39', date: 'Mar 13', title: 'KQ Strength Above All', activity: 'Defeat players (Yesop)' },
-  { type: 'SMS', level: '40-50', date: 'Mar 13', title: 'KQ Strength Above All', activity: 'Defeat players (Dudu)' },
-  { type: 'SMS', level: '20-50', date: 'Mar 14', title: 'KQ Will of Khan', activity: 'Destroy hostiles' },
-  { type: 'SMS', level: '20-50', date: 'Mar 15', title: 'KQ Divide and Conquer', activity: 'Destroy FKR hostiles' },
-  { type: 'SMS', level: '20-50', date: 'Mar 9-15', title: 'Khanquest Meta Pt2', activity: 'Complete KQ events' },
-  { type: 'RLB', level: '20-50', date: 'Mar 9-13', title: 'Unleash the Wrath', activity: 'Destroy hostiles' },
-  { type: 'SMS', level: '20-50', date: 'Mar 9-10,14-15', title: 'Forged by Khan (Heroic)', activity: 'Recruit/tier Khan officers' },
-  { type: 'SLB', level: '40-50', date: 'Mar 10,15', title: 'Barrier Resilience', activity: 'Mitigate damage with Apex Barrier' },
-  { type: 'SLB', level: '20-39', date: 'Mar 10,15', title: 'Focused Fire', activity: 'Deal damage' },
-  { type: 'SMS', level: '30-50', date: 'Mar 11', title: 'Wavebreaker', activity: 'Defeat wave defense hostiles' },
-  { type: 'SMS', level: '20-50', date: 'Mar 11-12', title: 'Syndicate Advancement', activity: 'Earn syndicate XP' },
-  { type: 'SMS', level: '20-50', date: 'Mar 12-14', title: 'Standing Orders', activity: 'Collect final daily goal' },
-  { type: 'SLB', level: '26-50', date: 'Mar 12-13', title: 'Hijacked Harvest', activity: 'Dock hijacked splicers' },
-  { type: 'SMS', level: '20-50', date: 'Mar 15', title: 'Power Advancement', activity: 'Gain power' }
+  { series: 'BP Event', type: 'SMS', format: 'Solo Milestone', level: '20-50', date: 'Mar 9,12', title: 'Domination', activity: 'Gain power through research, defense platforms, buildings, and drydocks.', summary: 'Score in this event by Gaining Power via Research, Defense Platforms, Buildings and Drydocks.' },
+  { series: 'BP Event', type: 'SMS', format: 'Solo Milestone', level: '20-29', date: 'Mar 10', title: 'Supply Line Scramble', activity: 'Dock ore, crystal, and gas or mine parsteel, tritanium, and dilithium.', summary: 'Score in this event by Docking Ore, Crystal, and Gas or Mining Parsteel, Tritanium, and Dilithium.' },
+  { series: 'BP Event', type: 'SMS', format: 'Solo Milestone', level: '30-50', date: 'Mar 10', title: 'Supply Line Scramble', activity: 'Mine common, uncommon, rare, and epic transogen.', summary: 'Score in this event by mining Common, Uncommon, Rare and Epic Transogen.' },
+  { series: 'BP Event', type: 'SMS', format: 'Solo Milestone', level: '20-50', date: 'Mar 11,15', title: 'Active Augments', activity: 'Destroy Augment Exile hostiles, with bonus points from Revenge and DY-200 kills.', summary: 'Score in this event by destroying Augment Exile Hostiles with a much needed bonus by destroying Augment Exile Revenge and DY-200 Hostiles. Score bonus points for using the USS Reliant.' },
+  { series: 'BP Event', type: 'SMS', format: 'Solo Milestone', level: '20-50', date: 'Mar 13', title: 'Crossfire', activity: 'Destroy hostiles or attack player ships in Risa, Maluria, or Tellun.', summary: 'Score in this event by destroying Hostiles or engaging Player Ships in Risa, Maluria, or Tellun.' },
+  { series: 'BP Event', type: 'SMS', format: 'Solo Milestone', level: '20-50', date: 'Mar 14', title: 'Danger Zone', activity: 'Destroy hostiles, with bonus points for the USS Reliant or Stella.', summary: 'Score in this event by destroying hostiles. Bonus points for using the USS Reliant or Stella.' },
+  { series: 'Khanquest', type: 'SMS', format: 'Solo Milestone', level: '20-29', date: 'Mar 9', title: "Khan's Supply War", activity: 'Extract corrupted and decoded data.', summary: 'Score in this event by extracting corrupted and decoded data. Event completion scores into the Khanquest Meta Pt. 2 - SMS event.' },
+  { series: 'Khanquest', type: 'SMS', format: 'Solo Milestone', level: '30-50', date: 'Mar 9', title: "Khan's Supply War", activity: 'Mine common, uncommon, rare, and epic transogen.', summary: 'Score in this event by mining Common, Uncommon, Rare and Epic Transogen. Event completion scores into the Khanquest Meta Pt. 2 - SMS event.' },
+  { series: 'Khanquest', type: 'SMS', format: 'Solo Milestone', level: '20-50', date: 'Mar 10', title: 'Orchestrated Chaos', activity: 'Destroy hostiles.', summary: 'Score in this event by destroying hostiles. Event completion scores into the Khanquest Meta Pt. 2 - SMS event.' },
+  { series: 'Khanquest', type: 'SMS', format: 'Solo Milestone', level: '20-50', date: 'Mar 11', title: 'Augments Ascendant', activity: 'Destroy Augment Exile hostiles.', summary: 'Score in this event by destroying Augment Exile Hostiles. Event completion scores into the Khanquest Meta Pt. 2 - SMS event.' },
+  { series: 'Khanquest', type: 'SMS', format: 'Solo Milestone', level: '20-25', date: 'Mar 12', title: 'The Hidden Design', activity: 'Complete Away Teams assignments.', summary: 'Score in this event by completing Away Teams Assignments. Event completion scores into the Khanquest Meta Pt. 2 - SMS event.' },
+  { series: 'Khanquest', type: 'SMS', format: 'Solo Milestone', level: '26-50', date: 'Mar 12', title: 'The Hidden Design', activity: 'Complete Priority One Away Teams assignments.', summary: 'Score in this event by completing Priority One Away Teams Assignments. Event completion scores into the Khanquest Meta Pt. 2 - SMS event.' },
+  { series: 'Khanquest', type: 'SMS', format: 'Solo Milestone', level: '20-29', date: 'Mar 13', title: 'Strength Above All', activity: 'Defeat level 20-29 players in Nausicaa, with small PvE hostile points.', summary: 'Score in this event by defeating level 20-29 players in system Nausicaa. Earn small points by defeating PvE hostiles. Event completion scores into the Khanquest Meta Pt. 2 - SMS event.' },
+  { series: 'Khanquest', type: 'SMS', format: 'Solo Milestone', level: '30-39', date: 'Mar 13', title: 'Strength Above All', activity: 'Defeat level 30-39 players in Yesop, with small PvE hostile points.', summary: 'Score in this event by defeating level 30-39 players in system Yesop. Earn small points by defeating PvE hostiles. Event completion scores into the Khanquest Meta Pt. 2 - SMS event.' },
+  { series: 'Khanquest', type: 'SMS', format: 'Solo Milestone', level: '40-50', date: 'Mar 13', title: 'Strength Above All', activity: 'Defeat level 40-50 players in Dudu, with small PvE hostile points.', summary: 'Score in this event by defeating level 40-50 players in system Dudu. Earn small points by defeating PvE hostiles. Event completion scores into the Khanquest Meta Pt. 2 - SMS event.' },
+  { series: 'Khanquest', type: 'SMS', format: 'Solo Milestone', level: '20-50', date: 'Mar 14', title: 'Will of Khan', activity: 'Destroy hostiles, with bridge bonus from listed WOK officers.', summary: 'Score in this event by destroying hostiles. Bonus for having listed WOK officers on the Bridge. Event completion scores into the Khanquest Meta Pt. 2 - SMS event.' },
+  { series: 'Khanquest', type: 'SMS', format: 'Solo Milestone', level: '20-50', date: 'Mar 15', title: 'Divide and Conquer', activity: 'Destroy FKR hostiles.', summary: 'Score in this event by destroying FKR hostiles. Event completion scores into the Khanquest Meta Pt. 2 - SMS event.' },
+  { series: 'Khanquest Meta', type: 'SMS', format: 'Solo Milestone', level: '20-50', date: 'Mar 9-15', title: 'Khanquest Meta Pt. 2', activity: 'Complete daily Khanquest events to earn milestone points.', summary: 'Score in this meta event by completing the daily Khanquest (KQ) events to earn milestone points and claim your rewards.' },
+  { series: 'Cross-Server Ops', type: 'RLB', format: 'Cross-Server Solo Leaderboard', level: '20-50', date: 'Mar 9-13', title: 'Unleash the Wrath', activity: 'Destroy hostiles.', summary: 'Score in this event by destroying hostiles.' },
+  { series: 'Heroic Event', type: 'SMS', format: 'Solo Milestone', level: '20-50', date: 'Mar 9-10,14-15', title: 'Forged by Khan (Heroic)', activity: 'Recruit and tier up Khan-linked officers.', summary: 'Complete this event by recruiting and tiering up officers who have encountered or allied with Khan Noonien Singh.' },
+  { series: 'Apex Combat', type: 'SLB', format: 'Solo Leaderboard', level: '40-50', date: 'Mar 10,15', title: 'Barrier Resilience', activity: 'Mitigate damage with Apex Barrier against hostiles.', summary: 'Score in this event by mitigating damage with Apex Barrier against hostiles.' },
+  { series: 'Apex Combat', type: 'SLB', format: 'Solo Leaderboard', level: '20-39', date: 'Mar 10,15', title: 'Focused Fire', activity: 'Deal damage.', summary: 'Score in this event by dealing damage.' },
+  { series: 'Wave Defense', type: 'SMS', format: 'Solo Milestone', level: '30-50', date: 'Mar 11', title: 'Wavebreaker', activity: 'Defeat Wave Defense hostiles successfully.', summary: 'Score by defeating Wave Defense hostiles successfully to score.' },
+  { series: 'Heroic Event', type: 'SMS', format: 'Solo Milestone', level: '20-50', date: 'Mar 11-12', title: 'Syndicate Advancement (Heroic)', activity: 'Earn Syndicate XP.', summary: 'Score in this event by earning Syndicate XP.' },
+  { series: 'Daily Ops', type: 'SMS', format: 'Solo Milestone', level: '20-50', date: 'Mar 12-14', title: 'Standing Orders', activity: 'Collect the final Daily Goal milestone each day.', summary: 'Score in this event by collecting the final Daily Goal Milestone each day the event is live.' },
+  { series: 'Hijacked Event', type: 'SLB', format: 'Solo Leaderboard', level: '26-50', date: 'Mar 12-13', title: 'Hijacked Harvest', activity: 'Dock Hijacked Splicers.', summary: 'Score in this event by docking Hijacked Splicers.' },
+  { series: 'Power Event', type: 'SMS', format: 'Solo Milestone', level: '20-50', date: 'Mar 15', title: 'Power Advancement', activity: 'Gain power through research, defense platforms, buildings, and drydocks.', summary: 'Score in this event by Gaining Power via Research, Defense Platforms, Buildings and Drydocks.' }
 ];
 
 const VAF_NAMES = {
@@ -873,6 +1052,15 @@ function formatDateTime(ts) {
     day: 'numeric',
     hour: 'numeric',
     minute: '2-digit'
+  });
+}
+
+function formatDateLong(ts) {
+  if (!ts) return 'Unknown';
+  return new Date(ts * 1000).toLocaleDateString('en-US', {
+    weekday: 'long',
+    month: 'short',
+    day: 'numeric'
   });
 }
 
@@ -1027,7 +1215,7 @@ function normalizeManualEvents(entries) {
       title: raw.title || 'Untitled Event',
       type,
       typeClass: eventTypeClass(type),
-      series: MANUAL_EVENT_SERIES,
+      series: raw.series || MANUAL_EVENT_SERIES,
       start,
       end,
       claimEnd: end,
@@ -1035,8 +1223,11 @@ function normalizeManualEvents(entries) {
       vafName: '',
       level: raw.level || '--',
       activity: raw.activity || 'Objective unavailable',
+      summary: raw.summary || raw.activity || 'No scoring summary provided.',
+      format: raw.format || 'Event',
       activeDates,
-      dateLabel: raw.date || ''
+      dateLabel: raw.date || '',
+      colorKey: String((raw.series || '') + '|' + (raw.title || ''))
     };
   }).filter(Boolean));
 }
@@ -1165,6 +1356,107 @@ function formatWeekOccurrence(days, weekStartTs) {
   }).join(', ');
 }
 
+function hashString(value) {
+  let hash = 0;
+  for (let i = 0; i < value.length; i++) {
+    hash = ((hash << 5) - hash) + value.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash);
+}
+
+function accentStyle(event) {
+  const hue = 190 + (hashString(event.colorKey || event.title || event.id) % 120);
+  return '--accent: hsl(' + hue + ' 78% 68%)';
+}
+
+function eventDayPosition(event, dayStartTs) {
+  if (!Array.isArray(event.activeDates)) return null;
+  const index = event.activeDates.indexOf(dayStartTs);
+  if (index === -1) return null;
+  return index + 1;
+}
+
+function statusLabelFor(event, dayStartTs, isToday) {
+  if (isToday) return 'Today';
+  const totalDays = (event.activeDates && event.activeDates.length) || 1;
+  if (totalDays > 1) {
+    const position = eventDayPosition(event, dayStartTs);
+    if (position) return position + ' of ' + totalDays;
+    return totalDays + ' dates';
+  }
+  return 'Single-day';
+}
+
+function renderEventTrail(event, weekStartTs, currentDayStartTs) {
+  return (
+    '<div class="event-trail" aria-hidden="true">' +
+      Array.from({ length: 7 }, (_, idx) => {
+        const dayStartTs = weekStartTs + (idx * DAY_SECONDS);
+        const active = Array.isArray(event.activeDates) && event.activeDates.includes(dayStartTs);
+        const current = dayStartTs === currentDayStartTs;
+        return '<span class="trail-segment' + (active ? ' active' : '') + (current ? ' current' : '') + '"></span>';
+      }).join('') +
+    '</div>'
+  );
+}
+
+function getEventById(eventId) {
+  return allEvents.find(event => event.id === eventId) || null;
+}
+
+function openEventModal(eventId) {
+  const event = getEventById(eventId);
+  if (!event) return;
+
+  const modal = document.getElementById('event-modal');
+  const head = document.getElementById('modal-head');
+  const body = document.getElementById('modal-body');
+  const weekDays = activeDaysForWeek(event, currentWeekStart);
+  const weekLabel = formatWeekOccurrence(weekDays, currentWeekStart);
+
+  head.innerHTML =
+    '<div class="modal-kicker" style="' + accentStyle(event) + '">' + esc(event.series) + '</div>' +
+    '<div class="modal-title-row">' +
+      '<div class="modal-title">' + esc(event.title) + '</div>' +
+      '<button class="modal-close" id="modal-close" type="button" aria-label="Close event details">X</button>' +
+    '</div>' +
+    '<div class="modal-meta">' +
+      '<span class="type-badge ' + event.typeClass + '">' + esc(event.type) + '</span>' +
+      '<span class="format-badge">' + esc(event.format || 'Event') + '</span>' +
+      '<span class="level-badge">' + esc(event.level) + '</span>' +
+    '</div>';
+
+  body.innerHTML =
+    '<div class="modal-card" style="' + accentStyle(event) + '">' +
+      '<div class="modal-label">This Week</div>' +
+      '<div class="modal-copy">' + esc(weekLabel) + '</div>' +
+      '<div class="modal-copy muted" style="margin-top:6px;">Original schedule: ' + esc(event.dateLabel || weekLabel) + '</div>' +
+      renderEventTrail(event, currentWeekStart, 0) +
+    '</div>' +
+    '<div class="modal-card">' +
+      '<div class="modal-label">How To Score</div>' +
+      '<div class="modal-copy">' + esc(event.summary || event.activity) + '</div>' +
+    '</div>' +
+    '<div class="modal-card">' +
+      '<div class="modal-label">Quick Read</div>' +
+      '<div class="modal-copy">' + esc(event.activity) + '</div>' +
+    '</div>' +
+    '<div class="modal-card">' +
+      '<div class="modal-label">Window Anchor</div>' +
+      '<div class="modal-copy muted">Starts ' + esc(formatDateLong(event.start)) + ' and is mapped into the current seven-day board using the dates above.</div>' +
+    '</div>';
+
+  modal.hidden = false;
+  document.body.classList.add('modal-open');
+  document.getElementById('modal-close').addEventListener('click', closeEventModal);
+}
+
+function closeEventModal() {
+  document.getElementById('event-modal').hidden = true;
+  document.body.classList.remove('modal-open');
+}
+
 function weekRangeLabel(weekStartTs) {
   return formatDateShort(weekStartTs) + ' - ' + formatDateShort(weekStartTs + (6 * DAY_SECONDS));
 }
@@ -1174,12 +1466,12 @@ function updateControls(weekEvents) {
   document.getElementById('week-range').textContent = weekRangeLabel(currentWeekStart);
   document.getElementById('week-subline').textContent =
     weekEvents.length
-      ? weekEvents.length + ' focused events inside this captured week'
-      : 'No captured events match this seven-day window';
+      ? weekEvents.length + ' scheduled events inside this seven-day window'
+      : 'No scheduled events match this seven-day window';
 
   document.getElementById('capture-pill').textContent = captureTs
-    ? 'Last captured: ' + formatDateTime(captureTs)
-    : 'No capture timestamp available';
+    ? 'Manual load: ' + formatDateTime(captureTs)
+    : 'No schedule timestamp available';
 
   const hasEarlier = allEvents.some(event => isWeeklyCandidate(event, currentWeekStart - WEEK_SECONDS));
   const hasLater = allEvents.some(event => isWeeklyCandidate(event, weekEndTs));
@@ -1220,30 +1512,35 @@ function renderSummary(weekEvents) {
 
 function renderWeekGrid(weekEvents) {
   const grid = document.getElementById('week-grid');
-  const nowTs = Date.now() / 1000;
   const today = new Date();
 
   grid.innerHTML = Array.from({ length: 7 }, (_, dayIndex) => {
-    const date = new Date((currentWeekStart + dayIndex * DAY_SECONDS) * 1000);
+    const dayStartTs = currentWeekStart + dayIndex * DAY_SECONDS;
+    const date = new Date(dayStartTs * 1000);
     const events = weekEvents.filter(event => activeDaysForWeek(event, currentWeekStart).includes(dayIndex));
     const isToday = isSameDay(date, today);
 
     const cards = events.length
       ? events.map(event => {
-        const activeNow = event.start <= nowTs && event.claimEnd > nowTs;
         return (
-          '<article class="event-card ' + event.typeClass + '">' +
+          '<button type="button" class="event-card ' + event.typeClass + '" data-event-id="' + esc(event.id) + '" style="' + accentStyle(event) + '">' +
             '<div class="event-topline">' +
               '<span class="type-badge ' + event.typeClass + '">' + esc(event.type) + '</span>' +
-              '<span class="status-badge">' + (activeNow ? 'Active' : 'Scheduled') + '</span>' +
+              '<span class="status-badge">' + esc(statusLabelFor(event, dayStartTs, isToday)) + '</span>' +
             '</div>' +
             '<div class="event-title">' + esc(event.title) + '</div>' +
             '<div class="meta-line">' +
               '<span class="level-badge">' + esc(event.level) + '</span>' +
               '<span class="series-badge">' + esc(event.series) + '</span>' +
+              '<span class="format-badge">' + esc(event.format || 'Event') + '</span>' +
             '</div>' +
             '<div class="activity-copy">' + esc(event.activity) + '</div>' +
-          '</article>'
+            renderEventTrail(event, currentWeekStart, dayStartTs) +
+            '<div class="event-footline">' +
+              '<span class="event-datechip">' + esc(event.dateLabel || formatDateShort(dayStartTs)) + '</span>' +
+              '<span class="event-open">Open Brief</span>' +
+            '</div>' +
+          '</button>'
         );
       }).join('')
       : '<div class="empty-card">No tracked events</div>';
@@ -1264,7 +1561,7 @@ function renderWeekGrid(weekEvents) {
 function renderAgenda(weekEvents) {
   const body = document.getElementById('agenda-body');
   if (!weekEvents.length) {
-    body.innerHTML = '<tr><td colspan="5"><div class="empty-state">No events were captured for this weekly slice.</div></td></tr>';
+    body.innerHTML = '<tr><td colspan="5"><div class="empty-state">No events are scheduled for this weekly slice.</div></td></tr>';
     return;
   }
 
@@ -1272,13 +1569,13 @@ function renderAgenda(weekEvents) {
     const activeDays = activeDaysForWeek(event, currentWeekStart);
     const windowLabel = formatWeekOccurrence(activeDays, currentWeekStart);
     return (
-      '<tr>' +
+      '<tr data-event-id="' + esc(event.id) + '">' +
         '<td class="date-cell">' + esc(windowLabel) + '</td>' +
         '<td><span class="type-badge ' + event.typeClass + '">' + esc(event.type) + '</span></td>' +
         '<td>' + esc(event.level) + '</td>' +
         '<td class="title-cell">' +
           '<strong>' + esc(event.title) + '</strong>' +
-          '<div class="row-sub">' + esc(event.series) + ' | starts ' + esc(formatDateTime(event.start)) + '</div>' +
+          '<div class="row-sub">' + esc(event.series) + ' | ' + esc(event.format || 'Event') + '</div>' +
         '</td>' +
         '<td class="activity-cell">' + esc(event.activity) + '</td>' +
       '</tr>'
@@ -1295,7 +1592,7 @@ function renderCurrentWeek() {
 
   document.getElementById('status-bar').textContent = usingFallbackFeed
     ? 'Using data/game_news.json fallback. Activity and level hints may be partial.'
-    : 'Using the manually entered weekly event list for this ops board.';
+    : 'Cards are mapped to each date they run. Click a card or agenda row for the full scoring brief.';
 }
 
 async function loadData() {
@@ -1319,6 +1616,25 @@ document.getElementById('prev-week').addEventListener('click', () => {
 document.getElementById('next-week').addEventListener('click', () => {
   currentWeekStart += WEEK_SECONDS;
   renderCurrentWeek();
+});
+
+document.getElementById('week-grid').addEventListener('click', event => {
+  const trigger = event.target.closest('[data-event-id]');
+  if (!trigger) return;
+  openEventModal(trigger.getAttribute('data-event-id'));
+});
+
+document.getElementById('agenda-body').addEventListener('click', event => {
+  const trigger = event.target.closest('[data-event-id]');
+  if (!trigger) return;
+  openEventModal(trigger.getAttribute('data-event-id'));
+});
+
+document.getElementById('modal-backdrop').addEventListener('click', closeEventModal);
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape' && !document.getElementById('event-modal').hidden) {
+    closeEventModal();
+  }
 });
 
 loadData().catch(error => {
