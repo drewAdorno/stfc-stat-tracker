@@ -1337,36 +1337,82 @@ function parseDateSpec(dateSpec, year) {
   return [...new Set(activeDates)].sort((a, b) => a - b);
 }
 
+function splitActiveDateRuns(activeDates) {
+  if (!activeDates.length) return [];
+  const sorted = [...activeDates].sort((a, b) => a - b);
+  const runs = [];
+  let start = sorted[0];
+  let prev = sorted[0];
+
+  for (let i = 1; i < sorted.length; i++) {
+    if (sorted[i] === prev + DAY_SECONDS) {
+      prev = sorted[i];
+      continue;
+    }
+    runs.push([start, prev]);
+    start = sorted[i];
+    prev = sorted[i];
+  }
+
+  runs.push([start, prev]);
+  return runs.map(([runStart, runEnd]) => {
+    const days = [];
+    for (let ts = runStart; ts <= runEnd; ts += DAY_SECONDS) {
+      days.push(ts);
+    }
+    return days;
+  });
+}
+
+function formatDateSpan(activeDates) {
+  if (!activeDates.length) return '';
+  const startTs = activeDates[0];
+  const endTs = activeDates[activeDates.length - 1];
+  const startDate = new Date(startTs * 1000);
+  const endDate = new Date(endTs * 1000);
+  const startLabel = MONTH_NAMES[startDate.getMonth()] + ' ' + startDate.getDate();
+
+  if (startTs === endTs) return startLabel;
+  if (startDate.getMonth() === endDate.getMonth()) {
+    return startLabel + '-' + endDate.getDate();
+  }
+  return startLabel + ' - ' + MONTH_NAMES[endDate.getMonth()] + ' ' + endDate.getDate();
+}
+
 function normalizeManualEvents(entries) {
-  return dedupeEvents(entries.map((raw, index) => {
+  return dedupeEvents(entries.flatMap((raw, index) => {
     const activeDates = parseDateSpec(raw.date, MANUAL_EVENT_YEAR);
-    if (!activeDates.length) return null;
+    if (!activeDates.length) return [];
 
     const type = String(raw.type || 'OTHER').toUpperCase();
-    const start = activeDates[0];
-    const end = activeDates[activeDates.length - 1] + DAY_SECONDS;
+    const colorKey = String((raw.series || '') + '|' + (raw.title || ''));
 
-    return {
-      id: 'manual-' + (index + 1),
-      rawName: raw.title || '',
-      title: raw.title || 'Untitled Event',
-      type,
-      typeClass: eventTypeClass(type),
-      series: raw.series || MANUAL_EVENT_SERIES,
-      start,
-      end,
-      claimEnd: end,
-      displayTs: end,
-      vafName: '',
-      level: raw.level || '--',
-      activity: raw.activity || 'Objective unavailable',
-      summary: raw.summary || raw.activity || 'No scoring summary provided.',
-      format: raw.format || 'Event',
-      activeDates,
-      dateLabel: raw.date || '',
-      colorKey: String((raw.series || '') + '|' + (raw.title || ''))
-    };
-  }).filter(Boolean));
+    return splitActiveDateRuns(activeDates).map((runDates, runIndex) => {
+      const start = runDates[0];
+      const end = runDates[runDates.length - 1] + DAY_SECONDS;
+
+      return {
+        id: 'manual-' + (index + 1) + '-run-' + (runIndex + 1),
+        rawName: raw.title || '',
+        title: raw.title || 'Untitled Event',
+        type,
+        typeClass: eventTypeClass(type),
+        series: raw.series || MANUAL_EVENT_SERIES,
+        start,
+        end,
+        claimEnd: end,
+        displayTs: end,
+        vafName: '',
+        level: raw.level || '--',
+        activity: raw.activity || 'Objective unavailable',
+        summary: raw.summary || raw.activity || 'No scoring summary provided.',
+        format: raw.format || 'Event',
+        activeDates: runDates,
+        dateLabel: formatDateSpan(runDates),
+        colorKey
+      };
+    });
+  }));
 }
 
 function normalizeRawEvents(data) {
@@ -1596,14 +1642,6 @@ function openEventModal(eventId) {
     '<div class="modal-card">' +
       '<div class="modal-label">How To Score</div>' +
       '<div class="modal-copy">' + esc(event.summary || event.activity) + '</div>' +
-    '</div>' +
-    '<div class="modal-card">' +
-      '<div class="modal-label">Quick Read</div>' +
-      '<div class="modal-copy">' + esc(event.activity) + '</div>' +
-    '</div>' +
-    '<div class="modal-card">' +
-      '<div class="modal-label">Window Anchor</div>' +
-      '<div class="modal-copy muted">Starts ' + esc(formatDateLong(event.start)) + ' and is mapped into the current seven-day board using the dates above.</div>' +
     '</div>';
 
   modal.hidden = false;
@@ -1729,7 +1767,7 @@ function renderWeekGrid(weekEvents) {
             '<span class="type-badge ' + event.typeClass + '">' + esc(event.type) + '</span>' +
             '<span class="level-badge">' + esc(event.level) + '</span>' +
           '</div>' +
-          '<div class="schedule-bar-sub">' + esc(event.dateLabel) + (segment.runIndex > 0 ? ' | continued run' : '') + '</div>' +
+          '<div class="schedule-bar-sub">' + esc(event.dateLabel) + '</div>' +
         '</div>' +
       '</button>'
     );
