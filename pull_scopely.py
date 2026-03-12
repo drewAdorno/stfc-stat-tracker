@@ -25,7 +25,8 @@ from pathlib import Path
 
 import requests
 
-from db import (get_db, upsert_players, log_pull, now_est, export_latest_json,
+from db import (get_db, upsert_players, clear_bad_rss_contrib_snapshots,
+                log_pull, now_est, export_latest_json,
                 export_history_json, export_server_alliances_json,
                 export_server_players_json, export_server_history_json,
                 ingest_alliance_inventory, export_alliance_inventory_json,
@@ -46,6 +47,15 @@ RSS_CONTRIB_CONFIG = "32e959047182a77eb2ac98d8c547ebfcd7f11ded"
 ISO_CONTRIB_CONFIG = "4d21cabdec534dbf5896b0441d774dd7c0f1252d"
 SERVER = 716
 PROFILE_BATCH_SIZE = 200
+
+# `32e959...` resolves to a resources-raided leaderboard in the archived event
+# metadata, so using it for rss_contrib duplicates raided totals. Keep the
+# bad IDs explicit here so we fail safe until a real RSS contribution source is
+# identified.
+KNOWN_RAIDED_LEADERBOARD_CONFIGS = {
+    "32e959047182a77eb2ac98d8c547ebfcd7f11ded",
+    RESOURCES_RAIDED_CONFIG,
+}
 
 BASE_DIR = Path(__file__).parent
 DATA_DIR = BASE_DIR / "data"
@@ -237,6 +247,20 @@ def fetch_resources_raided():
     return raided
 
 
+def contribution_sources():
+    """Return the contribution leaderboard configs that are safe to ingest."""
+    sources = []
+    if RSS_CONTRIB_CONFIG in KNOWN_RAIDED_LEADERBOARD_CONFIGS:
+        safe_print(
+            "  WARNING: RSS contrib fetch disabled; configured leaderboard resolves "
+            "to Resources Raided and would duplicate raided totals."
+        )
+    else:
+        sources.append((RSS_CONTRIB_CONFIG, "RSS contrib", "rss_contrib"))
+    sources.append((ISO_CONTRIB_CONFIG, "ISO contrib", "iso_contrib"))
+    return sources
+
+
 def fetch_alliance_contrib(alliance_ids):
     """Fetch RSS and ISO contribution scores for all alliances' members.
 
@@ -247,11 +271,10 @@ def fetch_alliance_contrib(alliance_ids):
     """
     rss = {}
     iso = {}
+    targets = {"rss_contrib": rss, "iso_contrib": iso}
 
-    for config, label, target in [
-        (RSS_CONTRIB_CONFIG, "RSS contrib", rss),
-        (ISO_CONTRIB_CONFIG, "ISO contrib", iso),
-    ]:
+    for config, label, field_name in contribution_sources():
+        target = targets[field_name]
         for alliance_id in alliance_ids:
             start = 0
             page_size = 500
@@ -680,6 +703,10 @@ def save_data(all_mapped, total_count):
 
     upsert_players(conn, all_mapped, today)
     safe_print(f"Database updated ({len(all_mapped)} players upserted)")
+
+    cleared_rows = clear_bad_rss_contrib_snapshots(conn)
+    if cleared_rows:
+        safe_print(f"Cleared {cleared_rows} bad RSS contribution snapshot values")
 
     log_pull(conn, SERVER, total_count, source="scopely")
 

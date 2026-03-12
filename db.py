@@ -368,6 +368,24 @@ def upsert_players(conn, mapped_players, date):
     conn.commit()
 
 
+def clear_bad_rss_contrib_snapshots(conn):
+    """Zero out snapshots polluted by the raided-as-RSS scraper bug.
+
+    The early Scopely pulls on these dates stored `resources_raided` into
+    `rss_contrib`, which makes later deltas look like massive negative drops.
+    Keep the cleanup narrowly scoped to the known-corrupt snapshot dates.
+    """
+    cur = conn.execute("""
+        UPDATE daily_snapshots
+        SET rss_contrib = 0
+        WHERE date IN ('2026-02-28', '2026-03-06')
+          AND resources_raided > 0
+          AND rss_contrib = resources_raided
+    """)
+    conn.commit()
+    return cur.rowcount
+
+
 def log_pull(conn, server, total_players, source="api"):
     """Record a pull run in the pull_log table."""
     conn.execute(
