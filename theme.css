@@ -1,0 +1,350 @@
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Instrument+Sans:wght@400;500;600&display=swap');
+
+:root {
+  --bg: #07111f;
+  --panel: rgba(10, 20, 37, 0.88);
+  --panel-strong: rgba(16, 29, 50, 0.96);
+  --panel-soft: rgba(8, 16, 28, 0.88);
+  --border: rgba(120, 154, 195, 0.18);
+  --border-strong: rgba(113, 215, 255, 0.3);
+  --text: #e7eefb;
+  --muted: #8fa2bf;
+  --dim: #60738f;
+  --cyan: #71d7ff;
+  --gold: #ffd36a;
+  --green: #73f0b8;
+  --pink: #ff8ee3;
+  --red: #ff8f8f;
+  --shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+  --radius-lg: 28px;
+  --radius-md: 22px;
+  --radius-sm: 16px;
+}
+
+body {
+  font-family: 'Instrument Sans', sans-serif !important;
+  color: var(--text) !important;
+  background:
+    radial-gradient(circle at 15% 20%, rgba(63, 140, 255, 0.18), transparent 34%),
+    radial-gradient(circle at 85% 18%, rgba(255, 211, 106, 0.14), transparent 28%),
+    radial-gradient(circle at 50% 100%, rgba(53, 120, 201, 0.14), transparent 32%),
+    linear-gradient(180deg, #05101d 0%, #091625 38%, #07111f 100%) !important;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.24;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 28px 28px;
+  mask-image: linear-gradient(180deg, rgba(0,0,0,0.7), transparent 90%);
+}
+
+.container {
+  position: relative;
+  z-index: 1;
+  width: min(1520px, calc(100vw - 32px)) !important;
+  max-width: none !important;
+  padding: 24px 0 44px !important;
+}
+
+header {
+  position: relative;
+  padding: 34px 32px 30px !important;
+  margin-bottom: 18px !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-lg) !important;
+  overflow: hidden;
+  background:
+    linear-gradient(135deg, rgba(10, 24, 43, 0.94), rgba(11, 23, 38, 0.82)),
+    var(--panel-strong) !important;
+  box-shadow: var(--shadow) !important;
+  text-align: center;
+}
+
+header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(125deg, rgba(113, 215, 255, 0.12), transparent 35%),
+    linear-gradient(315deg, rgba(255, 211, 106, 0.09), transparent 34%);
+  pointer-events: none;
+}
+
+header > * {
+  position: relative;
+  z-index: 1;
+}
+
+header h1,
+.player-header h1 {
+  font-family: 'Chakra Petch', sans-serif !important;
+  font-size: clamp(2rem, 4vw, 3.6rem) !important;
+  line-height: 0.96 !important;
+  letter-spacing: 0.05em !important;
+  text-transform: uppercase;
+  color: var(--text) !important;
+}
+
+header h1 span {
+  color: var(--cyan) !important;
+}
+
+.updated,
+.player-meta,
+.search-hint,
+.filter-hint,
+.inv-date,
+.row-sub,
+.empty,
+.no-data {
+  color: var(--muted) !important;
+}
+
+nav {
+  display: flex;
+  justify-content: center;
+  gap: 8px !important;
+  flex-wrap: wrap;
+  margin: 0 0 18px !important;
+}
+
+nav a {
+  padding: 9px 16px !important;
+  border-radius: 999px !important;
+  border: 1px solid var(--border) !important;
+  background: rgba(11, 22, 39, 0.78) !important;
+  color: var(--muted) !important;
+  text-decoration: none;
+  font-size: 0.88rem !important;
+  transition: 0.16s ease;
+}
+
+nav a:hover,
+nav a.active {
+  color: var(--text) !important;
+  border-color: rgba(113, 215, 255, 0.36) !important;
+  background: rgba(28, 62, 110, 0.55) !important;
+}
+
+.cards,
+.mini-cards,
+.activity-dist,
+.movers-grid,
+.compare-grid {
+  gap: 12px !important;
+}
+
+.card,
+.mini-card,
+.activity-dist-item,
+.chart-container,
+.table-wrap,
+.login-box,
+.selector-wrap select,
+.search-input,
+.filter-input-wrap input {
+  border: 1px solid var(--border) !important;
+  background: var(--panel) !important;
+  backdrop-filter: blur(12px);
+  box-shadow: var(--shadow);
+}
+
+.card,
+.mini-card,
+.activity-dist-item,
+.chart-container,
+.login-box {
+  border-radius: var(--radius-md) !important;
+}
+
+.card .label,
+.cards-label,
+.section-header,
+.section-title,
+.compare-label,
+.standing-label,
+.login-box h2,
+.mini-card h3 {
+  color: var(--dim) !important;
+}
+
+.card .value,
+.rd-count,
+.standing-rank {
+  color: var(--text) !important;
+}
+
+.card .value,
+.rd-count {
+  font-family: 'Chakra Petch', sans-serif !important;
+}
+
+.tab-btn,
+.period-btn,
+.stat-btn,
+.filter-toggle,
+.login-box button {
+  border-radius: 999px !important;
+  border: 1px solid var(--border) !important;
+  background: rgba(13, 24, 42, 0.8) !important;
+  color: var(--muted) !important;
+  transition: 0.15s ease;
+}
+
+.tab-btn:hover,
+.period-btn:hover,
+.stat-btn:hover,
+.filter-toggle:hover,
+.login-box button:hover {
+  border-color: rgba(113, 215, 255, 0.36) !important;
+  color: var(--text) !important;
+}
+
+.tab-btn.active,
+.period-btn.active,
+.stat-btn.active,
+.filter-toggle.active,
+.login-box button,
+.login-box button:hover {
+  color: var(--text) !important;
+  border-color: rgba(113, 215, 255, 0.42) !important;
+  background: linear-gradient(135deg, rgba(32, 81, 145, 0.9), rgba(20, 53, 97, 0.95)) !important;
+}
+
+.login-box input,
+.search-input,
+.selector-wrap select,
+.filter-input-wrap input {
+  color: var(--text) !important;
+  background: rgba(7, 16, 29, 0.82) !important;
+  border-radius: 14px !important;
+}
+
+.login-box input:focus,
+.search-input:focus,
+.selector-wrap select:focus,
+.filter-input-wrap input:focus {
+  outline: none;
+  border-color: var(--border-strong) !important;
+  box-shadow: 0 0 0 3px rgba(113, 215, 255, 0.08);
+}
+
+.table-wrap {
+  border-radius: var(--radius-md) !important;
+  overflow: auto;
+}
+
+table {
+  background: rgba(8, 16, 28, 0.9) !important;
+}
+
+th {
+  background: rgba(12, 24, 42, 0.97) !important;
+  color: var(--dim) !important;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+
+th:hover {
+  color: var(--cyan) !important;
+}
+
+td {
+  color: var(--text) !important;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+tr {
+  border-bottom: none !important;
+}
+
+tr:hover td {
+  background: rgba(19, 36, 61, 0.42) !important;
+}
+
+tr.ncc-row td {
+  background: rgba(26, 55, 95, 0.45) !important;
+}
+
+.rank {
+  border-radius: 999px !important;
+  padding: 4px 10px !important;
+}
+
+.rank-admiral    { background: rgba(124, 58, 237, 0.16) !important; color: #c4b5fd !important; border: 1px solid rgba(124, 58, 237, 0.34) !important; }
+.rank-commodore  { background: rgba(220, 38, 38, 0.15) !important; color: #fca5a5 !important; border: 1px solid rgba(220, 38, 38, 0.32) !important; }
+.rank-premier    { background: rgba(217, 119, 6, 0.15) !important; color: #fdba74 !important; border: 1px solid rgba(217, 119, 6, 0.3) !important; }
+.rank-operative  { background: rgba(13, 148, 104, 0.15) !important; color: #86efac !important; border: 1px solid rgba(13, 148, 104, 0.3) !important; }
+.rank-agent      { background: rgba(29, 78, 216, 0.15) !important; color: #93c5fd !important; border: 1px solid rgba(29, 78, 216, 0.3) !important; }
+
+.player-link,
+footer a {
+  color: var(--cyan) !important;
+}
+
+.delta-pos { color: var(--green) !important; }
+.delta-neg { color: var(--red) !important; }
+.delta-zero { color: var(--dim) !important; }
+
+.activity-badge,
+.badge,
+[class*="activity-"] {
+  border-radius: 999px !important;
+}
+
+.compare-bar {
+  border-radius: 999px !important;
+}
+
+.standing-bar-wrap {
+  background: rgba(255,255,255,0.06) !important;
+  border-radius: 999px !important;
+}
+
+.standing-bar {
+  background: linear-gradient(90deg, rgba(113, 215, 255, 0.95), rgba(78, 157, 255, 0.92)) !important;
+  border-radius: 999px !important;
+}
+
+.section-header,
+.section-title {
+  font-family: 'Chakra Petch', sans-serif !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border) !important;
+}
+
+.loading {
+  color: var(--muted) !important;
+}
+
+.error {
+  color: var(--red) !important;
+}
+
+footer {
+  color: var(--dim) !important;
+  border-top: 1px solid var(--border) !important;
+}
+
+@media (max-width: 900px) {
+  .container {
+    width: min(100vw - 20px, 1520px) !important;
+    padding-top: 12px !important;
+  }
+
+  header,
+  .card,
+  .mini-card,
+  .login-box,
+  .chart-container,
+  .table-wrap,
+  .activity-dist-item {
+    border-radius: var(--radius-md) !important;
+  }
+}
