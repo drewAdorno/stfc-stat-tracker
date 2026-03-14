@@ -479,7 +479,7 @@ function App() {
                   id="offender_query"
                   value={form.offender_query}
                   onChange={(event) => updateForm("offender_query", event.target.value)}
-                  placeholder="Player name or player id"
+                  placeholder="Player name"
                   required
                 />
                 {searchLoading ? <div className="hint">Searching players...</div> : null}
@@ -500,7 +500,6 @@ function App() {
                     ))}
                   </div>
                 ) : null}
-                <div className="hint">Alliance details below auto-fill when this matches a known player.</div>
               </div>
 
               <div className="field-row">
@@ -547,7 +546,6 @@ function App() {
                     id="override_tag"
                     value={form.offender_overrides.alliance_tag}
                     onChange={(event) => updateOverride("alliance_tag", event.target.value)}
-                    placeholder="Auto-filled when available"
                   />
                 </div>
                 <div className="field">
@@ -556,16 +554,6 @@ function App() {
                     id="override_name_alliance"
                     value={form.offender_overrides.alliance_name}
                     onChange={(event) => updateOverride("alliance_name", event.target.value)}
-                    placeholder="Auto-filled when available"
-                  />
-                </div>
-                <div className="field">
-                  <label htmlFor="override_id">Alliance id</label>
-                  <input
-                    id="override_id"
-                    value={form.offender_overrides.alliance_id}
-                    onChange={(event) => updateOverride("alliance_id", event.target.value)}
-                    placeholder="Optional manual override"
                   />
                 </div>
               </div>
