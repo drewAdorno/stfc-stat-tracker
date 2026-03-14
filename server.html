@@ -267,6 +267,78 @@
     margin-right: 8px;
   }
 
+  /* Alliance search */
+  .alliance-search-wrap {
+    position: relative;
+    max-width: 500px;
+    margin: 0 auto 20px;
+  }
+  .alliance-search-input {
+    width: 100%;
+    padding: 10px 16px;
+    background: #111827;
+    border: 1px solid #1e2d3d;
+    border-radius: 8px;
+    color: #c8d6e5;
+    font-size: 1rem;
+    font-family: inherit;
+  }
+  .alliance-search-input:focus {
+    outline: none;
+    border-color: #4dabf7;
+  }
+  .alliance-search-hint {
+    font-size: 0.78rem;
+    color: #4a5568;
+    margin-top: 6px;
+    text-align: center;
+  }
+  .alliance-search-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #111827;
+    border: 1px solid #1e2d3d;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    max-height: 320px;
+    overflow-y: auto;
+    z-index: 100;
+  }
+  .alliance-search-results:empty {
+    display: none;
+  }
+  .alliance-search-item {
+    padding: 10px 16px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #1a2332;
+    transition: background 0.1s;
+  }
+  .alliance-search-item:last-child { border-bottom: none; }
+  .alliance-search-item:hover,
+  .alliance-search-item.highlighted {
+    background: #162030;
+  }
+  .alliance-search-item .tag {
+    color: #4dabf7;
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+  .alliance-search-item .meta {
+    color: #636e7b;
+    font-size: 0.8rem;
+  }
+  .alliance-search-no-results {
+    padding: 12px 16px;
+    color: #4a5568;
+    font-size: 0.85rem;
+    font-style: italic;
+  }
+
   /* Comparison layout */
   .compare-grid {
     display: grid;
@@ -743,20 +815,25 @@
     return `${field}_delta_${days}d`;
   }
 
+  let allianceSearchQuery = '';
+  let allianceSearchHighlight = -1;
+
   function renderDetail() {
     const alliances = allianceData.alliances;
+    const selectedAlliance = detailAllianceId ? alliances.find(a => a.alliance_id === detailAllianceId) : null;
 
-    let html = '<div class="selector-wrap"><label>Alliance:</label>';
-    html += '<select id="alliance-select">';
-    html += '<option value="">-- Select Alliance --</option>';
-    for (const a of alliances) {
-      const sel = a.alliance_id === detailAllianceId ? ' selected' : '';
-      html += `<option value="${a.alliance_id}"${sel}>[${esc(a.alliance_tag)}] ${a.member_count} members - ${formatAbbr(a.total_power)}</option>`;
+    // Search bar
+    const displayValue = selectedAlliance ? `[${selectedAlliance.alliance_tag}]` : allianceSearchQuery;
+    let html = '<div class="alliance-search-wrap">';
+    html += `<input type="text" class="alliance-search-input" id="alliance-search" placeholder="Search alliances by tag..." value="${esc(displayValue)}" autocomplete="off">`;
+    html += '<div id="alliance-search-dropdown" class="alliance-search-results"></div>';
+    html += '</div>';
+    if (!detailAllianceId) {
+      html += `<div class="alliance-search-hint">Search across ${alliances.length} alliances on Server 716</div>`;
     }
-    html += '</select></div>';
 
     if (!detailAllianceId) {
-      html += '<div class="empty">Select an alliance to view details</div>';
+      html += '<div class="empty">Search for an alliance to view details</div>';
       return html;
     }
 
@@ -884,12 +961,101 @@
   }
 
   function attachDetailHandlers() {
-    const sel = document.getElementById('alliance-select');
-    if (sel) {
-      sel.addEventListener('change', () => {
-        detailAllianceId = sel.value || null;
-        document.getElementById('tab-content').innerHTML = renderDetail();
-        attachDetailHandlers();
+    const input = document.getElementById('alliance-search');
+    const dropdown = document.getElementById('alliance-search-dropdown');
+
+    if (input && dropdown) {
+      function showDropdown(query) {
+        const q = query.toLowerCase().replace(/[\[\]]/g, '');
+        if (q.length === 0) {
+          dropdown.innerHTML = '';
+          return;
+        }
+        const matches = allianceData.alliances.filter(a =>
+          a.alliance_tag.toLowerCase().includes(q)
+        ).slice(0, 20);
+
+        if (matches.length === 0) {
+          dropdown.innerHTML = '<div class="alliance-search-no-results">No alliances found</div>';
+          allianceSearchHighlight = -1;
+          return;
+        }
+
+        dropdown.innerHTML = matches.map((a, i) =>
+          `<div class="alliance-search-item${i === allianceSearchHighlight ? ' highlighted' : ''}" data-aid="${a.alliance_id}">` +
+          `<span class="tag">[${esc(a.alliance_tag)}]</span>` +
+          `<span class="meta">${a.member_count} members &middot; ${formatAbbr(a.total_power)} power &middot; #${a.rank}</span>` +
+          `</div>`
+        ).join('');
+
+        dropdown.querySelectorAll('.alliance-search-item').forEach(item => {
+          item.addEventListener('click', () => {
+            detailAllianceId = item.dataset.aid;
+            allianceSearchQuery = '';
+            allianceSearchHighlight = -1;
+            document.getElementById('tab-content').innerHTML = renderDetail();
+            attachDetailHandlers();
+          });
+        });
+      }
+
+      input.addEventListener('focus', () => {
+        // If an alliance is selected, clear to allow new search
+        if (detailAllianceId) {
+          input.value = '';
+          input.select();
+        }
+        if (input.value.length > 0) {
+          showDropdown(input.value);
+        }
+      });
+
+      input.addEventListener('input', () => {
+        allianceSearchQuery = input.value;
+        allianceSearchHighlight = -1;
+        // Clear selection when typing
+        if (detailAllianceId) {
+          detailAllianceId = null;
+        }
+        showDropdown(input.value);
+      });
+
+      input.addEventListener('keydown', (e) => {
+        const items = dropdown.querySelectorAll('.alliance-search-item');
+        if (items.length === 0) return;
+
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          allianceSearchHighlight = Math.min(allianceSearchHighlight + 1, items.length - 1);
+          items.forEach((el, i) => el.classList.toggle('highlighted', i === allianceSearchHighlight));
+          items[allianceSearchHighlight]?.scrollIntoView({ block: 'nearest' });
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          allianceSearchHighlight = Math.max(allianceSearchHighlight - 1, 0);
+          items.forEach((el, i) => el.classList.toggle('highlighted', i === allianceSearchHighlight));
+          items[allianceSearchHighlight]?.scrollIntoView({ block: 'nearest' });
+        } else if (e.key === 'Enter' && allianceSearchHighlight >= 0) {
+          e.preventDefault();
+          const aid = items[allianceSearchHighlight]?.dataset.aid;
+          if (aid) {
+            detailAllianceId = aid;
+            allianceSearchQuery = '';
+            allianceSearchHighlight = -1;
+            document.getElementById('tab-content').innerHTML = renderDetail();
+            attachDetailHandlers();
+          }
+        } else if (e.key === 'Escape') {
+          dropdown.innerHTML = '';
+          allianceSearchHighlight = -1;
+        }
+      });
+
+      // Close dropdown when clicking outside
+      document.addEventListener('click', function closeDropdown(e) {
+        if (!e.target.closest('.alliance-search-wrap')) {
+          dropdown.innerHTML = '';
+          allianceSearchHighlight = -1;
+        }
       });
     }
 
