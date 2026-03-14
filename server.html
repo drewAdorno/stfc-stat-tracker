@@ -41,9 +41,13 @@
     display: flex;
     justify-content: center;
     gap: 6px;
+    flex-wrap: wrap;
     margin-bottom: 24px;
   }
   nav a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     background: #111827;
     border: 1px solid #1e2d3d;
     color: #8899aa;
@@ -55,6 +59,19 @@
   }
   nav a:hover { border-color: #4dabf7; color: #c8d6e5; }
   nav a.active { background: #4dabf7; color: #0a0e17; border-color: #4dabf7; font-weight: 600; }
+  .nav-lock { font-size: 0.78rem; opacity: 0.75; }
+  .nav-admin::after {
+    content: 'ADMIN';
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 6px;
+    border-radius: 999px;
+    background: #f8717122;
+    border: 1px solid #f8717140;
+    color: #fca5a5;
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
+  }
 
   /* Login */
   #login-gate {
@@ -481,9 +498,10 @@
   <nav>
     <a href="index">Tracker</a>
     <a href="calendar">Calendar</a>
-    <a href="server" class="active">Server</a>
-    <a href="leaderboard">Leaderboard</a>
-    <a href="admin">Admin</a>
+    <a href="server" class="active nav-admin">Server <span class="nav-lock" aria-hidden="true">&#128274;</span></a>
+    <a href="leaderboard" class="nav-admin">Leaderboard <span class="nav-lock" aria-hidden="true">&#128274;</span></a>
+    <a href="/roe-admin/" class="nav-admin">ROE Violations <span class="nav-lock" aria-hidden="true">&#128274;</span></a>
+    <a href="admin" class="nav-admin">Admin <span class="nav-lock" aria-hidden="true">&#128274;</span></a>
   </nav>
 
   <div id="login-gate">

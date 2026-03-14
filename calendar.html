@@ -157,6 +157,9 @@
   }
 
   nav a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     padding: 9px 16px;
     border-radius: 999px;
     border: 1px solid var(--border);
@@ -172,6 +175,19 @@
     color: var(--text);
     border-color: rgba(113, 215, 255, 0.36);
     background: rgba(28, 62, 110, 0.55);
+  }
+  .nav-lock { font-size: 0.78rem; opacity: 0.75; }
+  .nav-admin::after {
+    content: 'ADMIN';
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 6px;
+    border-radius: 999px;
+    background: rgba(255, 142, 227, 0.12);
+    border: 1px solid rgba(255, 142, 227, 0.22);
+    color: var(--pink);
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
   }
 
   .control-shell,
@@ -958,9 +974,10 @@
   <nav>
     <a href="index">Tracker</a>
     <a href="calendar" class="active">Calendar</a>
-    <a href="server">Server</a>
-    <a href="leaderboard">Leaderboard</a>
-    <a href="admin">Admin</a>
+    <a href="server" class="nav-admin">Server <span class="nav-lock" aria-hidden="true">&#128274;</span></a>
+    <a href="leaderboard" class="nav-admin">Leaderboard <span class="nav-lock" aria-hidden="true">&#128274;</span></a>
+    <a href="/roe-admin/" class="nav-admin">ROE Violations <span class="nav-lock" aria-hidden="true">&#128274;</span></a>
+    <a href="admin" class="nav-admin">Admin <span class="nav-lock" aria-hidden="true">&#128274;</span></a>
   </nav>
 
   <section class="control-shell">

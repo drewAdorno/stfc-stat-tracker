@@ -55,14 +55,21 @@ select {
 
 .login-shell {
   min-height: 100vh;
-  display: grid;
-  place-items: center;
   padding: 24px;
+}
+
+.login-layout {
+  max-width: 1480px;
+  margin: 0 auto;
+}
+
+.login-intro {
+  margin: 28px auto 22px;
+  text-align: center;
 }
 
 .login-card,
 .panel,
-.hero,
 .stat-card {
   backdrop-filter: blur(18px);
 }
@@ -76,6 +83,7 @@ select {
   background: linear-gradient(180deg, rgba(12, 17, 28, 0.94), rgba(12, 18, 31, 0.78));
   border: 1px solid rgba(130, 170, 214, 0.16);
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.38);
+  margin: 0 auto;
 }
 
 .eyebrow {
@@ -86,8 +94,7 @@ select {
   margin-bottom: 10px;
 }
 
-.login-shell h1,
-.hero h1 {
+.login-shell h1 {
   margin: 0 0 12px;
   font-size: clamp(2rem, 5vw, 3.8rem);
   line-height: 0.95;
@@ -107,26 +114,75 @@ select {
   padding: 32px 24px 48px;
 }
 
-.hero {
+.site-nav {
   display: flex;
-  justify-content: space-between;
-  gap: 24px;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
   margin-bottom: 24px;
-  padding: 32px;
-  border-radius: 28px;
-  border: 1px solid rgba(123, 168, 214, 0.15);
-  background:
-    linear-gradient(130deg, rgba(11, 22, 38, 0.92), rgba(12, 18, 32, 0.75)),
-    radial-gradient(circle at right center, rgba(0, 163, 255, 0.22), transparent 42%);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
 
-.hero-actions {
+.site-nav a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 15px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 0.85rem;
+  color: #8899aa;
+  background: #111827;
+  border: 1px solid #1e2d3d;
+  transition: all 0.15s ease;
+}
+
+.site-nav a:hover {
+  border-color: #4dabf7;
+  color: #dce9f4;
+}
+
+.site-nav a.active {
+  background: #4dabf7;
+  color: #0a0e17;
+  border-color: #4dabf7;
+  font-weight: 700;
+}
+
+.nav-lock {
+  font-size: 0.78rem;
+  opacity: 0.75;
+}
+
+.nav-admin {
+  position: relative;
+}
+
+.nav-admin::after {
+  content: "ADMIN";
+  display: inline-flex;
+  align-items: center;
+  margin-left: 4px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  background: rgba(248, 113, 113, 0.14);
+  color: #ffb4b4;
+  border: 1px solid rgba(248, 113, 113, 0.2);
+}
+
+.page-actions {
   display: flex;
-  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.page-action-buttons {
+  display: flex;
   gap: 12px;
-  align-content: flex-start;
-  justify-content: flex-end;
+  flex-wrap: wrap;
 }
 
 .ghost-link,
@@ -421,6 +477,11 @@ tbody tr:hover {
 @media (max-width: 860px) {
   .hero {
     flex-direction: column;
+  }
+
+  .page-actions {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .field-row,

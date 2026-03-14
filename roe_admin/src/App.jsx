@@ -118,6 +118,27 @@ function TalliesList({ title, rows, type }) {
   );
 }
 
+function SiteNav() {
+  return (
+    <nav className="site-nav" aria-label="Primary">
+      <a href="/index">Tracker</a>
+      <a href="/calendar">Calendar</a>
+      <a className="nav-admin" href="/server">
+        Server <span className="nav-lock" aria-hidden="true">&#128274;</span>
+      </a>
+      <a className="nav-admin" href="/leaderboard">
+        Leaderboard <span className="nav-lock" aria-hidden="true">&#128274;</span>
+      </a>
+      <a className="active nav-admin" href="/roe-admin/">
+        ROE Violations <span className="nav-lock" aria-hidden="true">&#128274;</span>
+      </a>
+      <a className="nav-admin" href="/admin">
+        Admin <span className="nav-lock" aria-hidden="true">&#128274;</span>
+      </a>
+    </nav>
+  );
+}
+
 function App() {
   const [password, setPassword] = useState(() => sessionStorage.getItem(PASSWORD_KEY) || "");
   const [passwordInput, setPasswordInput] = useState(password);
@@ -330,11 +351,15 @@ function App() {
       <div className="screen login-screen">
         <div className="noise" />
         <div className="login-shell">
-          <div className="eyebrow">NCC Alliance Control</div>
-          <h1>ROE Violations</h1>
-          <p className="lead">
-            Manual incident entry, offender tallies, and alliance history in one place.
-          </p>
+          <div className="login-layout">
+            <SiteNav />
+            <div className="login-intro">
+              <div className="eyebrow">NCC Alliance Control</div>
+              <h1>ROE Violations</h1>
+              <p className="lead">
+                Manual incident entry, offender tallies, and alliance history in one place.
+              </p>
+            </div>
           <form className="login-card" onSubmit={handleLogin}>
             <label htmlFor="admin-password">Admin password</label>
             <input
@@ -350,6 +375,7 @@ function App() {
             </button>
             {bootError ? <div className="form-status error">{bootError}</div> : null}
           </form>
+          </div>
         </div>
       </div>
     );
@@ -359,19 +385,10 @@ function App() {
     <div className="screen">
       <div className="noise" />
       <div className="app-shell">
-        <header className="hero">
-          <div>
-            <div className="eyebrow">NCC ROE Violations</div>
-            <h1>Alliance incident tracking with a real write path.</h1>
-            <p className="lead">
-              Log new breaches, spot repeat offenders fast, and keep the ROE channel aligned
-              with a clean record in the tracker database.
-            </p>
-          </div>
-          <div className="hero-actions">
-            <a className="ghost-link" href="/admin">
-              Legacy admin
-            </a>
+        <SiteNav />
+        <div className="page-actions">
+          <div className="eyebrow">NCC ROE Violations</div>
+          <div className="page-action-buttons">
             <button className="ghost-button" type="button" onClick={() => loadDashboard(password)}>
               Refresh
             </button>
@@ -379,7 +396,7 @@ function App() {
               Sign out
             </button>
           </div>
-        </header>
+        </div>
 
         <section className="stats-grid">
           <StatCard
