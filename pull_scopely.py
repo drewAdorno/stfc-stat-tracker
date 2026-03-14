@@ -30,6 +30,7 @@ from db import (get_db, upsert_players, clear_bad_rss_contrib_snapshots,
                 export_history_json, export_server_alliances_json,
                 export_server_players_json, export_server_history_json,
                 ingest_alliance_inventory, export_alliance_inventory_json,
+                export_roe_violations_json,
                 NCC_ALLIANCE_ID, _migrate_alliance_ids)
 
 # ---------------------------------------------------------------------------
@@ -733,6 +734,9 @@ def save_data(all_mapped, total_count):
 
     export_server_history_json(conn)
     safe_print(f"Exported {DATA_DIR / 'server_history.json'}")
+
+    export_roe_violations_json(conn)
+    safe_print(f"Exported {DATA_DIR / 'roe_violations.json'}")
 
     conn.close()
 

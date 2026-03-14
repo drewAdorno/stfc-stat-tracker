@@ -262,6 +262,99 @@
 
   /* Inventory */
   .inv-date { color: #636e7b; font-size: 0.85rem; margin-bottom: 10px; }
+  .section-note {
+    color: #8fa6bb;
+    font-size: 0.92rem;
+    margin-bottom: 14px;
+  }
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+  .stat-card {
+    background:
+      linear-gradient(160deg, rgba(77,171,247,0.12), rgba(17,24,39,0.85)),
+      #111827;
+    border: 1px solid #1e2d3d;
+    border-radius: 12px;
+    padding: 16px 18px;
+    min-height: 98px;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22);
+  }
+  .stat-label {
+    color: #8fa6bb;
+    font-size: 0.76rem;
+    text-transform: uppercase;
+    letter-spacing: 1.1px;
+    margin-bottom: 8px;
+  }
+  .stat-value {
+    color: #f8fbff;
+    font-size: 1.9rem;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .stat-sub {
+    color: #6f8498;
+    font-size: 0.82rem;
+  }
+  .cmd-box {
+    background: linear-gradient(180deg, rgba(18, 28, 43, 0.98), rgba(9, 14, 23, 0.98));
+    border: 1px solid #23405c;
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 18px;
+    overflow-x: auto;
+  }
+  .cmd-box code {
+    color: #8fe0ff;
+    font-size: 0.9rem;
+    font-family: Consolas, 'Courier New', monospace;
+    white-space: nowrap;
+  }
+  .section-action-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, rgba(77,171,247,0.18), rgba(77,171,247,0.08));
+    border: 1px solid #27527b;
+    color: #a8dbff;
+    text-decoration: none;
+    font-size: 0.88rem;
+    font-weight: 600;
+    margin-bottom: 18px;
+  }
+  .section-action-link:hover {
+    border-color: #4dabf7;
+    color: #d7efff;
+  }
+  .cell-sub {
+    display: block;
+    color: #6f8498;
+    font-size: 0.78rem;
+    margin-top: 2px;
+  }
+  .alliance-chip {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    border: 1px solid #27435e;
+    background: rgba(77, 171, 247, 0.12);
+    color: #9bd3ff;
+    font-size: 0.76rem;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+  }
+  .notes-cell {
+    max-width: 320px;
+    white-space: normal;
+    color: #b9c8d6;
+  }
 
   /* Loading / Error */
   .loading {
@@ -304,6 +397,7 @@
     <a href="calendar">Calendar</a>
     <a href="server">Server</a>
     <a href="leaderboard">Leaderboard</a>
+    <a href="/roe-admin/">ROE Console</a>
     <a href="admin" class="active">Admin</a>
   </nav>
 
@@ -436,6 +530,22 @@
     return `<a class="player-link" href="player.html?id=${encodeURIComponent(member.id)}">${esc(member.name)}</a>`;
   }
 
+  function entityLink(name, id) {
+    if (!id) return esc(name);
+    return `<a class="player-link" href="player.html?id=${encodeURIComponent(id)}">${esc(name)}</a>`;
+  }
+
+  function formatShortDate(value) {
+    if (!value) return '-';
+    const d = new Date(value);
+    if (Number.isNaN(d.getTime())) return esc(value);
+    return d.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+  }
+
   // --- Data loading ---
   function loadData() {
     const dataP = fetch('data/latest.json?t=' + Date.now())
@@ -446,16 +556,19 @@
     const invP = fetch('data/alliance_inventory.json?t=' + Date.now())
       .then(r => { if (!r.ok) return null; return r.json(); })
       .catch(() => null);
+    const roeP = fetch('data/roe_violations.json?t=' + Date.now())
+      .then(r => { if (!r.ok) return null; return r.json(); })
+      .catch(() => null);
 
-    Promise.all([dataP, histP, invP])
-      .then(([data, hist, inv]) => {
+    Promise.all([dataP, histP, invP, roeP])
+      .then(([data, hist, inv, roe]) => {
         hist.sort((a, b) => a.date.localeCompare(b.date));
         const d = new Date(data.pulled_at);
         $('updated').textContent = 'Last updated: ' + d.toLocaleDateString('en-US', {
           year: 'numeric', month: 'short', day: 'numeric',
           hour: '2-digit', minute: '2-digit'
         });
-        render(data, hist, inv);
+        render(data, hist, inv, roe);
       })
       .catch(err => {
         $('content').innerHTML = `<div class="loading error">Failed to load data: ${esc(err.message)}</div>`;
@@ -475,36 +588,119 @@
     return best;
   }
 
-  function render(data, history, inv) {
+  function render(data, history, inv, roe) {
     const members = data.members || [];
     const snap7 = getSnapshotDaysAgo(history, 7);
     let html = '';
 
-    // --- 1. Alliance Inventory ---
+    // --- 1. ROE Violations ---
+    html += renderRoeViolations(roe);
+
+    // --- 2. Alliance Inventory ---
     html += renderAllianceInventory(inv);
 
-    // --- 2. Inactive Members ---
+    // --- 3. Inactive Members ---
     html += renderInactive(members, history);
 
-    // --- 3. New Members ---
+    // --- 4. New Members ---
     html += renderNewMembers(members, history);
 
-    // --- 4. Members Who Left ---
+    // --- 5. Members Who Left ---
     html += renderLeftMembers(members, history);
 
-    // --- 5. Lowest Contributors ---
+    // --- 6. Lowest Contributors ---
     html += renderLowestContributors(members, history);
 
-    // --- 6. Power Movers (7-Day) ---
+    // --- 7. Power Movers (7-Day) ---
     html += renderPowerMovers(members, snap7);
 
-    // --- 7. Activity Distribution ---
+    // --- 8. Activity Distribution ---
     html += renderActivityDistribution(members);
 
     $('content').innerHTML = html;
   }
 
   // --- Section renderers ---
+
+  function renderRoeViolations(roe) {
+    const total = roe?.violation_count || 0;
+    const playerTallies = roe?.player_tallies || [];
+    const allianceTallies = roe?.alliance_tallies || [];
+    const recent = roe?.recent_violations || [];
+    const latest = recent[0];
+
+    let s = '<div class="section"><div class="section-header">ROE Violations</div>';
+    s += '<div class="section-note">Manual entry is handled through the tracker CLI today, and this dashboard shows the live tallies that will later feed Discord automation.</div>';
+    s += '<a class="section-action-link" href="/roe-admin/">Open ROE entry console</a>';
+    s += '<div class="cmd-box"><code>python manage_roe.py add "BadGuy" --type "OPC hit" --reported-by "Officer" --victim "NCC Member" --system "Ty\'Gokor"</code></div>';
+
+    const lastReported = latest ? formatShortDate(latest.reported_at || latest.offense_date) : 'None';
+    s += '<div class="stat-grid">';
+    s += `<div class="stat-card"><div class="stat-label">Total Violations</div><div class="stat-value">${total}</div><div class="stat-sub">Every logged incident</div></div>`;
+    s += `<div class="stat-card"><div class="stat-label">Tracked Offenders</div><div class="stat-value">${roe?.unique_offender_count || 0}</div><div class="stat-sub">Unique players with incidents</div></div>`;
+    s += `<div class="stat-card"><div class="stat-label">Tracked Alliances</div><div class="stat-value">${roe?.alliance_count || 0}</div><div class="stat-sub">Alliances represented in reports</div></div>`;
+    s += `<div class="stat-card"><div class="stat-label">Latest Report</div><div class="stat-value" style="font-size:1.25rem; line-height:1.2">${esc(lastReported)}</div><div class="stat-sub">${latest ? esc(latest.violation_type || 'Violation logged') : 'No incidents yet'}</div></div>`;
+    s += '</div>';
+
+    if (!total) {
+      s += '<div class="empty">No ROE violations have been logged yet.</div></div>';
+      return s;
+    }
+
+    s += '<div class="movers-grid">';
+    s += '<div class="mini-card"><h3>Top Individual Offenders</h3>';
+    if (!playerTallies.length) {
+      s += '<div class="empty">No offender tallies yet</div>';
+    } else {
+      s += '<ol>';
+      for (const entry of playerTallies.slice(0, 8)) {
+        const alliance = entry.offender_alliance_tag ? `<span class="alliance-chip">${esc(entry.offender_alliance_tag)}</span>` : '';
+        s += `<li>
+          <span class="li-name">${entityLink(entry.offender_name, entry.offender_player_id)}<span class="cell-sub">${alliance || esc(entry.offender_alliance_name || 'Alliance unknown')}</span></span>
+          <span class="li-val">${entry.offense_count}</span>
+        </li>`;
+      }
+      s += '</ol>';
+    }
+    s += '</div>';
+
+    s += '<div class="mini-card"><h3>Top Offending Alliances</h3>';
+    if (!allianceTallies.length) {
+      s += '<div class="empty">No alliance tallies yet</div>';
+    } else {
+      s += '<ol>';
+      for (const entry of allianceTallies.slice(0, 8)) {
+        const label = entry.offender_alliance_tag || entry.offender_alliance_name || 'Unknown alliance';
+        s += `<li>
+          <span class="li-name">${esc(label)}<span class="cell-sub">${entry.unique_offender_count} offenders</span></span>
+          <span class="li-val">${entry.offense_count}</span>
+        </li>`;
+      }
+      s += '</ol>';
+    }
+    s += '</div>';
+    s += '</div>';
+
+    s += '<div class="table-wrap"><table><thead><tr>';
+    s += '<th>Date</th><th>Offender</th><th>Alliance</th><th>Violation</th><th>Victim</th><th>System</th><th>Reported By</th><th>Notes</th>';
+    s += '</tr></thead><tbody>';
+    for (const entry of recent.slice(0, 50)) {
+      const allianceLabel = entry.offender_alliance_tag || entry.offender_alliance_name || '-';
+      s += `<tr>
+        <td>${esc(entry.offense_date || '-')}</td>
+        <td>${entityLink(entry.offender_name, entry.offender_player_id)}</td>
+        <td>${esc(allianceLabel)}</td>
+        <td>${esc(entry.violation_type || '-')}</td>
+        <td>${entityLink(entry.victim_name, entry.victim_player_id)}</td>
+        <td>${esc(entry.system_name || '-')}</td>
+        <td>${esc(entry.reported_by || '-')}</td>
+        <td class="notes-cell">${esc(entry.notes || '-')}</td>
+      </tr>`;
+    }
+    s += '</tbody></table></div>';
+    s += '</div>';
+    return s;
+  }
 
   function renderInactive(members, history) {
     // Walk backwards through completed days to count consecutive zero-change days.

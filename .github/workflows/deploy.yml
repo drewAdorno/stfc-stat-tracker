@@ -14,13 +14,22 @@ jobs:
         with:
           python-version: "3.12"
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
           pip install pytest
+          cd roe_admin
+          npm ci
 
       - name: Run tests
-        run: pytest --tb=short -q
+        run: |
+          pytest --tb=short -q
+          cd roe_admin
+          npm run build
 
   deploy:
     needs: test
@@ -45,15 +54,18 @@ jobs:
             sudo cp deploy/stfc-scraper-failure.service /etc/systemd/system/
             sudo cp deploy/stfc-scraper.timer /etc/systemd/system/
             sudo cp deploy/stfc-discord-bot.service /etc/systemd/system/
+            sudo cp deploy/stfc-roe-api.service /etc/systemd/system/
             sudo systemctl daemon-reload
             sudo systemctl enable stfc-scraper.timer
             sudo systemctl enable stfc-discord-bot
+            sudo systemctl enable stfc-roe-api
             sudo systemctl restart stfc-discord-bot || true
+            sudo systemctl restart stfc-roe-api || true
 
             # Regenerate JSON data files from DB (ensures they exist after deploy)
             venv/bin/python -c "
-            from db import get_db, export_latest_json, export_history_json, export_server_alliances_json, export_server_players_json, export_alliance_inventory_json
-            conn = get_db(); export_latest_json(conn); export_history_json(conn); export_server_alliances_json(conn); export_server_players_json(conn); export_alliance_inventory_json(conn); conn.close()
+            from db import get_db, export_latest_json, export_history_json, export_server_alliances_json, export_server_players_json, export_alliance_inventory_json, export_roe_violations_json
+            conn = get_db(); export_latest_json(conn); export_history_json(conn); export_server_alliances_json(conn); export_server_players_json(conn); export_alliance_inventory_json(conn); export_roe_violations_json(conn); conn.close()
             "
 
             # Only update nginx config + re-run certbot if the base config changed

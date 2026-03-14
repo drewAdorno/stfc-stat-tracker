@@ -1,0 +1,22 @@
+[Unit]
+Description=STFC ROE API
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/opt/stfc
+ExecStart=/opt/stfc/venv/bin/python -m uvicorn roe_api:app --host 127.0.0.1 --port 8010
+Environment=HOME=/home/ubuntu
+Restart=on-failure
+RestartSec=10
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=stfc-roe-api
+
+[Install]
+WantedBy=multi-user.target

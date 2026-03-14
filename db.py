@@ -95,6 +95,31 @@ CREATE TABLE IF NOT EXISTS alliance_inventory (
     count       INTEGER NOT NULL,
     PRIMARY KEY (date, refid)
 );
+
+CREATE TABLE IF NOT EXISTS roe_violations (
+    id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+    reported_at         TEXT NOT NULL,
+    offense_date        TEXT NOT NULL,
+    reported_by         TEXT NOT NULL DEFAULT '',
+    offender_player_id  TEXT,
+    offender_name       TEXT NOT NULL,
+    offender_alliance_id TEXT,
+    offender_alliance_tag TEXT,
+    offender_alliance_name TEXT,
+    victim_player_id    TEXT,
+    victim_name         TEXT,
+    violation_type      TEXT NOT NULL,
+    system_name         TEXT,
+    notes               TEXT,
+    source              TEXT NOT NULL DEFAULT 'manual',
+    source_ref          TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_roe_violations_offender
+    ON roe_violations(offender_player_id, offense_date);
+
+CREATE INDEX IF NOT EXISTS idx_roe_violations_alliance
+    ON roe_violations(offender_alliance_id, offender_alliance_tag, offense_date);
 """
 
 
@@ -1285,6 +1310,217 @@ def get_members_for_date(conn, date, alliance_id=NCC_ALLIANCE_ID):
             "power": power or 0,
         }
     return members
+
+
+# --- ROE violation helpers ---
+
+def _clean_text(value):
+    """Normalize optional string values for DB storage."""
+    return str(value or "").strip()
+
+
+def record_roe_violation(
+    conn,
+    *,
+    offender_name,
+    violation_type,
+    offense_date=None,
+    reported_by="",
+    offender_player_id="",
+    offender_alliance_id="",
+    offender_alliance_tag="",
+    offender_alliance_name="",
+    victim_player_id="",
+    victim_name="",
+    system_name="",
+    notes="",
+    source="manual",
+    source_ref="",
+):
+    """Insert a single ROE violation record and return its row id."""
+    offender_name = _clean_text(offender_name)
+    violation_type = _clean_text(violation_type)
+    if not offender_name:
+        raise ValueError("offender_name is required")
+    if not violation_type:
+        raise ValueError("violation_type is required")
+
+    offense_date = _clean_text(offense_date) or now_est().strftime("%Y-%m-%d")
+    reported_at = now_est().isoformat()
+
+    cur = conn.execute("""
+        INSERT INTO roe_violations (
+            reported_at, offense_date, reported_by,
+            offender_player_id, offender_name,
+            offender_alliance_id, offender_alliance_tag, offender_alliance_name,
+            victim_player_id, victim_name, violation_type,
+            system_name, notes, source, source_ref
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """, (
+        reported_at,
+        offense_date,
+        _clean_text(reported_by),
+        _clean_text(offender_player_id) or None,
+        offender_name,
+        _clean_text(offender_alliance_id) or None,
+        _clean_text(offender_alliance_tag) or None,
+        _clean_text(offender_alliance_name) or None,
+        _clean_text(victim_player_id) or None,
+        _clean_text(victim_name) or None,
+        violation_type,
+        _clean_text(system_name) or None,
+        _clean_text(notes) or None,
+        _clean_text(source) or "manual",
+        _clean_text(source_ref) or None,
+    ))
+    conn.commit()
+    return cur.lastrowid
+
+
+def _build_roe_violations_export(rows):
+    """Build the ROE violations export payload from raw DB rows."""
+    recent = []
+    player_tallies = {}
+    alliance_tallies = {}
+
+    for row in rows:
+        (
+            violation_id,
+            reported_at,
+            offense_date,
+            reported_by,
+            offender_player_id,
+            offender_name,
+            offender_alliance_id,
+            offender_alliance_tag,
+            offender_alliance_name,
+            victim_player_id,
+            victim_name,
+            violation_type,
+            system_name,
+            notes,
+            source,
+            source_ref,
+        ) = row
+
+        recent.append({
+            "id": violation_id,
+            "reported_at": reported_at,
+            "offense_date": offense_date,
+            "reported_by": reported_by or "",
+            "offender_player_id": offender_player_id or "",
+            "offender_name": offender_name or "",
+            "offender_alliance_id": offender_alliance_id or "",
+            "offender_alliance_tag": offender_alliance_tag or "",
+            "offender_alliance_name": offender_alliance_name or "",
+            "victim_player_id": victim_player_id or "",
+            "victim_name": victim_name or "",
+            "violation_type": violation_type or "",
+            "system_name": system_name or "",
+            "notes": notes or "",
+            "source": source or "",
+            "source_ref": source_ref or "",
+        })
+
+        player_key = offender_player_id or f"name:{(offender_name or '').strip().lower()}"
+        player_entry = player_tallies.get(player_key)
+        if player_entry is None:
+            player_entry = {
+                "offender_player_id": offender_player_id or "",
+                "offender_name": offender_name or "",
+                "offender_alliance_id": offender_alliance_id or "",
+                "offender_alliance_tag": offender_alliance_tag or "",
+                "offender_alliance_name": offender_alliance_name or "",
+                "offense_count": 0,
+                "last_offense_date": offense_date or "",
+                "last_reported_at": reported_at or "",
+                "latest_violation_type": violation_type or "",
+            }
+            player_tallies[player_key] = player_entry
+        player_entry["offense_count"] += 1
+
+        alliance_key = ""
+        if offender_alliance_id:
+            alliance_key = offender_alliance_id
+        elif offender_alliance_tag and offender_alliance_tag.strip():
+            alliance_key = f"tag:{offender_alliance_tag.strip().lower()}"
+        elif offender_alliance_name and offender_alliance_name.strip():
+            alliance_key = f"name:{offender_alliance_name.strip().lower()}"
+        if alliance_key:
+            alliance_entry = alliance_tallies.get(alliance_key)
+            if alliance_entry is None:
+                alliance_entry = {
+                    "offender_alliance_id": offender_alliance_id or "",
+                    "offender_alliance_tag": offender_alliance_tag or "",
+                    "offender_alliance_name": offender_alliance_name or "",
+                    "offense_count": 0,
+                    "unique_offenders": set(),
+                    "last_offense_date": offense_date or "",
+                    "last_reported_at": reported_at or "",
+                }
+                alliance_tallies[alliance_key] = alliance_entry
+            alliance_entry["offense_count"] += 1
+            alliance_entry["unique_offenders"].add(player_key)
+
+    player_summary = sorted(
+        player_tallies.values(),
+        key=lambda entry: (
+            -entry["offense_count"],
+            entry["offender_name"].lower(),
+            entry["last_reported_at"],
+        ),
+    )
+
+    alliance_summary = []
+    for entry in alliance_tallies.values():
+        alliance_summary.append({
+            "offender_alliance_id": entry["offender_alliance_id"],
+            "offender_alliance_tag": entry["offender_alliance_tag"],
+            "offender_alliance_name": entry["offender_alliance_name"],
+            "offense_count": entry["offense_count"],
+            "unique_offender_count": len(entry["unique_offenders"]),
+            "last_offense_date": entry["last_offense_date"],
+            "last_reported_at": entry["last_reported_at"],
+        })
+    alliance_summary.sort(
+        key=lambda entry: (
+            -entry["offense_count"],
+            -(entry["unique_offender_count"]),
+            entry["offender_alliance_tag"].lower(),
+            entry["offender_alliance_name"].lower(),
+        )
+    )
+
+    return {
+        "updated_at": now_est().isoformat(),
+        "violation_count": len(recent),
+        "unique_offender_count": len(player_summary),
+        "alliance_count": len(alliance_summary),
+        "player_tallies": player_summary,
+        "alliance_tallies": alliance_summary,
+        "recent_violations": recent,
+    }
+
+
+def export_roe_violations_json(conn):
+    """Export ROE violations and tallies to data/roe_violations.json."""
+    rows = conn.execute("""
+        SELECT id, reported_at, offense_date, reported_by,
+               offender_player_id, offender_name,
+               offender_alliance_id, offender_alliance_tag, offender_alliance_name,
+               victim_player_id, victim_name, violation_type,
+               system_name, notes, source, source_ref
+        FROM roe_violations
+        ORDER BY offense_date DESC, reported_at DESC, id DESC
+    """).fetchall()
+
+    payload = _build_roe_violations_export(rows)
+    out_path = DATA_DIR / "roe_violations.json"
+    with open(out_path, "w", encoding="utf-8") as f:
+        json.dump(payload, f, indent=2, ensure_ascii=False)
+
+    return payload
 
 
 # --- Discord link helpers ---
