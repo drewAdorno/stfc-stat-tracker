@@ -7,6 +7,7 @@ const initialForm = {
   offender_query: "",
   violation_type: "OPC hit",
   victim_name: "",
+  victim_player_id: "",
   offense_date: new Date().toISOString().slice(0, 10),
   screenshots: "",
   notes: "",
@@ -50,6 +51,10 @@ function screenshotUrl(value) {
   if (!value) return "";
   if (/^https?:\/\//i.test(value)) return value;
   return value.startsWith("/") ? value : `/${value}`;
+}
+
+function sortByName(items) {
+  return [...items].sort((left, right) => left.name.localeCompare(right.name, undefined, { sensitivity: "base" }));
 }
 
 async function apiFetch(path, password, options = {}) {
@@ -174,6 +179,7 @@ function App() {
   const [filterText, setFilterText] = useState("");
   const [screenshotFiles, setScreenshotFiles] = useState([]);
   const [screenshotInputKey, setScreenshotInputKey] = useState(0);
+  const [victimRoster, setVictimRoster] = useState([]);
 
   const screenshotPreviews = useMemo(
     () =>
@@ -196,15 +202,26 @@ function App() {
     setLoading(true);
     setBootError("");
     try {
-      const [summaryPayload, violationsPayload] = await Promise.all([
+      const [summaryPayload, violationsPayload, rosterPayload] = await Promise.all([
         apiFetch("/api/roe/summary", activePassword),
         apiFetch("/api/roe/violations?limit=200", activePassword),
+        fetch(`/data/latest.json?t=${Date.now()}`)
+          .then((response) => (response.ok ? response.json() : { members: [] }))
+          .catch(() => ({ members: [] })),
       ]);
       sessionStorage.setItem(PASSWORD_KEY, activePassword);
       sessionStorage.setItem(AUTH_KEY, "ok");
       setPassword(activePassword);
       setSummary(summaryPayload);
       setViolations(violationsPayload.violations || []);
+      setVictimRoster(
+        sortByName(
+          (rosterPayload.members || []).map((member) => ({
+            id: String(member.id || ""),
+            name: member.name || "",
+          })),
+        ),
+      );
     } catch (error) {
       if (error.message === "auth") {
         sessionStorage.removeItem(PASSWORD_KEY);
@@ -321,6 +338,15 @@ function App() {
     setForm((current) => ({
       ...current,
       offender_overrides: { ...current.offender_overrides, [field]: value },
+    }));
+  }
+
+  function updateVictim(value) {
+    const selected = victimRoster.find((member) => member.id === value);
+    setForm((current) => ({
+      ...current,
+      victim_player_id: selected?.id || "",
+      victim_name: selected?.name || "",
     }));
   }
 
@@ -531,12 +557,22 @@ function App() {
 
               <div className="field">
                 <label htmlFor="victim_name">Victim</label>
-                <input
+                <select
                   id="victim_name"
-                  value={form.victim_name}
-                  onChange={(event) => updateForm("victim_name", event.target.value)}
-                  placeholder="Alliance member hit"
-                />
+                  value={form.victim_player_id}
+                  onChange={(event) => updateVictim(event.target.value)}
+                  disabled={!victimRoster.length}
+                  required
+                >
+                  <option value="">
+                    {victimRoster.length ? "Select alliance member" : "Loading alliance roster..."}
+                  </option>
+                  {victimRoster.map((member) => (
+                    <option key={member.id || member.name} value={member.id}>
+                      {member.name}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div className="override-grid">
