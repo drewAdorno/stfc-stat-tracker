@@ -1,5 +1,7 @@
 """Tests for the ROE FastAPI service."""
 
+import io
+
 from fastapi.testclient import TestClient
 import pytest
 
@@ -12,6 +14,7 @@ def client(tmp_path, monkeypatch):
     monkeypatch.setattr(db_mod, "DB_PATH", tmp_path / "test.db")
     monkeypatch.setattr(db_mod, "DATA_DIR", tmp_path)
     monkeypatch.setenv("NCC_ADMIN_PASSWORD", "testpw")
+    monkeypatch.setenv("ROE_UPLOAD_DIR", str(tmp_path / "roe_uploads"))
 
     from roe_api import app
 
@@ -57,8 +60,7 @@ class TestRoeApi:
                 "offender_query": "BadGuy",
                 "violation_type": "OPC hit",
                 "victim_name": "Victim",
-                "system_name": "Ty'Gokor",
-                "screenshots": "https://example.com/shot-1.png",
+                "screenshots": "/roe_uploads/shot-1.png",
                 "notes": "Caught on survey",
             },
             headers=_headers(),
@@ -68,7 +70,20 @@ class TestRoeApi:
         assert data["identity"]["name"] == "BadGuy"
         assert data["payload"]["violation_count"] == 1
         assert data["payload"]["recent_violations"][0]["reported_by"] == "Victim"
-        assert data["payload"]["recent_violations"][0]["screenshots"] == "https://example.com/shot-1.png"
+        assert data["payload"]["recent_violations"][0]["screenshots"] == "/roe_uploads/shot-1.png"
+
+    def test_upload_screenshots(self, client, tmp_path):
+        response = client.post(
+            "/api/roe/uploads",
+            files=[("files", ("proof.png", io.BytesIO(b"pngdata"), "image/png"))],
+            headers=_headers(),
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert len(data["screenshots"]) == 1
+        assert data["screenshots"][0].startswith("/roe_uploads/")
+        stored_files = list((tmp_path / "roe_uploads").iterdir())
+        assert len(stored_files) == 1
 
     def test_summary_and_list(self, client):
         create_response = client.post(

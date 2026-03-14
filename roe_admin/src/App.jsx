@@ -7,7 +7,6 @@ const initialForm = {
   offender_query: "",
   violation_type: "OPC hit",
   victim_name: "",
-  system_name: "",
   offense_date: new Date().toISOString().slice(0, 10),
   screenshots: "",
   notes: "",
@@ -47,14 +46,24 @@ function parseScreenshotItems(value) {
     .filter(Boolean);
 }
 
+function screenshotUrl(value) {
+  if (!value) return "";
+  if (/^https?:\/\//i.test(value)) return value;
+  return value.startsWith("/") ? value : `/${value}`;
+}
+
 async function apiFetch(path, password, options = {}) {
+  const headers = {
+    "X-Admin-Password": password,
+    ...(options.headers || {}),
+  };
+  if (!(options.body instanceof FormData) && !headers["Content-Type"]) {
+    headers["Content-Type"] = "application/json";
+  }
+
   const response = await fetch(path, {
     ...options,
-    headers: {
-      "Content-Type": "application/json",
-      "X-Admin-Password": password,
-      ...(options.headers || {}),
-    },
+    headers,
   });
 
   if (response.status === 401) {
@@ -72,6 +81,17 @@ async function apiFetch(path, password, options = {}) {
   }
 
   return payload;
+}
+
+async function uploadScreenshots(files, password) {
+  if (!files.length) return [];
+  const body = new FormData();
+  files.forEach((file) => body.append("files", file));
+  const payload = await apiFetch("/api/roe/uploads", password, {
+    method: "POST",
+    body,
+  });
+  return payload.screenshots || [];
 }
 
 function StatCard({ label, value, subtext }) {
@@ -152,6 +172,25 @@ function App() {
   const [playerResults, setPlayerResults] = useState([]);
   const [searchLoading, setSearchLoading] = useState(false);
   const [filterText, setFilterText] = useState("");
+  const [screenshotFiles, setScreenshotFiles] = useState([]);
+  const [screenshotInputKey, setScreenshotInputKey] = useState(0);
+
+  const screenshotPreviews = useMemo(
+    () =>
+      screenshotFiles.map((file) => ({
+        id: `${file.name}-${file.size}-${file.lastModified}`,
+        name: file.name,
+        url: URL.createObjectURL(file),
+      })),
+    [screenshotFiles],
+  );
+
+  useEffect(
+    () => () => {
+      screenshotPreviews.forEach((preview) => URL.revokeObjectURL(preview.url));
+    },
+    [screenshotPreviews],
+  );
 
   async function loadDashboard(activePassword) {
     setLoading(true);
@@ -261,7 +300,6 @@ function App() {
         entry.offender_alliance_name,
         entry.violation_type,
         entry.victim_name,
-        entry.system_name,
         entry.screenshots,
         entry.notes,
         entry.reported_by,
@@ -305,16 +343,20 @@ function App() {
     setSubmitting(true);
     setSubmitMessage("");
     try {
+      const uploadedScreenshots = await uploadScreenshots(screenshotFiles, password);
       const payload = await apiFetch("/api/roe/violations", password, {
         method: "POST",
         body: JSON.stringify({
           ...form,
           reported_by: form.victim_name,
+          screenshots: uploadedScreenshots.join("\n"),
         }),
       });
 
       setSubmitMessage(`Logged violation #${payload.violation_id} for ${payload.identity.name}.`);
       setForm(initialForm);
+      setScreenshotFiles([]);
+      setScreenshotInputKey((current) => current + 1);
       setSummary(payload.payload);
       await loadDashboard(password);
     } catch (error) {
@@ -426,7 +468,7 @@ function App() {
             <div className="panel-title-row">
               <div>
                 <h2>Log New Violation</h2>
-                <p>Type the offender name freely or pick a search result to auto-fill alliance details.</p>
+                  <p>Type the offender name freely, upload the proof images, and save the incident.</p>
               </div>
             </div>
 
@@ -488,25 +530,14 @@ function App() {
                 </div>
               </div>
 
-              <div className="field-row">
-                <div className="field">
-                  <label htmlFor="victim_name">Victim</label>
-                  <input
-                    id="victim_name"
-                    value={form.victim_name}
-                    onChange={(event) => updateForm("victim_name", event.target.value)}
-                    placeholder="Alliance member hit"
-                  />
-                </div>
-                <div className="field">
-                  <label htmlFor="system_name">System</label>
-                  <input
-                    id="system_name"
-                    value={form.system_name}
-                    onChange={(event) => updateForm("system_name", event.target.value)}
-                    placeholder="Where it happened"
-                  />
-                </div>
+              <div className="field">
+                <label htmlFor="victim_name">Victim</label>
+                <input
+                  id="victim_name"
+                  value={form.victim_name}
+                  onChange={(event) => updateForm("victim_name", event.target.value)}
+                  placeholder="Alliance member hit"
+                />
               </div>
 
               <div className="override-grid">
@@ -541,13 +572,25 @@ function App() {
 
               <div className="field">
                 <label htmlFor="screenshots">Screenshots</label>
-                <textarea
+                <input
+                  key={screenshotInputKey}
                   id="screenshots"
-                  value={form.screenshots}
-                  onChange={(event) => updateForm("screenshots", event.target.value)}
-                  placeholder="Paste screenshot URLs or references, one per line"
-                  rows={3}
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={(event) => setScreenshotFiles(Array.from(event.target.files || []))}
                 />
+                <div className="hint">Upload one or more screenshots. They will be stored with the violation automatically.</div>
+                {screenshotPreviews.length ? (
+                  <div className="screenshot-preview-grid">
+                    {screenshotPreviews.map((preview) => (
+                      <figure className="screenshot-preview-card" key={preview.id}>
+                        <img src={preview.url} alt={preview.name} />
+                        <figcaption>{preview.name}</figcaption>
+                      </figure>
+                    ))}
+                  </div>
+                ) : null}
               </div>
 
               <div className="field">
@@ -597,7 +640,7 @@ function App() {
           <div className="panel-title-row">
             <div>
               <h2>Recent Violations</h2>
-              <p>Filter locally across offender, alliance, victim, system, screenshots, notes, and reporter.</p>
+                  <p>Filter locally across offender, alliance, victim, screenshots, notes, and reporter.</p>
             </div>
             <input
               className="filter-input"
@@ -619,7 +662,6 @@ function App() {
                     <th>Alliance</th>
                     <th>Violation</th>
                     <th>Victim</th>
-                    <th>System</th>
                     <th>Reported by</th>
                     <th>Screenshots</th>
                     <th>Notes</th>
@@ -633,16 +675,19 @@ function App() {
                       <td>{entry.offender_alliance_tag || entry.offender_alliance_name || "-"}</td>
                       <td>{entry.violation_type}</td>
                       <td>{entry.victim_name || "-"}</td>
-                      <td>{entry.system_name || "-"}</td>
                       <td>{entry.reported_by || "-"}</td>
-                      <td className="notes-cell">
+                      <td className="screenshot-cell">
                         {parseScreenshotItems(entry.screenshots).length ? (
                           parseScreenshotItems(entry.screenshots).map((item) => (
-                            <div key={item}>
-                              <a href={item} target="_blank" rel="noreferrer">
-                                {item}
-                              </a>
-                            </div>
+                            <a
+                              key={item}
+                              className="screenshot-thumb"
+                              href={screenshotUrl(item)}
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              <img src={screenshotUrl(item)} alt="Violation screenshot" loading="lazy" />
+                            </a>
                           ))
                         ) : (
                           "-"

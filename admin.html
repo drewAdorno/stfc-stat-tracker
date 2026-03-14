@@ -372,6 +372,25 @@
     white-space: normal;
     color: #b9c8d6;
   }
+  .screenshot-cell {
+    min-width: 180px;
+  }
+  .screenshot-thumb {
+    display: inline-block;
+    width: 72px;
+    height: 72px;
+    margin: 0 8px 8px 0;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid #27435e;
+    background: rgba(10, 14, 24, 0.9);
+  }
+  .screenshot-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
 
   /* Loading / Error */
   .loading {
@@ -552,6 +571,30 @@
     return `<a class="player-link" href="player.html?id=${encodeURIComponent(id)}">${esc(name)}</a>`;
   }
 
+  function parseScreenshotItems(value) {
+    return String(value || '')
+      .split(/\r?\n|,/)
+      .map(item => item.trim())
+      .filter(Boolean);
+  }
+
+  function screenshotUrl(value) {
+    if (!value) return '';
+    if (/^https?:\/\//i.test(value)) return value;
+    return value.startsWith('/') ? value : '/' + value;
+  }
+
+  function renderScreenshotThumbs(value) {
+    const items = parseScreenshotItems(value);
+    if (!items.length) return '-';
+    return items
+      .map(item => {
+        const url = screenshotUrl(item);
+        return `<a class="screenshot-thumb" href="${esc(url)}" target="_blank" rel="noreferrer"><img src="${esc(url)}" alt="Violation screenshot"></a>`;
+      })
+      .join('');
+  }
+
   function formatShortDate(value) {
     if (!value) return '-';
     const d = new Date(value);
@@ -698,7 +741,7 @@
     s += '</div>';
 
     s += '<div class="table-wrap"><table><thead><tr>';
-    s += '<th>Date</th><th>Offender</th><th>Alliance</th><th>Violation</th><th>Victim</th><th>System</th><th>Reported By</th><th>Screenshots</th><th>Notes</th>';
+    s += '<th>Date</th><th>Offender</th><th>Alliance</th><th>Violation</th><th>Victim</th><th>Reported By</th><th>Screenshots</th><th>Notes</th>';
     s += '</tr></thead><tbody>';
     for (const entry of recent.slice(0, 50)) {
       const allianceLabel = entry.offender_alliance_tag || entry.offender_alliance_name || '-';
@@ -708,9 +751,8 @@
         <td>${esc(allianceLabel)}</td>
         <td>${esc(entry.violation_type || '-')}</td>
         <td>${entityLink(entry.victim_name, entry.victim_player_id)}</td>
-        <td>${esc(entry.system_name || '-')}</td>
         <td>${esc(entry.reported_by || '-')}</td>
-        <td class="notes-cell">${esc(entry.screenshots || '-')}</td>
+        <td class="screenshot-cell">${renderScreenshotThumbs(entry.screenshots)}</td>
         <td class="notes-cell">${esc(entry.notes || '-')}</td>
       </tr>`;
     }
