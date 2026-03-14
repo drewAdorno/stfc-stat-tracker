@@ -25,6 +25,13 @@ DB_PATH = DATA_DIR / "stfc.db"
 NCC_ALLIANCE_ID = "2616095065411838478"
 NCC_ALLIANCE_NAME = "Discovery"
 SERVER = 716
+ROE_VIOLATION_TYPES = {
+    "opc hit": "OPC hit",
+    "upc hit": "OPC hit",
+    "token space hit": "Token space hit",
+    "armada interference": "Armada interference",
+    "friendly alliance hit": "Friendly alliance hit",
+}
 
 TRACKED_FIELDS = [
     "level", "power", "helps", "rss_contrib", "iso_contrib",
@@ -110,6 +117,7 @@ CREATE TABLE IF NOT EXISTS roe_violations (
     victim_name         TEXT,
     violation_type      TEXT NOT NULL,
     system_name         TEXT,
+    screenshots         TEXT,
     notes               TEXT,
     source              TEXT NOT NULL DEFAULT 'manual',
     source_ref          TEXT
@@ -256,6 +264,9 @@ def get_db():
         conn.execute("ALTER TABLE daily_snapshots ADD COLUMN name TEXT")
     if "alliance_name" not in cols:
         conn.execute("ALTER TABLE daily_snapshots ADD COLUMN alliance_name TEXT")
+    roe_cols = {r[1] for r in conn.execute("PRAGMA table_info(roe_violations)")}
+    if roe_cols and "screenshots" not in roe_cols:
+        conn.execute("ALTER TABLE roe_violations ADD COLUMN screenshots TEXT")
     conn.commit()
     return conn
 
@@ -1333,6 +1344,7 @@ def record_roe_violation(
     victim_player_id="",
     victim_name="",
     system_name="",
+    screenshots="",
     notes="",
     source="manual",
     source_ref="",
@@ -1340,10 +1352,14 @@ def record_roe_violation(
     """Insert a single ROE violation record and return its row id."""
     offender_name = _clean_text(offender_name)
     violation_type = _clean_text(violation_type)
+    normalized_type = ROE_VIOLATION_TYPES.get(violation_type.lower())
     if not offender_name:
         raise ValueError("offender_name is required")
     if not violation_type:
         raise ValueError("violation_type is required")
+    if not normalized_type:
+        allowed = ", ".join(sorted(set(ROE_VIOLATION_TYPES.values())))
+        raise ValueError(f"violation_type must be one of: {allowed}")
 
     offense_date = _clean_text(offense_date) or now_est().strftime("%Y-%m-%d")
     reported_at = now_est().isoformat()
@@ -1354,9 +1370,9 @@ def record_roe_violation(
             offender_player_id, offender_name,
             offender_alliance_id, offender_alliance_tag, offender_alliance_name,
             victim_player_id, victim_name, violation_type,
-            system_name, notes, source, source_ref
+            system_name, screenshots, notes, source, source_ref
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, (
         reported_at,
         offense_date,
@@ -1368,8 +1384,9 @@ def record_roe_violation(
         _clean_text(offender_alliance_name) or None,
         _clean_text(victim_player_id) or None,
         _clean_text(victim_name) or None,
-        violation_type,
+        normalized_type,
         _clean_text(system_name) or None,
+        _clean_text(screenshots) or None,
         _clean_text(notes) or None,
         _clean_text(source) or "manual",
         _clean_text(source_ref) or None,
@@ -1399,6 +1416,7 @@ def _build_roe_violations_export(rows):
             victim_name,
             violation_type,
             system_name,
+            screenshots,
             notes,
             source,
             source_ref,
@@ -1418,6 +1436,7 @@ def _build_roe_violations_export(rows):
             "victim_name": victim_name or "",
             "violation_type": violation_type or "",
             "system_name": system_name or "",
+            "screenshots": screenshots or "",
             "notes": notes or "",
             "source": source or "",
             "source_ref": source_ref or "",
@@ -1510,7 +1529,7 @@ def export_roe_violations_json(conn):
                offender_player_id, offender_name,
                offender_alliance_id, offender_alliance_tag, offender_alliance_name,
                victim_player_id, victim_name, violation_type,
-               system_name, notes, source, source_ref
+               system_name, screenshots, notes, source, source_ref
         FROM roe_violations
         ORDER BY offense_date DESC, reported_at DESC, id DESC
     """).fetchall()

@@ -52,6 +52,7 @@ class TestRoeViolations:
             violation_type="OPC hit",
             reported_by="OfficerOne",
             offense_date="2026-03-13",
+            screenshots="https://example.com/shot-1.png",
             notes="First strike",
         )
         db_mod.record_roe_violation(
@@ -62,7 +63,7 @@ class TestRoeViolations:
             offender_alliance_tag="FOE",
             offender_alliance_name="Foe Alliance",
             victim_name="Victim",
-            violation_type="Zero node hit",
+            violation_type="Token space hit",
             reported_by="OfficerTwo",
             offense_date="2026-03-14",
         )
@@ -73,7 +74,7 @@ class TestRoeViolations:
             offender_alliance_id="a1",
             offender_alliance_tag="FOE",
             offender_alliance_name="Foe Alliance",
-            violation_type="Armada grief",
+            violation_type="Armada interference",
             offense_date="2026-03-14",
         )
 
@@ -87,7 +88,8 @@ class TestRoeViolations:
         assert payload["alliance_tallies"][0]["offender_alliance_tag"] == "FOE"
         assert payload["alliance_tallies"][0]["offense_count"] == 3
         assert payload["alliance_tallies"][0]["unique_offender_count"] == 2
-        assert payload["recent_violations"][0]["violation_type"] in {"Zero node hit", "Armada grief"}
+        assert payload["recent_violations"][0]["violation_type"] in {"Token space hit", "Armada interference"}
+        assert payload["recent_violations"][-1]["screenshots"] == "https://example.com/shot-1.png"
 
         exported = json.loads((tmp_path / "roe_violations.json").read_text(encoding="utf-8"))
         assert exported["violation_count"] == 3
@@ -101,6 +103,9 @@ class TestRoeViolations:
 
         with pytest.raises(ValueError):
             db_mod.record_roe_violation(conn, offender_name="BadGuy", violation_type="")
+
+        with pytest.raises(ValueError):
+            db_mod.record_roe_violation(conn, offender_name="BadGuy", violation_type="Zero node hit")
 
     def test_alliance_tally_skips_blank_alliance(self, test_db):
         conn, _ = test_db

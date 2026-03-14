@@ -86,6 +86,20 @@ def merge_identity(identity: Dict[str, str], *, fallback_name: str, overrides: D
     return merged
 
 
+def detect_identity(conn, offender_query: str) -> Dict[str, str]:
+    """Best-effort identity detection without requiring explicit selection."""
+    query = str(offender_query or "").strip()
+    if not query:
+        return {}
+    candidates = fetch_player_candidates(conn, query, limit=8)
+    if not candidates:
+        return {}
+    exact = [candidate for candidate in candidates if candidate["name"].lower() == query.lower()]
+    if len(exact) == 1:
+        return exact[0]
+    return {}
+
+
 def create_violation(
     conn,
     *,
@@ -95,6 +109,7 @@ def create_violation(
     victim_name: str = "",
     victim_player_id: str = "",
     system_name: str = "",
+    screenshots: str = "",
     notes: str = "",
     offense_date: str = "",
     source: str = "manual",
@@ -102,8 +117,13 @@ def create_violation(
     offender_overrides: Dict[str, str] | None = None,
 ):
     """Create a violation, refresh the export, and return the result payload."""
-    identity = resolve_player(conn, offender_query)
+    identity = detect_identity(conn, offender_query)
+    if not identity and offender_overrides:
+        identity = {}
+    elif not identity:
+        identity = resolve_player(conn, offender_query)
     identity = merge_identity(identity, fallback_name=offender_query, overrides=offender_overrides)
+    reported_by = reported_by or victim_name
 
     violation_id = record_roe_violation(
         conn,
@@ -115,6 +135,7 @@ def create_violation(
         victim_player_id=victim_player_id,
         victim_name=victim_name,
         system_name=system_name,
+        screenshots=screenshots,
         reported_by=reported_by,
         violation_type=violation_type,
         notes=notes,
@@ -136,7 +157,7 @@ def list_violations(conn, limit: int = 50):
     rows = conn.execute("""
         SELECT id, reported_at, offense_date, offender_player_id, offender_name,
                offender_alliance_id, offender_alliance_tag, offender_alliance_name,
-               victim_player_id, victim_name, violation_type, system_name, notes, reported_by
+               victim_player_id, victim_name, violation_type, system_name, screenshots, notes, reported_by
         FROM roe_violations
         ORDER BY offense_date DESC, reported_at DESC, id DESC
         LIMIT ?
@@ -155,8 +176,9 @@ def list_violations(conn, limit: int = 50):
             "victim_name": row[9] or "",
             "violation_type": row[10] or "",
             "system_name": row[11] or "",
-            "notes": row[12] or "",
-            "reported_by": row[13] or "",
+            "screenshots": row[12] or "",
+            "notes": row[13] or "",
+            "reported_by": row[14] or "",
         }
         for row in rows
     ]

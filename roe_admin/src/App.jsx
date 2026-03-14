@@ -6,13 +6,12 @@ const AUTH_KEY = "ncc_admin_auth";
 const initialForm = {
   offender_query: "",
   violation_type: "OPC hit",
-  reported_by: "",
   victim_name: "",
   system_name: "",
   offense_date: new Date().toISOString().slice(0, 10),
+  screenshots: "",
   notes: "",
   offender_overrides: {
-    name: "",
     alliance_id: "",
     alliance_tag: "",
     alliance_name: "",
@@ -21,12 +20,9 @@ const initialForm = {
 
 const violationOptions = [
   "OPC hit",
-  "Zero node hit",
-  "Protected miner hit",
   "Token space hit",
   "Armada interference",
-  "Territory ROE breach",
-  "Other",
+  "Friendly alliance hit",
 ];
 
 function formatDate(value) {
@@ -42,6 +38,13 @@ function formatDate(value) {
 
 function classNames(...values) {
   return values.filter(Boolean).join(" ");
+}
+
+function parseScreenshotItems(value) {
+  return String(value || "")
+    .split(/\r?\n|,/)
+    .map((item) => item.trim())
+    .filter(Boolean);
 }
 
 async function apiFetch(path, password, options = {}) {
@@ -209,6 +212,24 @@ function App() {
     };
   }, [form.offender_query, password]);
 
+  useEffect(() => {
+    const query = form.offender_query.trim().toLowerCase();
+    if (!query || !playerResults.length) return;
+    const exactMatch = playerResults.find(
+      (player) => player.name.trim().toLowerCase() === query || player.player_id === form.offender_query.trim(),
+    );
+    if (!exactMatch) return;
+    setForm((current) => ({
+      ...current,
+      offender_overrides: {
+        ...current.offender_overrides,
+        alliance_id: exactMatch.alliance_id || "",
+        alliance_tag: exactMatch.alliance_tag || "",
+        alliance_name: exactMatch.alliance_name || "",
+      },
+    }));
+  }, [form.offender_query, playerResults]);
+
   const filteredViolations = useMemo(() => {
     const query = filterText.trim().toLowerCase();
     if (!query) return violations;
@@ -220,6 +241,7 @@ function App() {
         entry.violation_type,
         entry.victim_name,
         entry.system_name,
+        entry.screenshots,
         entry.notes,
         entry.reported_by,
       ]
@@ -239,10 +261,7 @@ function App() {
   function updateOverride(field, value) {
     setForm((current) => ({
       ...current,
-      offender_overrides: {
-        ...current.offender_overrides,
-        [field]: value,
-      },
+      offender_overrides: { ...current.offender_overrides, [field]: value },
     }));
   }
 
@@ -252,7 +271,6 @@ function App() {
       offender_query: player.name,
       offender_overrides: {
         ...current.offender_overrides,
-        name: player.name || "",
         alliance_id: player.alliance_id || "",
         alliance_tag: player.alliance_tag || "",
         alliance_name: player.alliance_name || "",
@@ -268,14 +286,14 @@ function App() {
     try {
       const payload = await apiFetch("/api/roe/violations", password, {
         method: "POST",
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          ...form,
+          reported_by: form.victim_name,
+        }),
       });
 
       setSubmitMessage(`Logged violation #${payload.violation_id} for ${payload.identity.name}.`);
-      setForm({
-        ...initialForm,
-        reported_by: form.reported_by,
-      });
+      setForm(initialForm);
       setSummary(payload.payload);
       await loadDashboard(password);
     } catch (error) {
@@ -313,7 +331,7 @@ function App() {
         <div className="noise" />
         <div className="login-shell">
           <div className="eyebrow">NCC Alliance Control</div>
-          <h1>ROE Console</h1>
+          <h1>ROE Violations</h1>
           <p className="lead">
             Manual incident entry, offender tallies, and alliance history in one place.
           </p>
@@ -328,7 +346,7 @@ function App() {
               autoComplete="current-password"
             />
             <button type="submit" disabled={!passwordInput || loading}>
-              {loading ? "Checking..." : "Enter Console"}
+              {loading ? "Checking..." : "Open page"}
             </button>
             {bootError ? <div className="form-status error">{bootError}</div> : null}
           </form>
@@ -343,7 +361,7 @@ function App() {
       <div className="app-shell">
         <header className="hero">
           <div>
-            <div className="eyebrow">NCC ROE Console</div>
+            <div className="eyebrow">NCC ROE Violations</div>
             <h1>Alliance incident tracking with a real write path.</h1>
             <p className="lead">
               Log new breaches, spot repeat offenders fast, and keep the ROE channel aligned
@@ -391,7 +409,7 @@ function App() {
             <div className="panel-title-row">
               <div>
                 <h2>Log New Violation</h2>
-                <p>Use search when possible so offender alliance data fills itself in.</p>
+                <p>Type the offender name freely or pick a search result to auto-fill alliance details.</p>
               </div>
             </div>
 
@@ -423,6 +441,7 @@ function App() {
                     ))}
                   </div>
                 ) : null}
+                <div className="hint">Alliance details below auto-fill when this matches a known player.</div>
               </div>
 
               <div className="field-row">
@@ -473,33 +492,14 @@ function App() {
                 </div>
               </div>
 
-              <div className="field">
-                <label htmlFor="reported_by">Reported by</label>
-                <input
-                  id="reported_by"
-                  value={form.reported_by}
-                  onChange={(event) => updateForm("reported_by", event.target.value)}
-                  placeholder="Officer or member name"
-                />
-              </div>
-
               <div className="override-grid">
-                <div className="field">
-                  <label htmlFor="override_name">Override offender name</label>
-                  <input
-                    id="override_name"
-                    value={form.offender_overrides.name}
-                    onChange={(event) => updateOverride("name", event.target.value)}
-                    placeholder="Use only if search result is wrong"
-                  />
-                </div>
                 <div className="field">
                   <label htmlFor="override_tag">Alliance tag</label>
                   <input
                     id="override_tag"
                     value={form.offender_overrides.alliance_tag}
                     onChange={(event) => updateOverride("alliance_tag", event.target.value)}
-                    placeholder="FOE"
+                    placeholder="Auto-filled when available"
                   />
                 </div>
                 <div className="field">
@@ -508,9 +508,29 @@ function App() {
                     id="override_name_alliance"
                     value={form.offender_overrides.alliance_name}
                     onChange={(event) => updateOverride("alliance_name", event.target.value)}
-                    placeholder="Foe Alliance"
+                    placeholder="Auto-filled when available"
                   />
                 </div>
+                <div className="field">
+                  <label htmlFor="override_id">Alliance id</label>
+                  <input
+                    id="override_id"
+                    value={form.offender_overrides.alliance_id}
+                    onChange={(event) => updateOverride("alliance_id", event.target.value)}
+                    placeholder="Optional manual override"
+                  />
+                </div>
+              </div>
+
+              <div className="field">
+                <label htmlFor="screenshots">Screenshots</label>
+                <textarea
+                  id="screenshots"
+                  value={form.screenshots}
+                  onChange={(event) => updateForm("screenshots", event.target.value)}
+                  placeholder="Paste screenshot URLs or references, one per line"
+                  rows={3}
+                />
               </div>
 
               <div className="field">
@@ -519,7 +539,7 @@ function App() {
                   id="notes"
                   value={form.notes}
                   onChange={(event) => updateForm("notes", event.target.value)}
-                  placeholder="What happened, what was hit, screenshots, follow-up, etc."
+                  placeholder="What happened, what was hit, follow-up, or context"
                   rows={4}
                 />
               </div>
@@ -560,7 +580,7 @@ function App() {
           <div className="panel-title-row">
             <div>
               <h2>Recent Violations</h2>
-              <p>Filter locally across offender, alliance, victim, system, notes, and reporter.</p>
+              <p>Filter locally across offender, alliance, victim, system, screenshots, notes, and reporter.</p>
             </div>
             <input
               className="filter-input"
@@ -584,6 +604,7 @@ function App() {
                     <th>Victim</th>
                     <th>System</th>
                     <th>Reported by</th>
+                    <th>Screenshots</th>
                     <th>Notes</th>
                   </tr>
                 </thead>
@@ -597,6 +618,19 @@ function App() {
                       <td>{entry.victim_name || "-"}</td>
                       <td>{entry.system_name || "-"}</td>
                       <td>{entry.reported_by || "-"}</td>
+                      <td className="notes-cell">
+                        {parseScreenshotItems(entry.screenshots).length ? (
+                          parseScreenshotItems(entry.screenshots).map((item) => (
+                            <div key={item}>
+                              <a href={item} target="_blank" rel="noreferrer">
+                                {item}
+                              </a>
+                            </div>
+                          ))
+                        ) : (
+                          "-"
+                        )}
+                      </td>
                       <td className="notes-cell">{entry.notes || "-"}</td>
                     </tr>
                   ))}

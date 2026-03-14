@@ -31,7 +31,6 @@ def require_admin(x_admin_password: Optional[str] = Header(default=None)) -> Non
 class OffenderOverrides(BaseModel):
     """Optional manual overrides when the offender cannot be resolved cleanly."""
 
-    name: str = ""
     alliance_id: str = ""
     alliance_tag: str = ""
     alliance_name: str = ""
@@ -46,6 +45,7 @@ class CreateViolationRequest(BaseModel):
     victim_name: str = ""
     victim_player_id: str = ""
     system_name: str = ""
+    screenshots: str = ""
     notes: str = ""
     offense_date: str = ""
     source: str = "manual-ui"
@@ -110,6 +110,7 @@ def create_roe_violation(payload: CreateViolationRequest, _auth: None = Depends(
                 victim_name=payload.victim_name,
                 victim_player_id=payload.victim_player_id,
                 system_name=payload.system_name,
+                screenshots=payload.screenshots,
                 notes=payload.notes,
                 offense_date=payload.offense_date,
                 source=payload.source,

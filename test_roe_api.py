@@ -56,9 +56,9 @@ class TestRoeApi:
             json={
                 "offender_query": "BadGuy",
                 "violation_type": "OPC hit",
-                "reported_by": "Officer",
                 "victim_name": "Victim",
                 "system_name": "Ty'Gokor",
+                "screenshots": "https://example.com/shot-1.png",
                 "notes": "Caught on survey",
             },
             headers=_headers(),
@@ -67,13 +67,15 @@ class TestRoeApi:
         data = response.json()
         assert data["identity"]["name"] == "BadGuy"
         assert data["payload"]["violation_count"] == 1
+        assert data["payload"]["recent_violations"][0]["reported_by"] == "Victim"
+        assert data["payload"]["recent_violations"][0]["screenshots"] == "https://example.com/shot-1.png"
 
     def test_summary_and_list(self, client):
         create_response = client.post(
             "/api/roe/violations",
             json={
                 "offender_query": "BadGuy",
-                "violation_type": "Zero node hit",
+                "violation_type": "Friendly alliance hit",
             },
             headers=_headers(),
         )
@@ -88,4 +90,4 @@ class TestRoeApi:
         list_response = client.get("/api/roe/violations", headers=_headers())
         assert list_response.status_code == 200
         listing = list_response.json()
-        assert listing["violations"][0]["violation_type"] == "Zero node hit"
+        assert listing["violations"][0]["violation_type"] == "Friendly alliance hit"

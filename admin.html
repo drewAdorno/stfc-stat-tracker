@@ -397,7 +397,7 @@
     <a href="calendar">Calendar</a>
     <a href="server">Server</a>
     <a href="leaderboard">Leaderboard</a>
-    <a href="/roe-admin/">ROE Console</a>
+    <a href="/roe-admin/">ROE Violations</a>
     <a href="admin" class="active">Admin</a>
   </nav>
 
@@ -630,9 +630,8 @@
     const latest = recent[0];
 
     let s = '<div class="section"><div class="section-header">ROE Violations</div>';
-    s += '<div class="section-note">Manual entry is handled through the tracker CLI today, and this dashboard shows the live tallies that will later feed Discord automation.</div>';
-    s += '<a class="section-action-link" href="/roe-admin/">Open ROE entry console</a>';
-    s += '<div class="cmd-box"><code>python manage_roe.py add "BadGuy" --type "OPC hit" --reported-by "Officer" --victim "NCC Member" --system "Ty\'Gokor"</code></div>';
+    s += '<div class="section-note">Use the ROE violations page for manual entry, and this dashboard will keep showing the live tallies and recent incidents.</div>';
+    s += '<a class="section-action-link" href="/roe-admin/">Open ROE violations page</a>';
 
     const lastReported = latest ? formatShortDate(latest.reported_at || latest.offense_date) : 'None';
     s += '<div class="stat-grid">';
@@ -682,7 +681,7 @@
     s += '</div>';
 
     s += '<div class="table-wrap"><table><thead><tr>';
-    s += '<th>Date</th><th>Offender</th><th>Alliance</th><th>Violation</th><th>Victim</th><th>System</th><th>Reported By</th><th>Notes</th>';
+    s += '<th>Date</th><th>Offender</th><th>Alliance</th><th>Violation</th><th>Victim</th><th>System</th><th>Reported By</th><th>Screenshots</th><th>Notes</th>';
     s += '</tr></thead><tbody>';
     for (const entry of recent.slice(0, 50)) {
       const allianceLabel = entry.offender_alliance_tag || entry.offender_alliance_name || '-';
@@ -694,6 +693,7 @@
         <td>${entityLink(entry.victim_name, entry.victim_player_id)}</td>
         <td>${esc(entry.system_name || '-')}</td>
         <td>${esc(entry.reported_by || '-')}</td>
+        <td class="notes-cell">${esc(entry.screenshots || '-')}</td>
         <td class="notes-cell">${esc(entry.notes || '-')}</td>
       </tr>`;
     }
