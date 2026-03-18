@@ -57,25 +57,11 @@ class TestDetectChanges:
         names = [m["name"] for m in changes["left"]]
         assert "Carol" in names
 
-    def test_level_up(self, prev_members, curr_members):
-        changes = sha.detect_changes(prev_members, curr_members)
-        ups = {m["name"]: m for m in changes["level_ups"]}
-        assert "Alice" in ups
-        assert ups["Alice"]["old_level"] == "39"
-        assert ups["Alice"]["new_level"] == "40"
-
-    def test_no_false_level_up(self, prev_members, curr_members):
-        """Bob stayed at level 35 — should not appear in level_ups."""
-        changes = sha.detect_changes(prev_members, curr_members)
-        names = [m["name"] for m in changes["level_ups"]]
-        assert "Bob" not in names
-
     def test_no_changes(self):
         members = {"1": {"id": "1", "name": "X", "level": "10", "power": "1M"}}
         changes = sha.detect_changes(members, members)
         assert changes["joined"] == []
         assert changes["left"] == []
-        assert changes["level_ups"] == []
 
     def test_empty_to_empty(self):
         changes = sha.detect_changes({}, {})
@@ -99,13 +85,12 @@ class TestDetectChanges:
 # ---------------------------------------------------------------------------
 
 class TestBuildAlertEmbeds:
-    def test_three_embeds_when_all_changes(self, prev_members, curr_members):
+    def test_two_embeds_when_join_and_leave(self, prev_members, curr_members):
         changes = sha.detect_changes(prev_members, curr_members)
         embeds = sha.build_alert_embeds(changes)
         titles = [e["title"] for e in embeds]
         assert "✅ Member Joined" in titles
         assert "🚪 Member Left" in titles
-        assert "⬆️ Level Up" in titles
 
     def test_each_embed_has_footer(self, prev_members, curr_members):
         changes = sha.detect_changes(prev_members, curr_members)
@@ -117,7 +102,6 @@ class TestBuildAlertEmbeds:
         changes = {
             "joined": [{"name": "NewGuy", "level": "10", "power": "1M"}],
             "left": [],
-            "level_ups": [],
         }
         embeds = sha.build_alert_embeds(changes)
         assert len(embeds) == 1
@@ -129,7 +113,6 @@ class TestBuildAlertEmbeds:
         changes = {
             "joined": [],
             "left": [{"name": "GoneGuy", "level": "20", "power": "5M"}],
-            "level_ups": [],
         }
         embeds = sha.build_alert_embeds(changes)
         assert len(embeds) == 1
@@ -137,31 +120,8 @@ class TestBuildAlertEmbeds:
         assert embeds[0]["title"] == "🚪 Member Left"
         assert "GoneGuy" in embeds[0]["description"]
 
-    def test_level_up_embed_is_blue(self):
-        changes = {
-            "joined": [],
-            "left": [],
-            "level_ups": [{"name": "Leveler", "old_level": "29", "new_level": "30"}],
-        }
-        embeds = sha.build_alert_embeds(changes)
-        assert len(embeds) == 1
-        assert embeds[0]["color"] == 0x4DABF7
-        assert embeds[0]["title"] == "⬆️ Level Up"
-        assert "Lv29" in embeds[0]["description"]
-        assert "Lv30" in embeds[0]["description"]
-
-    def test_level_up_has_congrats_message(self):
-        changes = {
-            "joined": [],
-            "left": [],
-            "level_ups": [{"name": "Leveler", "old_level": "29", "new_level": "30"}],
-        }
-        embeds = sha.build_alert_embeds(changes)
-        desc = embeds[0]["description"]
-        assert any(msg in desc for msg in sha.LEVEL_UP_MESSAGES)
-
     def test_no_embeds_when_no_changes(self):
-        changes = {"joined": [], "left": [], "level_ups": []}
+        changes = {"joined": [], "left": []}
         embeds = sha.build_alert_embeds(changes)
         assert embeds == []
 
@@ -169,7 +129,6 @@ class TestBuildAlertEmbeds:
         changes = {
             "joined": [{"name": "Rich", "level": "40", "power": "100M"}],
             "left": [],
-            "level_ups": [],
         }
         embeds = sha.build_alert_embeds(changes)
         desc = embeds[0]["description"]
@@ -180,7 +139,6 @@ class TestBuildAlertEmbeds:
         changes = {
             "joined": [],
             "left": [{"name": "Gone", "level": "25", "power": "5M"}],
-            "level_ups": [],
         }
         embeds = sha.build_alert_embeds(changes)
         assert "was Lv25" in embeds[0]["description"]
@@ -192,7 +150,6 @@ class TestBuildAlertEmbeds:
                 {"name": "B", "level": "20", "power": "2M"},
             ],
             "left": [],
-            "level_ups": [],
         }
         embeds = sha.build_alert_embeds(changes)
         assert len(embeds) == 1
@@ -206,16 +163,13 @@ class TestBuildAlertEmbeds:
 
 class TestHasChanges:
     def test_true_with_joined(self):
-        assert sha.has_changes({"joined": [{}], "left": [], "level_ups": []})
+        assert sha.has_changes({"joined": [{}], "left": []})
 
     def test_true_with_left(self):
-        assert sha.has_changes({"joined": [], "left": [{}], "level_ups": []})
-
-    def test_true_with_level_ups(self):
-        assert sha.has_changes({"joined": [], "left": [], "level_ups": [{}]})
+        assert sha.has_changes({"joined": [], "left": [{}]})
 
     def test_false_when_empty(self):
-        assert not sha.has_changes({"joined": [], "left": [], "level_ups": []})
+        assert not sha.has_changes({"joined": [], "left": []})
 
 
 # ---------------------------------------------------------------------------

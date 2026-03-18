@@ -16,7 +16,6 @@ import discord
 from discord import app_commands
 from dotenv import load_dotenv
 
-import random
 
 from db import (
     NCC_ALLIANCE_ID,
@@ -447,6 +446,7 @@ EST = timezone(timedelta(hours=-5))
 TERRITORY_CHANNEL_ID = 1452766274127138939
 CHAT_CHANNEL_ID = 1452757187188490292
 ACTIVITY_CHANNEL_ID = 1479693128850997258
+JOIN_CHANNEL_ID = 1453385101382647922
 _STATE_DIR = Path(__file__).parent / "data"
 
 
@@ -547,20 +547,10 @@ async def territory_reminder_loop():
         await asyncio.sleep(60)
 
 
-# --- Alliance Alerts (joins, leaves, level-ups) ---
-
-LEVEL_UP_MESSAGES = [
-    "🎉 Congrats! Keep climbing!",
-    "🚀 To boldly go to the next level!",
-    "💪 Nice grind, Commander!",
-    "🔥 Unstoppable!",
-    "⭐ The fleet grows stronger!",
-    "🏆 Another one bites the dust!",
-    "📈 Stonks! Level goes up!",
-]
+# --- Alliance Alerts (joins, leaves) ---
 
 def _detect_changes(prev_members, curr_members):
-    """Compare two member dicts and return joined, left, level_ups lists."""
+    """Compare two member dicts and return joined, left lists."""
     prev_ids = set(prev_members.keys())
     curr_ids = set(curr_members.keys())
 
@@ -572,28 +562,17 @@ def _detect_changes(prev_members, curr_members):
     for mid in sorted(prev_ids - curr_ids):
         left.append(prev_members[mid])
 
-    level_ups = []
-    for mid in sorted(prev_ids & curr_ids):
-        prev_level = int(prev_members[mid].get("level", 0) or 0)
-        curr_level = int(curr_members[mid].get("level", 0) or 0)
-        if curr_level > prev_level:
-            level_ups.append({
-                **curr_members[mid],
-                "old_level": prev_level,
-                "new_level": curr_level,
-            })
-
-    return {"joined": joined, "left": left, "level_ups": level_ups}
+    return {"joined": joined, "left": left}
 
 
 async def alliance_alert_loop():
-    """Check for joins, leaves, level-ups every 5 minutes."""
+    """Check for joins, leaves every 5 minutes."""
     await client.wait_until_ready()
 
-    chat_channel = client.get_channel(CHAT_CHANNEL_ID)
+    join_channel = client.get_channel(JOIN_CHANNEL_ID)
     activity_channel = client.get_channel(ACTIVITY_CHANNEL_ID)
-    if not chat_channel or not activity_channel:
-        print(f"WARNING: Alert channels not found (chat={CHAT_CHANNEL_ID}, activity={ACTIVITY_CHANNEL_ID})")
+    if not join_channel or not activity_channel:
+        print(f"WARNING: Alert channels not found (join={JOIN_CHANNEL_ID}, activity={ACTIVITY_CHANNEL_ID})")
         return
 
     MAX_ALERTS_PER_CYCLE = 15  # circuit breaker: skip if too many changes (likely bad data)
@@ -627,8 +606,7 @@ async def alliance_alert_loop():
             # Count unsent alerts; skip cycle if too many (likely bad data)
             unsent_joins = [m for m in changes["joined"] if f"join:{m['name']}" not in sent]
             unsent_lefts = [m for m in changes["left"] if f"left:{m['name']}" not in sent]
-            unsent_lvlups = [m for m in changes["level_ups"] if f"levelup:{m['name']}:{m['new_level']}" not in sent]
-            total_unsent = len(unsent_joins) + len(unsent_lefts) + len(unsent_lvlups)
+            total_unsent = len(unsent_joins) + len(unsent_lefts)
 
             if total_unsent > MAX_ALERTS_PER_CYCLE:
                 print(f"Alliance alerts: {total_unsent} unsent alerts exceeds cap of {MAX_ALERTS_PER_CYCLE}, skipping (likely bad data)")
@@ -643,7 +621,7 @@ async def alliance_alert_loop():
                     description=f"**{m['name']}** — Lv{m.get('level', '?')}, {power} power",
                     color=0x51CF66,
                 )
-                await chat_channel.send(embed=embed)
+                await join_channel.send(embed=embed)
                 await activity_channel.send(embed=embed)
                 sent.add(key)
                 _save_state(".bot_alerts_sent", {"dates": dates_key, "sent": sorted(sent)})
@@ -657,17 +635,6 @@ async def alliance_alert_loop():
                     color=0xFF6B6B,
                 )
                 await activity_channel.send(embed=embed)
-                sent.add(key)
-                _save_state(".bot_alerts_sent", {"dates": dates_key, "sent": sorted(sent)})
-
-            for m in unsent_lvlups:
-                key = f"levelup:{m['name']}:{m['new_level']}"
-                embed = discord.Embed(
-                    title="⬆️ Level Up",
-                    description=f"**{m['name']}** — Lv{m['old_level']} → Lv{m['new_level']}\n\n{random.choice(LEVEL_UP_MESSAGES)}",
-                    color=0x4DABF7,
-                )
-                await chat_channel.send(embed=embed)
                 sent.add(key)
                 _save_state(".bot_alerts_sent", {"dates": dates_key, "sent": sorted(sent)})
 

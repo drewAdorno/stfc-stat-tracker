@@ -1,11 +1,10 @@
 """
-Hourly Discord alerts for NCC Alliance: level ups, joins, leaves.
+Hourly Discord alerts for NCC Alliance: joins, leaves.
 Compares the 2 most recent daily snapshots from the SQLite DB and posts
 separate Discord embeds for each event type detected.
 """
 
 import json
-import random
 import sys
 from pathlib import Path
 
@@ -21,19 +20,9 @@ SENT_ALERTS_FILE = BASE_DIR / ".sent_hourly_alerts"
 
 EMBED_COLOR = 0x4DABF7  # blue accent
 
-LEVEL_UP_MESSAGES = [
-    "🎉 Congrats! Keep climbing!",
-    "🚀 To boldly go to the next level!",
-    "💪 Nice grind, Commander!",
-    "🔥 Unstoppable!",
-    "⭐ The fleet grows stronger!",
-    "🏆 Another one bites the dust!",
-    "📈 Stonks! Level goes up!",
-]
-
 
 def detect_changes(prev_members, curr_members):
-    """Compare two member dicts and return joined, left, level_ups lists."""
+    """Compare two member dicts and return joined, left lists."""
     prev_ids = set(prev_members.keys())
     curr_ids = set(curr_members.keys())
 
@@ -55,18 +44,7 @@ def detect_changes(prev_members, curr_members):
             "power": m.get("power", "0"),
         })
 
-    level_ups = []
-    for mid in sorted(prev_ids & curr_ids):
-        prev_level = int(prev_members[mid].get("level", "0") or "0")
-        curr_level = int(curr_members[mid].get("level", "0") or "0")
-        if curr_level > prev_level:
-            level_ups.append({
-                "name": curr_members[mid].get("name", mid),
-                "old_level": str(prev_level),
-                "new_level": str(curr_level),
-            })
-
-    return {"joined": joined, "left": left, "level_ups": level_ups}
+    return {"joined": joined, "left": left}
 
 
 def build_alert_embeds(changes):
@@ -97,31 +75,16 @@ def build_alert_embeds(changes):
             "footer": {"text": "ncctracker.top"},
         })
 
-    if changes["level_ups"]:
-        lines = []
-        for m in changes["level_ups"]:
-            lines.append(f"**{m['name']}** \u2014 Lv{m['old_level']} \u2192 Lv{m['new_level']}")
-        lines.append("")
-        lines.append(random.choice(LEVEL_UP_MESSAGES))
-        embeds.append({
-            "title": "⬆️ Level Up",
-            "description": truncate_field("\n".join(lines)),
-            "color": 0x4DABF7,  # blue
-            "footer": {"text": "ncctracker.top"},
-        })
-
     return embeds
 
 
 def has_changes(changes):
     """Return True if any change type is non-empty."""
-    return bool(changes["joined"] or changes["left"] or changes["level_ups"])
+    return bool(changes["joined"] or changes["left"])
 
 
 def _make_change_key(change_type, item):
     """Create a stable key for a single change event (for deduplication)."""
-    if change_type == "level_ups":
-        return f"levelup:{item['name']}:{item['new_level']}"
     return f"{change_type}:{item['name']}"
 
 
@@ -146,7 +109,7 @@ def _save_sent_alerts(dates_key, sent_keys):
 def _filter_unsent(changes, sent_keys):
     """Remove already-sent changes, returning only new ones."""
     filtered = {}
-    for change_type in ("joined", "left", "level_ups"):
+    for change_type in ("joined", "left"):
         filtered[change_type] = [
             item for item in changes[change_type]
             if _make_change_key(change_type, item) not in sent_keys
@@ -180,7 +143,7 @@ def main():
     changes = detect_changes(prev_members, curr_members)
 
     if not has_changes(changes):
-        safe_print("No joins, leaves, or level-ups detected.")
+        safe_print("No joins or leaves detected.")
         sys.exit(0)
 
     # Deduplication: skip changes we've already alerted on for this date pair
@@ -201,8 +164,6 @@ def main():
         counts.append(f"{len(changes['joined'])} joined")
     if changes["left"]:
         counts.append(f"{len(changes['left'])} left")
-    if changes["level_ups"]:
-        counts.append(f"{len(changes['level_ups'])} leveled up")
     safe_print(f"Changes detected: {', '.join(counts)}")
 
     webhook_url = load_webhook_url()
@@ -216,7 +177,7 @@ def main():
             failed = True
 
     # Record what we sent (even partial success) so we don't re-send
-    for change_type in ("joined", "left", "level_ups"):
+    for change_type in ("joined", "left"):
         for item in changes[change_type]:
             sent_keys.add(_make_change_key(change_type, item))
     _save_sent_alerts(dates_key, sent_keys)
