@@ -712,11 +712,26 @@
       const nccPlayer = nccMembers.find(m => m.id === playerId);
 
       if (nccPlayer) {
-        // NCC member — use NCC data as before
+        // NCC member — merge server history (pre-NCC) with NCC history
         isNccPlayer = true;
-        const history = nccHistory.sort((a, b) => a.date.localeCompare(b.date));
         const allPlayers = serverPlayersData ? serverPlayersData.players : [];
-        render(nccPlayer, history, nccMembers, allPlayers);
+        fetch('data/server_history.json?t=' + cacheBust)
+          .then(r => { if (!r.ok) return []; return r.json(); })
+          .catch(() => [])
+          .then(serverHistory => {
+            // Build a map of date -> entry from NCC history (takes priority)
+            const nccDates = new Set(nccHistory.map(e => e.date));
+            // Add server history entries for dates not covered by NCC history
+            // (i.e. before the player joined NCC)
+            const merged = [...nccHistory];
+            for (const entry of serverHistory) {
+              if (!nccDates.has(entry.date) && entry.members[playerId]) {
+                merged.push(entry);
+              }
+            }
+            const history = merged.sort((a, b) => a.date.localeCompare(b.date));
+            render(nccPlayer, history, nccMembers, allPlayers);
+          });
       } else if (serverPlayersData) {
         // Non-NCC player — use server-wide data
         isNccPlayer = false;
