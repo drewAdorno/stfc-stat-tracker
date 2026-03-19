@@ -719,13 +719,15 @@
           .then(r => { if (!r.ok) return []; return r.json(); })
           .catch(() => [])
           .then(serverHistory => {
-            // Build a map of date -> entry from NCC history (takes priority)
-            const nccDates = new Set(nccHistory.map(e => e.date));
-            // Add server history entries for dates not covered by NCC history
-            // (i.e. before the player joined NCC)
+            // Build set of dates where this player appears in NCC history
+            const nccPlayerDates = new Set(
+              nccHistory.filter(e => e.members[playerId]).map(e => e.date)
+            );
+            // Merge: use NCC entries as-is, add server history for dates
+            // where the player wasn't yet in NCC data
             const merged = [...nccHistory];
             for (const entry of serverHistory) {
-              if (!nccDates.has(entry.date) && entry.members[playerId]) {
+              if (!nccPlayerDates.has(entry.date) && entry.members[playerId]) {
                 merged.push(entry);
               }
             }
