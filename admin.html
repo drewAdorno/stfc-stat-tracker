@@ -558,7 +558,7 @@
   }
 
   const NUMERIC_FIELDS = [
-    'level', 'power', 'helps', 'rss_contrib', 'iso_contrib',
+    'level', 'power', 'helps', 'iso_contrib',
     'players_killed', 'hostiles_killed', 'resources_mined', 'resources_raided',
   ];
 
@@ -908,7 +908,6 @@
 
     const categories = [
       { label: 'Lowest Helps (Gained)', field: 'helps', valueFn: getHelpsGained, formatFn: formatAbbr },
-      { label: 'Lowest RSS Contrib', field: 'rss_contrib' },
       { label: 'Lowest ISO Contrib', field: 'iso_contrib' },
     ];
 

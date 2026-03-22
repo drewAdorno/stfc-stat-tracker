@@ -561,7 +561,7 @@
   let avgActivityScore = 0;
 
   const DELTA_FIELDS = [
-    'level', 'power', 'helps', 'rss_contrib', 'iso_contrib',
+    'level', 'power', 'helps', 'iso_contrib',
     'players_killed', 'hostiles_killed', 'resources_mined', 'resources_raided',
   ];
 
@@ -724,7 +724,7 @@
     const cardParts = [];
     if (filtered.length > 0) cardParts.push(`<div class="card"><div class="label">Total Players</div><div class="value">${filtered.length.toLocaleString()}</div></div>`);
     if (topPower && topPower.power > 0) cardParts.push(`<div class="card"><div class="label">Most Powerful</div><div class="value">${formatAbbr(topPower.power)}</div><div class="sub">${esc(topPower.name)}</div></div>`);
-    for (const [label, field] of [['Power Gained','power'],['PVP Kills','players_killed'],['Hostile Kills','hostiles_killed'],['RSS Mined','resources_mined'],['RSS Raided','resources_raided'],['Helps','helps'],['RSS Contributed','rss_contrib'],['ISO Contributed','iso_contrib']]) {
+    for (const [label, field] of [['Power Gained','power'],['PVP Kills','players_killed'],['Hostile Kills','hostiles_killed'],['RSS Mined','resources_mined'],['RSS Raided','resources_raided'],['Helps','helps'],['ISO Contributed','iso_contrib']]) {
       const c = leaderCard(label, field);
       if (c) cardParts.push(c);
     }

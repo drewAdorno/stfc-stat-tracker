@@ -370,7 +370,6 @@
     { key: 'power',            label: 'Power' },
     { key: 'level',            label: 'Level' },
     { key: 'helps',            label: 'Helps' },
-    { key: 'rss_contrib',      label: 'RSS Contrib' },
     { key: 'iso_contrib',      label: 'ISO Contrib' },
     { key: 'players_killed',   label: 'PVP Kills' },
     { key: 'hostiles_killed',  label: 'Hostile Kills' },
@@ -410,7 +409,7 @@
     if (sameLvl.length === 0) return;
     const me = sameLvl.find(p => p.id === playerId);
     if (!me) return;
-    const rankStats = ['power', 'helps', 'rss_contrib', 'iso_contrib',
+    const rankStats = ['power', 'helps', 'iso_contrib',
       'players_killed', 'hostiles_killed', 'resources_mined', 'resources_raided'];
     for (const key of rankStats) {
       const myVal = me[key] || 0;
@@ -588,7 +587,6 @@
     html += card('Power', player.power, 'power');
     html += card('Level', player.level, 'level');
     html += card('Helps', player.helps, 'helps');
-    html += card('RSS Contrib', player.rss_contrib, 'rss_contrib');
     html += card('ISO Contrib', player.iso_contrib, 'iso_contrib');
     html += '</div>';
     html += '<div class="cards">';
@@ -622,7 +620,6 @@
     const standingStats = [
       { key: 'power', label: 'Power' },
       { key: 'helps', label: 'Helps' },
-      { key: 'rss_contrib', label: 'RSS Contrib' },
       { key: 'iso_contrib', label: 'ISO Contrib' },
       { key: 'players_killed', label: 'PVP Kills' },
       { key: 'hostiles_killed', label: 'Hostile Kills' },
@@ -758,7 +755,6 @@
           level: formatAbbr(sp.level),
           power: formatAbbr(sp.power),
           helps: formatAbbr(sp.helps),
-          rss_contrib: formatAbbr(sp.rss_contrib),
           iso_contrib: formatAbbr(sp.iso_contrib),
           players_killed: formatAbbr(sp.players_killed),
           hostiles_killed: formatAbbr(sp.hostiles_killed),
@@ -776,7 +772,6 @@
             name: p.name,
             power: formatAbbr(p.power),
             helps: formatAbbr(p.helps),
-            rss_contrib: formatAbbr(p.rss_contrib),
             iso_contrib: formatAbbr(p.iso_contrib),
             players_killed: formatAbbr(p.players_killed),
             hostiles_killed: formatAbbr(p.hostiles_killed),

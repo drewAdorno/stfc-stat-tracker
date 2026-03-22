@@ -360,7 +360,7 @@
 
   // Numeric fields that support deltas
   const NUMERIC_KEYS = new Set([
-    'level', 'power', 'helps', 'rss_contrib', 'iso_contrib',
+    'level', 'power', 'helps', 'iso_contrib',
     'players_killed', 'hostiles_killed', 'resources_mined', 'resources_raided',
   ]);
 
@@ -377,7 +377,6 @@
     { key: 'activity_score',   label: 'Activity',          sort: (a,b) => (a.activity_score || 0) - (b.activity_score || 0) },
     { key: 'power',            label: 'Power',             sort: (a,b) => parseAbbr(a.power) - parseAbbr(b.power) },
     { key: 'helps',            label: 'Helps',             sort: (a,b) => parseAbbr(a.helps) - parseAbbr(b.helps) },
-    { key: 'rss_contrib',      label: 'RSS<br>Contrib',    sort: (a,b) => parseAbbr(a.rss_contrib) - parseAbbr(b.rss_contrib) },
     { key: 'iso_contrib',      label: 'ISO<br>Contrib',    sort: (a,b) => parseAbbr(a.iso_contrib) - parseAbbr(b.iso_contrib) },
     { key: 'players_killed',   label: 'PVP<br>Kills',      sort: (a,b) => parseAbbr(a.players_killed) - parseAbbr(b.players_killed) },
     { key: 'hostiles_killed',  label: 'Hostile<br>Kills',   sort: (a,b) => parseAbbr(a.hostiles_killed) - parseAbbr(b.hostiles_killed) },
@@ -467,7 +466,7 @@
     const pastSnap = period ? getSnapshotDaysAgo(period) : null;
 
     // Sort — use delta values when a period is active and column is numeric
-    const DELTA_KEYS = new Set(['level','power','helps','rss_contrib','iso_contrib',
+    const DELTA_KEYS = new Set(['level','power','helps','iso_contrib',
       'players_killed','hostiles_killed','resources_mined','resources_raided']);
     const colDef = COLUMNS.find(c => c.key === sortCol);
     if (colDef) {
@@ -493,7 +492,7 @@
     // Map from card field to summary key (for fields stored in summary)
     const summaryKeyMap = {
       power: 'total_power', helps: 'total_helps',
-      rss_contrib: 'total_rss', iso_contrib: 'total_iso',
+      iso_contrib: 'total_iso',
       players_killed: 'total_players_killed', hostiles_killed: 'total_hostiles_killed',
       resources_mined: 'total_resources_mined', resources_raided: 'total_resources_raided',
     };
@@ -532,7 +531,6 @@
     html += '<div class="cards">';
     html += renderCards([
       ['Helps',         s.total_helps  || '—', 'helps'],
-      ['RSS Contrib',   s.total_rss    || '—', 'rss_contrib'],
       ['ISO Contrib',   s.total_iso    || '—', 'iso_contrib'],
       ['PVP Kills',     formatAbbr(sumField(members, 'players_killed')),   'players_killed'],
       ['Hostile Kills', formatAbbr(sumField(members, 'hostiles_killed')),  'hostiles_killed'],

@@ -625,7 +625,7 @@
   let detailPeriod = null; // null = all time, 1/7/30 = days
 
   const DELTA_FIELDS = [
-    'level', 'power', 'helps', 'rss_contrib', 'iso_contrib',
+    'level', 'power', 'helps', 'iso_contrib',
     'players_killed', 'hostiles_killed', 'resources_mined', 'resources_raided',
   ];
 
@@ -864,11 +864,10 @@
     }
 
     // Summary cards — match homepage layout
-    const statFields = ['helps', 'rss_contrib', 'iso_contrib',
+    const statFields = ['helps', 'iso_contrib',
                         'players_killed', 'hostiles_killed', 'resources_mined', 'resources_raided'];
     const statLabels = {
-      helps: 'Helps', rss_contrib: 'RSS Contrib',
-      iso_contrib: 'ISO Contrib', players_killed: 'PVP Kills',
+      helps: 'Helps', iso_contrib: 'ISO Contrib', players_killed: 'PVP Kills',
       hostiles_killed: 'Hostile Kills', resources_mined: 'RSS Mined',
       resources_raided: 'RSS Raided',
     };
@@ -921,7 +920,6 @@
       { key: 'activity_score',   label: 'Activity' },
       { key: 'power',            label: 'Power' },
       { key: 'helps',            label: 'Helps' },
-      { key: 'rss_contrib',      label: 'RSS Contrib' },
       { key: 'iso_contrib',      label: 'ISO Contrib' },
       { key: 'players_killed',   label: 'PVP Kills' },
       { key: 'hostiles_killed',  label: 'Hostile Kills' },
