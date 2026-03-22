@@ -1268,6 +1268,34 @@ def export_server_players_json(conn):
             if p["moved"] and p["id"] in first_new_tag:
                 p["moved_date"] = first_new_tag[p["id"]]
 
+    # Build alliance history per player from daily_snapshots
+    alliance_rows = conn.execute("""
+        SELECT player_id, alliance_id, alliance_tag,
+               COALESCE(alliance_name, '') as alliance_name,
+               MIN(date) as first_seen, MAX(date) as last_seen
+        FROM daily_snapshots
+        WHERE alliance_id IS NOT NULL AND alliance_id != '' AND alliance_id != '0'
+        GROUP BY player_id, alliance_id
+        ORDER BY player_id, first_seen
+    """).fetchall()
+    alliance_history = {}  # {player_id: [{...}]}
+    for ar in alliance_rows:
+        pid = str(ar[0])
+        alliance_history.setdefault(pid, []).append({
+            "alliance_id": ar[1],
+            "alliance_tag": ar[2] or "",
+            "alliance_name": ar[3] or "",
+            "first_seen": ar[4],
+            "last_seen": ar[5],
+        })
+
+    for p in players:
+        stints = alliance_history.get(p["id"], [])
+        # Exclude the current alliance from past alliances
+        p["past_alliances"] = [
+            s for s in stints if s["alliance_id"] != p["alliance_id"]
+        ]
+
     # Compute activity scores across all server players
     scores = compute_activity_scores(players)
     for p in players:
