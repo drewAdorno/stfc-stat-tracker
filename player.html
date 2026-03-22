@@ -530,6 +530,8 @@
         const allianceUrl = `server?alliance=${encodeURIComponent(player.alliance_id)}`;
         metaHtml += ` &middot; <a href="${allianceUrl}" style="color:#4dabf7;text-decoration:none">${allianceLabel}</a>`;
       }
+    } else {
+      metaHtml += ` &middot; <span style="color:#636e7b;font-style:italic">No Alliance</span>`;
     }
     if (player.join_date) {
       metaHtml += ` &middot; Joined ${esc(player.join_date)}`;
