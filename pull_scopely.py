@@ -79,6 +79,15 @@ STAT_PREFIX_MAP = {
     "f92690d0": "arena_rating",
 }
 
+# Alliance rank ID → display name mapping (from /alliance/get_alliance response)
+RANK_ID_MAP = {
+    4186399962: "Admiral",
+    1869972635: "Commodore",
+    3423897132: "Premier",
+    1967264300: "Operative",
+    4071078643: "Agent",
+}
+
 # Platform request delay (CDN, no auth) — CDN handles rapid requests fine
 PLATFORM_DELAY = 0.05
 # Game server request delay (authenticated)
@@ -381,6 +390,32 @@ def fetch_alliances(alliance_ids, auth):
     return alliances
 
 
+def fetch_alliance_members(alliance_id, auth):
+    """Fetch alliance member ranks and join dates via /alliance/get_alliance.
+
+    Returns dict[hex_id → {"rank": str, "join_date": str}].
+    """
+    r = _game_post(auth, "/alliance/get_alliance",
+                   {"alliance_id": int(alliance_id)})
+    if r is None:
+        safe_print("  WARNING: Failed to fetch alliance members")
+        return {}
+
+    data = r.json()
+    members = data.get("alliance_members", {})
+    result = {}
+    for pid, m in members.items():
+        rank_id = m.get("rank", 0)
+        rank_name = RANK_ID_MAP.get(rank_id, "")
+        created_at = m.get("created_at", "")
+        # Extract just the date part from ISO datetime
+        join_date = created_at.split("T")[0] if created_at else ""
+        result[pid] = {"rank": rank_name, "join_date": join_date}
+
+    safe_print(f"  Alliance members: {len(result)} with ranks")
+    return result
+
+
 # ---------------------------------------------------------------------------
 # Stage 4: Player Stats (NO AUTH, protobuf)
 # ---------------------------------------------------------------------------
@@ -559,7 +594,7 @@ def _fetch_stats_with_delay(hex_id):
 # ---------------------------------------------------------------------------
 
 def map_player(hex_id, ranking, profile, alliance_info, stats, resources_raided=0,
-               rss_contrib=0, iso_contrib=0):
+               rss_contrib=0, iso_contrib=0, rank="", join_date=""):
     """Map Scopely API data to the format expected by db.upsert_players().
 
     Returns a dict compatible with pull_api.map_player() output.
@@ -599,8 +634,8 @@ def map_player(hex_id, ranking, profile, alliance_info, stats, resources_raided=
         "alliance_tag": alliance_tag,
         "alliance_name": alliance_name,
         "alliance_id": alliance_id,
-        "rank": "",
-        "join_date": "",
+        "rank": rank,
+        "join_date": join_date,
     }
 
 
@@ -795,6 +830,10 @@ def main():
             alliance_ids.add(aid)  # keep as original type (int) for the API
     alliances = fetch_alliances(alliance_ids, auth) if alliance_ids else {}
 
+    # --- Fetch NCC alliance member ranks ---
+    safe_print("=== Fetching NCC member ranks ===")
+    ncc_members = fetch_alliance_members(NCC_ALLIANCE_ID, auth)
+
     # --- Fetch RSS/ISO contrib for all alliances ---
     safe_print(f"=== Fetching alliance contributions (RSS + ISO) for {len(alliance_ids)} alliances ===")
     rss_scores, iso_scores = fetch_alliance_contrib(alliance_ids)
@@ -826,8 +865,11 @@ def main():
         raided = raided_scores.get(hex_id, 0)
         rss_c = rss_scores.get(hex_id, 0)
         iso_c = iso_scores.get(hex_id, 0)
+        member_info = ncc_members.get(hex_id, {})
         mapped = map_player(hex_id, ranking, profile, alliance_info, stats, raided,
-                            rss_c, iso_c)
+                            rss_c, iso_c,
+                            rank=member_info.get("rank", ""),
+                            join_date=member_info.get("join_date", ""))
         all_mapped.append(mapped)
 
     if skipped_cross_server:
