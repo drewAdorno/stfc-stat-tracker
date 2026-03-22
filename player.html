@@ -256,29 +256,6 @@
     padding: 12px 0;
   }
 
-  /* Past Alliances */
-  .alliance-history-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 8px 0;
-    border-bottom: 1px solid #1a2332;
-    font-size: 0.9rem;
-  }
-  .alliance-history-item:last-child { border-bottom: none; }
-  .alliance-tag-badge {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-size: 0.78rem;
-    font-weight: 600;
-    background: #1d4ed822;
-    color: #60a5fa;
-    border: 1px solid #1d4ed844;
-  }
-  .alliance-name { color: #c8d6e5; }
-  .alliance-dates { color: #636e7b; font-size: 0.8rem; margin-left: auto; }
-
   /* Footer */
   footer {
     text-align: center;
@@ -557,6 +534,14 @@
     if (player.join_date) {
       metaHtml += ` &middot; Joined ${esc(player.join_date)}`;
     }
+    if (player.past_alliances && player.past_alliances.length > 0) {
+      metaHtml += ` &middot; Past: ${player.past_alliances.map(a => {
+        const tag = a.alliance_tag ? `[${esc(a.alliance_tag)}]` : '';
+        const name = a.alliance_name ? esc(a.alliance_name) : '';
+        const label = name ? `${name} ${tag}` : (tag || 'Unknown');
+        return `<span style="color:#8899aa">${label}</span> <span style="color:#4a5568;font-size:0.78rem">(${a.first_seen} — ${a.last_seen})</span>`;
+      }).join(', ')}`;
+    }
     if (pastNames.length > 0) {
       metaHtml += ` &middot; Formerly: ${pastNames.map(n => `<span style="color:#8899aa">${esc(n.name)}</span> <span style="color:#4a5568;font-size:0.78rem">(${n.date})</span>`).join(', ')}`;
     }
@@ -691,22 +676,6 @@
       }
     }
     html += '</div>';
-
-    // Past Alliances
-    if (player.past_alliances && player.past_alliances.length > 0) {
-      html += '<div class="section">';
-      html += '<div class="section-title">Past Alliances</div>';
-      for (const a of player.past_alliances) {
-        const tag = a.alliance_tag ? `<span class="alliance-tag-badge">[${esc(a.alliance_tag)}]</span>` : '';
-        const name = a.alliance_name ? `<span class="alliance-name">${esc(a.alliance_name)}</span>` : '';
-        const label = tag + (name ? ' ' + name : (tag ? '' : '<span class="alliance-name">Unknown</span>'));
-        html += `<div class="alliance-history-item">
-          ${label}
-          <span class="alliance-dates">${esc(a.first_seen)} — ${esc(a.last_seen)}</span>
-        </div>`;
-      }
-      html += '</div>';
-    }
 
     $('content').innerHTML = html;
 
