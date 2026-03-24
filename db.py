@@ -539,8 +539,9 @@ def compute_activity_scores(players):
     rel_range = rel_max - rel_min if rel_max != rel_min else 1
 
     # --- Component 3: Recency (from 7d deltas) ---
-    # Blended as a third component rather than a multiplier, so lifetime
-    # engagement still counts even during a quiet week.
+    # Used as a multiplier on the base score so that players with zero
+    # recent activity are pulled down to Inactive/Low regardless of
+    # lifetime stats.
     raw_recency = []
     if has_deltas:
         for p in players:
@@ -551,8 +552,10 @@ def compute_activity_scores(players):
         rec_range = rec_max - rec_min if rec_max != rec_min else 1
 
     # --- Blend and produce final scores ---
-    # With deltas: 35% lifetime, 25% level-relative, 40% recency
-    # Without deltas: 50/50 lifetime + level-relative
+    # With deltas: base from lifetime + level-relative, scaled by recency
+    #   multiplier.  Recency mult ranges from 0.15 (zero 7d gains) to 1.0,
+    #   so truly inactive players cap out around 15 regardless of lifetime.
+    # Without deltas: 50/50 lifetime + level-relative (no recency data).
     scores = {}
     for i, p in enumerate(players):
         norm_abs = (raw_abs[i] - abs_min) / abs_range
@@ -560,7 +563,9 @@ def compute_activity_scores(players):
 
         if has_deltas:
             norm_rec = (raw_recency[i] - rec_min) / rec_range
-            final = int((norm_abs * 0.35 + norm_rel * 0.25 + norm_rec * 0.40) * 100)
+            base = norm_abs * 0.55 + norm_rel * 0.45
+            recency_mult = 0.15 + 0.85 * norm_rec
+            final = int(base * recency_mult * 100)
         else:
             final = int((norm_abs * 0.5 + norm_rel * 0.5) * 100)
 
@@ -653,12 +658,17 @@ def export_latest_json(conn, alliance_id=NCC_ALLIANCE_ID, league=""):
                hostiles_killed, resources_mined
         FROM daily_snapshots WHERE date = ?
     """, (latest_date,)).fetchall()
-    # Find 7d-ago snapshot date for recency calculation
+    # Find 7d and 30d-ago snapshot dates for recency calculation
     delta_row = conn.execute("""
         SELECT MAX(date) FROM daily_snapshots WHERE date <= date(?, '-7 days')
     """, (latest_date,)).fetchone()
     delta_date = delta_row[0] if delta_row and delta_row[0] else None
+    delta_row_30 = conn.execute("""
+        SELECT MAX(date) FROM daily_snapshots WHERE date <= date(?, '-30 days')
+    """, (latest_date,)).fetchone()
+    delta_date_30 = delta_row_30[0] if delta_row_30 and delta_row_30[0] else None
     past_7d = {}
+    past_30d = {}
     if delta_date:
         past_rows = conn.execute("""
             SELECT player_id, power, helps, players_killed,
@@ -668,13 +678,26 @@ def export_latest_json(conn, alliance_id=NCC_ALLIANCE_ID, league=""):
         past_7d = {r[0]: {"power": r[1] or 0, "helps": r[2] or 0,
                           "players_killed": r[3] or 0, "hostiles_killed": r[4] or 0,
                           "resources_mined": r[5] or 0} for r in past_rows}
+    if delta_date_30:
+        past_rows_30 = conn.execute("""
+            SELECT player_id, power, helps, players_killed,
+                   hostiles_killed, resources_mined
+            FROM daily_snapshots WHERE date = ?
+        """, (delta_date_30,)).fetchall()
+        past_30d = {r[0]: {"power": r[1] or 0, "helps": r[2] or 0,
+                           "players_killed": r[3] or 0, "hostiles_killed": r[4] or 0,
+                           "resources_mined": r[5] or 0} for r in past_rows_30}
     all_players_raw = []
     for r in all_rows:
         pid = r[0]
         d = {"id": str(pid), "level": r[1] or 0, "power": r[2] or 0,
              "helps": r[3] or 0, "players_killed": r[4] or 0,
              "hostiles_killed": r[5] or 0, "resources_mined": r[6] or 0}
-        past = past_7d.get(pid, {})
+        # Use 7d snapshot; if player missing, cascade to 30d to avoid
+        # inflated deltas when a player was just absent from one snapshot.
+        past = past_7d.get(pid)
+        if past is None:
+            past = past_30d.get(pid, {})
         for f in ["power", "helps", "players_killed", "hostiles_killed", "resources_mined"]:
             d[f + "_delta_7d"] = max((d[f] or 0) - (past.get(f, 0) or 0), 0)
         all_players_raw.append(d)
@@ -1211,9 +1234,18 @@ def export_server_players_json(conn):
         }
 
         # Compute deltas for all fields × all periods
-        # If a player has no snapshot for a period, fall back to earliest available
+        # If a player has no snapshot for a period, cascade to the next
+        # longer period before falling back to earliest.  This prevents
+        # inflated deltas when a player was simply missing from one
+        # snapshot date but present in a longer window.
         for days in delta_periods:
             past = past_snapshots[days].get(pid)
+            if not past:
+                for longer in delta_periods:
+                    if longer > days:
+                        past = past_snapshots[longer].get(pid)
+                        if past:
+                            break
             if not past:
                 past = earliest_snapshot.get(pid)
             for field in TRACKED_FIELDS:
