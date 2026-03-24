@@ -500,6 +500,7 @@
     <a href="calendar">Calendar</a>
     <a href="server" class="active nav-admin">Server <span class="nav-lock" aria-hidden="true">&#128274;</span></a>
     <a href="leaderboard" class="nav-admin">Leaderboard <span class="nav-lock" aria-hidden="true">&#128274;</span></a>
+    <a href="intel" class="nav-admin">Intel <span class="nav-lock" aria-hidden="true">&#128274;</span></a>
     <a href="/roe-admin/" class="nav-admin">ROE Violations <span class="nav-lock" aria-hidden="true">&#128274;</span></a>
     <a href="admin" class="nav-admin">Admin <span class="nav-lock" aria-hidden="true">&#128274;</span></a>
   </nav>
@@ -619,7 +620,7 @@
   // Sort state per tab
   let lbSortCol = 'total_power';
   let lbSortAsc = false;
-  let lbPeriod = 7; // 1/7/30 days for alliance leaderboard delta
+  let lbPeriod = 0; // 0 = current (no delta), 1/7/30 = days
   let detailSortCol = 'power';
   let detailSortAsc = false;
   let detailPeriod = null; // null = all time, 1/7/30 = days
@@ -753,7 +754,7 @@
     html += `<div class="card"><div class="label">Alliances</div><div class="value">${allianceData.alliance_count}</div></div>`;
     html += `<div class="card"><div class="label">Total Players</div><div class="value">${playerData.player_count}</div></div>`;
     html += `<div class="card"><div class="label">As Of</div><div class="value">${esc(allianceData.as_of_date)}</div></div>`;
-    if (allianceData.delta_dates) {
+    if (lbPeriod && allianceData.delta_dates) {
       const baseDate = allianceData.delta_dates[`${lbPeriod}d`];
       if (baseDate) html += `<div class="card"><div class="label">Delta Base</div><div class="value">${esc(baseDate)}</div></div>`;
     }
@@ -761,7 +762,7 @@
 
     // Period selector
     html += '<div class="period-bar">';
-    for (const [p, label] of [[1, 'Yesterday'], [7, 'This Week'], [30, 'This Month']]) {
+    for (const [p, label] of [[0, 'Current'], [1, 'Yesterday'], [7, 'This Week'], [30, 'This Month']]) {
       const active = lbPeriod === p ? ' active' : '';
       html += `<button class="lb-period-btn period-btn${active}" data-period="${p}">${label}</button>`;
     }
