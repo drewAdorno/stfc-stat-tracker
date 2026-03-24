@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alliance Intel — NCC vs THC</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #0a0e17;
+    color: #c8d6e5;
+    min-height: 100vh;
+    line-height: 1.5;
+  }
+
+  .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+
+  /* Header */
+  header {
+    text-align: center;
+    padding: 30px 0 20px;
+    border-bottom: 1px solid #1a2332;
+    margin-bottom: 24px;
+  }
+  header h1 {
+    font-size: 1.8rem;
+    color: #e2e8f0;
+    letter-spacing: 1px;
+  }
+  header h1 span { color: #4dabf7; }
+  .updated {
+    font-size: 0.85rem;
+    color: #636e7b;
+    margin-top: 6px;
+  }
+  .matchup-subtitle {
+    font-size: 1.1rem;
+    color: #8899aa;
+    margin-top: 8px;
+    letter-spacing: 0.5px;
+  }
+  .matchup-subtitle .team-a { color: #4dabf7; font-weight: 600; }
+  .matchup-subtitle .team-b { color: #fb923c; font-weight: 600; }
+  .matchup-subtitle .vs { color: #636e7b; margin: 0 6px; }
+
+  /* Nav */
+  nav {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+  }
+  nav a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #111827;
+    border: 1px solid #1e2d3d;
+    color: #8899aa;
+    padding: 6px 16px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: all 0.15s;
+  }
+  nav a:hover { border-color: #4dabf7; color: #c8d6e5; }
+  nav a.active { background: #4dabf7; color: #0a0e17; border-color: #4dabf7; font-weight: 600; }
+  .nav-lock { font-size: 0.78rem; opacity: 0.75; }
+  .nav-admin::after {
+    content: 'ADMIN';
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 6px;
+    border-radius: 999px;
+    background: #f8717122;
+    border: 1px solid #f8717140;
+    color: #fca5a5;
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
+  }
+
+  /* Login */
+  #login-gate {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 60vh;
+  }
+  .login-box {
+    background: #111827;
+    border: 1px solid #1e2d3d;
+    border-radius: 12px;
+    padding: 40px;
+    text-align: center;
+    max-width: 360px;
+    width: 100%;
+  }
+  .login-box h2 {
+    color: #e2e8f0;
+    font-size: 1.3rem;
+    margin-bottom: 20px;
+  }
+  .login-box input {
+    width: 100%;
+    padding: 10px 14px;
+    background: #0a0e17;
+    border: 1px solid #1e2d3d;
+    border-radius: 6px;
+    color: #c8d6e5;
+    font-size: 1rem;
+    font-family: inherit;
+    margin-bottom: 14px;
+  }
+  .login-box input:focus {
+    outline: none;
+    border-color: #4dabf7;
+  }
+  .login-box button {
+    width: 100%;
+    padding: 10px;
+    background: #4dabf7;
+    color: #0a0e17;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .login-box button:hover { background: #74c0fc; }
+  .login-error {
+    color: #f87171;
+    font-size: 0.85rem;
+    margin-top: 10px;
+    min-height: 1.2em;
+  }
+
+  /* Tabs */
+  .tab-bar {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .tab-btn {
+    background: #111827;
+    border: 1px solid #1e2d3d;
+    color: #8899aa;
+    padding: 8px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .tab-btn:hover { border-color: #4dabf7; color: #c8d6e5; }
+  .tab-btn.active {
+    background: #4dabf7;
+    color: #0a0e17;
+    border-color: #4dabf7;
+    font-weight: 600;
+  }
+
+  /* Period selector */
+  .period-bar {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 24px;
+  }
+  .period-btn {
+    background: #111827;
+    border: 1px solid #1e2d3d;
+    color: #8899aa;
+    padding: 6px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .period-btn:hover { border-color: #4dabf7; color: #c8d6e5; }
+  .period-btn.active {
+    background: #4dabf7;
+    color: #0a0e17;
+    border-color: #4dabf7;
+    font-weight: 600;
+  }
+
+  /* Summary cards */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  .card {
+    background: #111827;
+    border: 1px solid #1e2d3d;
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+  }
+  .card .label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #636e7b;
+    margin-bottom: 4px;
+  }
+  .card .value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #4dabf7;
+  }
+  .card .delta {
+    font-size: 0.8rem;
+    margin-top: 2px;
+    min-height: 1.2em;
+  }
+
+  /* Tables */
+  .table-wrap {
+    overflow-x: auto;
+    border: 1px solid #1e2d3d;
+    border-radius: 10px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  th, td {
+    padding: 10px 14px;
+    text-align: left;
+    white-space: nowrap;
+  }
+  th {
+    background: #111827;
+    color: #8899aa;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    cursor: pointer;
+    user-select: none;
+    position: sticky;
+    top: 0;
+  }
+  th:hover { color: #4dabf7; }
+  th .arrow { margin-left: 4px; font-size: 0.7rem; }
+  tr { border-bottom: 1px solid #1a2332; }
+  tr:last-child { border-bottom: none; }
+  tr:hover td { background: #111827; }
+  td { font-size: 0.9rem; }
+
+  /* Delta colors */
+  .delta-pos { color: #34d399; }
+  .delta-neg { color: #f87171; }
+  .delta-zero { color: #4a5568; }
+
+  /* Player link */
+  .player-link {
+    color: #4dabf7;
+    text-decoration: none;
+  }
+  .player-link:hover { text-decoration: underline; }
+
+  /* Comparison bars */
+  .compare-section {
+    margin-bottom: 28px;
+  }
+  .compare-row {
+    margin-bottom: 16px;
+  }
+  .compare-label {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #636e7b;
+    margin-bottom: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .compare-label .advantage {
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+  .advantage-a { background: #4dabf722; color: #4dabf7; }
+  .advantage-b { background: #fb923c22; color: #fb923c; }
+  .advantage-tie { background: #4a556822; color: #4a5568; }
+
+  .bar-pair {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .bar-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .bar-tag {
+    font-size: 0.78rem;
+    font-weight: 600;
+    width: 40px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .bar-track {
+    flex: 1;
+    background: #1a2332;
+    border-radius: 4px;
+    height: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.4s ease;
+  }
+  .bar-fill-a { background: #4dabf7; }
+  .bar-fill-b { background: #fb923c; }
+  .bar-value {
+    font-size: 0.82rem;
+    width: 80px;
+    flex-shrink: 0;
+  }
+  .bar-value-a { color: #4dabf7; }
+  .bar-value-b { color: #fb923c; }
+
+  /* Scorecard */
+  .scorecard {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 32px;
+    margin-bottom: 28px;
+    padding: 20px;
+    background: #111827;
+    border: 1px solid #1e2d3d;
+    border-radius: 10px;
+  }
+  .scorecard-team {
+    text-align: center;
+  }
+  .scorecard-tag {
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+  .scorecard-tag-a { color: #4dabf7; }
+  .scorecard-tag-b { color: #fb923c; }
+  .scorecard-name {
+    font-size: 0.78rem;
+    color: #636e7b;
+    margin-top: 2px;
+  }
+  .scorecard-stat {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-top: 4px;
+  }
+  .scorecard-divider {
+    font-size: 1.2rem;
+    color: #4a5568;
+    font-weight: 700;
+    letter-spacing: 2px;
+  }
+
+  /* Section headers */
+  .section-header {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #8899aa;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #1a2332;
+    margin-bottom: 16px;
+    margin-top: 28px;
+  }
+  .section-header:first-child { margin-top: 0; }
+
+  /* Dual tables */
+  .dual-tables {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .dual-tables .table-label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    padding: 6px 12px;
+    border-radius: 6px;
+  }
+  .table-label-a { color: #4dabf7; background: #4dabf712; border: 1px solid #4dabf730; }
+  .table-label-b { color: #fb923c; background: #fb923c12; border: 1px solid #fb923c30; }
+
+  /* Gain cell */
+  .cell-delta-main { display: block; font-weight: 600; font-size: 0.88rem; }
+  .cell-sub { display: block; font-size: 0.72rem; color: #636e7b; }
+
+  /* Loading */
+  .loading {
+    text-align: center;
+    padding: 40px;
+    color: #636e7b;
+    font-size: 1.1rem;
+  }
+  .error { color: #f87171; }
+  .empty {
+    color: #4a5568;
+    font-style: italic;
+    padding: 20px 0;
+    text-align: center;
+  }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    padding: 24px 0;
+    margin-top: 28px;
+    border-top: 1px solid #1a2332;
+    font-size: 0.8rem;
+    color: #4a5568;
+  }
+  footer a { color: #4dabf7; text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  @media (max-width: 600px) {
+    .container { padding: 12px; }
+    header h1 { font-size: 1.3rem; }
+    .dual-tables { grid-template-columns: 1fr; }
+    .scorecard { gap: 16px; }
+    .scorecard-stat { font-size: 1.4rem; }
+  }
+</style>
+<link rel="stylesheet" href="theme.css">
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1><span>Alliance</span> Intel</h1>
+    <div class="matchup-subtitle">
+      <span class="team-a">NCC</span><span class="vs">vs</span><span class="team-b">THC</span>
+    </div>
+    <div class="updated" id="updated"></div>
+  </header>
+
+  <nav>
+    <a href="index">Tracker</a>
+    <a href="calendar">Calendar</a>
+    <a href="server" class="nav-admin">Server <span class="nav-lock" aria-hidden="true">&#128274;</span></a>
+    <a href="leaderboard" class="nav-admin">Leaderboard <span class="nav-lock" aria-hidden="true">&#128274;</span></a>
+    <a href="intel" class="active nav-admin">Intel <span class="nav-lock" aria-hidden="true">&#128274;</span></a>
+    <a href="/roe-admin/" class="nav-admin">ROE Violations <span class="nav-lock" aria-hidden="true">&#128274;</span></a>
+    <a href="admin" class="nav-admin">Admin <span class="nav-lock" aria-hidden="true">&#128274;</span></a>
+  </nav>
+
+  <div id="login-gate">
+    <div class="login-box">
+      <h2>Alliance Intel</h2>
+      <input type="password" id="pw-input" placeholder="Enter password" autocomplete="off">
+      <button id="pw-btn">Enter</button>
+      <div class="login-error" id="pw-error"></div>
+    </div>
+  </div>
+
+  <div id="content" style="display:none">
+    <div class="loading">Loading intel data...</div>
+  </div>
+
+  <footer style="display:none" id="footer-el">
+    Data sourced from Scopely game APIs
+    &middot; <a href="index">Main Dashboard</a>
+  </footer>
+</div>
+
+<script>
+(function() {
+  const $ = id => document.getElementById(id);
+  const NCC_ID = '2616095065411838478';
+  const THC_ID = '2589865078455427614';
+
+  // --- Auth gate ---
+  const PASSWORD = 'salsa';
+
+  function checkAuth() {
+    return sessionStorage.getItem('ncc_admin_auth') === 'ok';
+  }
+
+  function showDashboard() {
+    $('login-gate').style.display = 'none';
+    $('content').style.display = '';
+    $('footer-el').style.display = '';
+    loadData();
+  }
+
+  if (checkAuth()) {
+    showDashboard();
+  } else {
+    $('pw-btn').addEventListener('click', tryLogin);
+    $('pw-input').addEventListener('keydown', e => { if (e.key === 'Enter') tryLogin(); });
+  }
+
+  function tryLogin() {
+    const val = $('pw-input').value;
+    if (val === PASSWORD) {
+      sessionStorage.setItem('ncc_admin_auth', 'ok');
+      showDashboard();
+    } else {
+      $('pw-error').textContent = 'Incorrect password';
+      $('pw-input').value = '';
+      $('pw-input').focus();
+    }
+  }
+
+  // --- Utilities ---
+  function esc(s) {
+    const el = document.createElement('span');
+    el.textContent = s == null ? '' : String(s);
+    return el.innerHTML;
+  }
+
+  function formatAbbr(n) {
+    if (n == null) n = 0;
+    if (n === 0) return '0';
+    const abs = Math.abs(n);
+    const sign = n < 0 ? '-' : '';
+    let val, suf;
+    if (abs >= 1e15)      { val = abs / 1e15; suf = 'Q'; }
+    else if (abs >= 1e12) { val = abs / 1e12; suf = 'T'; }
+    else if (abs >= 1e9)  { val = abs / 1e9;  suf = 'B'; }
+    else if (abs >= 1e6)  { val = abs / 1e6;  suf = 'M'; }
+    else if (abs >= 1e3)  { val = abs / 1e3;  suf = 'K'; }
+    else                  { val = abs;         suf = '';  }
+    return sign + val.toFixed(2).replace(/\.?0+$/, '') + suf;
+  }
+
+  function formatDelta(n) {
+    if (n === 0) return '<span class="delta-zero">0</span>';
+    const cls = n > 0 ? 'delta-pos' : 'delta-neg';
+    const sign = n > 0 ? '+' : '';
+    return `<span class="${cls}">${sign}${formatAbbr(n)}</span>`;
+  }
+
+  function gainCellHtml(current, delta) {
+    if (delta === 0) {
+      return `<span class="cell-delta-main delta-zero">0</span><span class="cell-sub">${formatAbbr(current)}</span>`;
+    }
+    const cls = delta > 0 ? 'delta-pos' : 'delta-neg';
+    const sign = delta > 0 ? '+' : '';
+    return `<span class="cell-delta-main ${cls}">${sign}${formatAbbr(delta)}</span><span class="cell-sub">${formatAbbr(current)}</span>`;
+  }
+
+  function playerLink(p) {
+    return `<a class="player-link" href="player?id=${encodeURIComponent(p.id)}">${esc(p.name)}</a>`;
+  }
+
+  function advantageLabel(va, vb) {
+    if (va > vb) return '<span class="advantage advantage-a">NCC leads</span>';
+    if (vb > va) return '<span class="advantage advantage-b">THC leads</span>';
+    return '<span class="advantage advantage-tie">Tied</span>';
+  }
+
+  function comparisonBar(label, va, vb) {
+    const maxVal = Math.max(Math.abs(va), Math.abs(vb), 1);
+    const pctA = (Math.abs(va) / maxVal) * 100;
+    const pctB = (Math.abs(vb) / maxVal) * 100;
+
+    let html = '<div class="compare-row">';
+    html += `<div class="compare-label">${label} ${advantageLabel(va, vb)}</div>`;
+    html += '<div class="bar-pair">';
+
+    html += '<div class="bar-row">';
+    html += '<span class="bar-tag" style="color:#4dabf7">NCC</span>';
+    html += `<div class="bar-track"><div class="bar-fill bar-fill-a" style="width:${pctA}%"></div></div>`;
+    html += `<span class="bar-value bar-value-a">${formatAbbr(va)}</span>`;
+    html += '</div>';
+
+    html += '<div class="bar-row">';
+    html += '<span class="bar-tag" style="color:#fb923c">THC</span>';
+    html += `<div class="bar-track"><div class="bar-fill bar-fill-b" style="width:${pctB}%"></div></div>`;
+    html += `<span class="bar-value bar-value-b">${formatAbbr(vb)}</span>`;
+    html += '</div>';
+
+    html += '</div></div>';
+    return html;
+  }
+
+  // --- State ---
+  let allianceData = null;
+  let playerData = null;
+  let currentTab = 'overview';
+  let period = 7;
+
+  function loadData() {
+    const t = Date.now();
+    const ap = fetch('data/server_alliances.json?t=' + t)
+      .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
+    const pp = fetch('data/server_players.json?t=' + t)
+      .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
+
+    Promise.all([ap, pp])
+      .then(([a, p]) => {
+        allianceData = a;
+        playerData = p;
+        const d = new Date(a.pulled_at);
+        $('updated').textContent = 'Last updated: ' + d.toLocaleDateString('en-US', {
+          year: 'numeric', month: 'short', day: 'numeric',
+          hour: '2-digit', minute: '2-digit'
+        });
+        renderPage();
+      })
+      .catch(err => {
+        $('content').innerHTML = `<div class="loading error">Failed to load data: ${esc(err.message)}</div>`;
+      });
+  }
+
+  function getAlliance(id) {
+    return allianceData.alliances.find(a => a.alliance_id === id);
+  }
+
+  function getPlayers(allianceId) {
+    return playerData.players.filter(p => p.alliance_id === allianceId);
+  }
+
+  function renderPage() {
+    let html = '';
+
+    // Period bar
+    html += '<div class="period-bar">';
+    for (const [d, label] of [[1, '1 Day'], [7, '7 Days'], [30, '30 Days']]) {
+      const cls = period === d ? ' active' : '';
+      html += `<button class="period-btn${cls}" data-period="${d}">${label}</button>`;
+    }
+    html += '</div>';
+
+    // Tab bar
+    const tabs = [
+      ['overview', 'Overview'],
+      ['combat', 'Combat (PVP)'],
+      ['activity', 'Activity (PVE)'],
+      ['roster', 'Full Roster'],
+    ];
+    html += '<div class="tab-bar">';
+    for (const [id, label] of tabs) {
+      const cls = currentTab === id ? ' active' : '';
+      html += `<button class="tab-btn${cls}" data-tab="${id}">${label}</button>`;
+    }
+    html += '</div>';
+
+    html += '<div id="tab-content"></div>';
+    $('content').innerHTML = html;
+
+    // Period handlers
+    document.querySelectorAll('.period-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        period = parseInt(btn.dataset.period);
+        renderPage();
+      });
+    });
+
+    // Tab handlers
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        currentTab = btn.dataset.tab;
+        renderPage();
+      });
+    });
+
+    renderTab();
+  }
+
+  function renderTab() {
+    const el = document.getElementById('tab-content');
+    if (!el) return;
+
+    switch (currentTab) {
+      case 'overview': el.innerHTML = renderOverview(); break;
+      case 'combat':   el.innerHTML = renderCombat();   break;
+      case 'activity': el.innerHTML = renderActivity();  break;
+      case 'roster':   el.innerHTML = renderRoster();    break;
+    }
+  }
+
+  // ===== OVERVIEW =====
+  function renderOverview() {
+    const ncc = getAlliance(NCC_ID);
+    const thc = getAlliance(THC_ID);
+    if (!ncc || !thc) return '<div class="empty">Alliance data not found</div>';
+
+    const suf = `_delta_${period}d`;
+
+    // Scorecard
+    let html = '<div class="scorecard">';
+    html += '<div class="scorecard-team">';
+    html += `<div class="scorecard-tag scorecard-tag-a">[${esc(ncc.alliance_tag)}]</div>`;
+    html += `<div class="scorecard-name">${esc(ncc.alliance_name || 'Discovery')}</div>`;
+    html += `<div class="scorecard-stat" style="color:#4dabf7">${ncc.member_count}</div>`;
+    html += '<div style="font-size:0.75rem;color:#636e7b">Members</div>';
+    html += '</div>';
+
+    html += '<div class="scorecard-divider">VS</div>';
+
+    html += '<div class="scorecard-team">';
+    html += `<div class="scorecard-tag scorecard-tag-b">[${esc(thc.alliance_tag)}]</div>`;
+    html += `<div class="scorecard-name">${esc(thc.alliance_name || 'The High Command')}</div>`;
+    html += `<div class="scorecard-stat" style="color:#fb923c">${thc.member_count}</div>`;
+    html += '<div style="font-size:0.75rem;color:#636e7b">Members</div>';
+    html += '</div>';
+    html += '</div>';
+
+    // Comparison bars — totals
+    html += '<div class="section-header">All-Time Totals</div>';
+    html += '<div class="compare-section">';
+    html += comparisonBar('Total Power', ncc.total_power, thc.total_power);
+    html += comparisonBar('PVP Kills', ncc.total_pvp, thc.total_pvp);
+    html += comparisonBar('Hostile Kills', ncc.total_hk, thc.total_hk);
+    html += comparisonBar('Resources Mined', ncc.total_mined, thc.total_mined);
+    html += comparisonBar('Resources Raided', ncc.total_raided, thc.total_raided);
+    html += '</div>';
+
+    // Comparison bars — deltas
+    html += `<div class="section-header">${period}-Day Gains</div>`;
+    html += '<div class="compare-section">';
+    html += comparisonBar('Power Growth', ncc['total_power' + suf] || 0, thc['total_power' + suf] || 0);
+    html += comparisonBar('PVP Kills', ncc['total_pvp' + suf] || 0, thc['total_pvp' + suf] || 0);
+    html += comparisonBar('Hostile Kills', ncc['total_hk' + suf] || 0, thc['total_hk' + suf] || 0);
+    html += comparisonBar('Resources Mined', ncc['total_mined' + suf] || 0, thc['total_mined' + suf] || 0);
+    html += comparisonBar('Resources Raided', ncc['total_raided' + suf] || 0, thc['total_raided' + suf] || 0);
+    html += '</div>';
+
+    // Per-member averages
+    const nccPlayers = getPlayers(NCC_ID);
+    const thcPlayers = getPlayers(THC_ID);
+    const nccCount = nccPlayers.length || 1;
+    const thcCount = thcPlayers.length || 1;
+
+    const avgFields = [
+      { key: 'power', label: 'Avg Power' },
+      { key: 'players_killed', label: 'Avg PVP Kills' },
+      { key: 'hostiles_killed', label: 'Avg Hostile Kills' },
+      { key: 'resources_mined', label: 'Avg Resources Mined' },
+      { key: 'resources_raided', label: 'Avg Resources Raided' },
+    ];
+
+    html += '<div class="section-header">Per-Member Averages</div>';
+    html += '<div class="compare-section">';
+    for (const f of avgFields) {
+      const aN = Math.round(nccPlayers.reduce((s, p) => s + (p[f.key] || 0), 0) / nccCount);
+      const bN = Math.round(thcPlayers.reduce((s, p) => s + (p[f.key] || 0), 0) / thcCount);
+      html += comparisonBar(f.label, aN, bN);
+    }
+    html += '</div>';
+
+    return html;
+  }
+
+  // ===== COMBAT (PVP) =====
+  function renderCombat() {
+    const ncc = getAlliance(NCC_ID);
+    const thc = getAlliance(THC_ID);
+    if (!ncc || !thc) return '<div class="empty">Alliance data not found</div>';
+
+    const suf = `_delta_${period}d`;
+    const nccPlayers = getPlayers(NCC_ID);
+    const thcPlayers = getPlayers(THC_ID);
+
+    // Alliance PVP scorecard
+    const nccPvpDelta = ncc['total_pvp' + suf] || 0;
+    const thcPvpDelta = thc['total_pvp' + suf] || 0;
+    const nccRaidDelta = ncc['total_raided' + suf] || 0;
+    const thcRaidDelta = thc['total_raided' + suf] || 0;
+
+    let html = '';
+
+    // Summary cards
+    html += '<div class="cards" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr))">';
+
+    html += '<div class="card">';
+    html += `<div class="label">NCC PVP Kills (${period}d)</div>`;
+    html += `<div class="value" style="color:#4dabf7">${formatAbbr(nccPvpDelta)}</div>`;
+    html += `<div class="delta">Total: ${formatAbbr(ncc.total_pvp)}</div>`;
+    html += '</div>';
+
+    html += '<div class="card">';
+    html += `<div class="label">THC PVP Kills (${period}d)</div>`;
+    html += `<div class="value" style="color:#fb923c">${formatAbbr(thcPvpDelta)}</div>`;
+    html += `<div class="delta">Total: ${formatAbbr(thc.total_pvp)}</div>`;
+    html += '</div>';
+
+    html += '<div class="card">';
+    html += `<div class="label">NCC Raided (${period}d)</div>`;
+    html += `<div class="value" style="color:#4dabf7">${formatAbbr(nccRaidDelta)}</div>`;
+    html += `<div class="delta">Total: ${formatAbbr(ncc.total_raided)}</div>`;
+    html += '</div>';
+
+    html += '<div class="card">';
+    html += `<div class="label">THC Raided (${period}d)</div>`;
+    html += `<div class="value" style="color:#fb923c">${formatAbbr(thcRaidDelta)}</div>`;
+    html += `<div class="delta">Total: ${formatAbbr(thc.total_raided)}</div>`;
+    html += '</div>';
+
+    html += '</div>';
+
+    // Comparison bars
+    html += '<div class="compare-section">';
+    html += comparisonBar(`PVP Kills (${period}d gain)`, nccPvpDelta, thcPvpDelta);
+    html += comparisonBar(`Resources Raided (${period}d gain)`, nccRaidDelta, thcRaidDelta);
+    html += '</div>';
+
+    // Top PVP players from each side
+    html += `<div class="section-header">Top PVP Players — ${period}-Day Gains</div>`;
+
+    const pvpSort = (a, b) => (b['players_killed' + suf] || 0) - (a['players_killed' + suf] || 0);
+    const topNcc = [...nccPlayers].sort(pvpSort).slice(0, 20);
+    const topThc = [...thcPlayers].sort(pvpSort).slice(0, 20);
+
+    html += '<div class="dual-tables">';
+    html += '<div>';
+    html += '<div class="table-label table-label-a">[NCC] Discovery</div>';
+    html += pvpTable(topNcc, suf);
+    html += '</div>';
+    html += '<div>';
+    html += '<div class="table-label table-label-b">[THC] The High Command</div>';
+    html += pvpTable(topThc, suf);
+    html += '</div>';
+    html += '</div>';
+
+    return html;
+  }
+
+  function pvpTable(players, suf) {
+    let html = '<div class="table-wrap"><table><thead><tr>';
+    html += '<th>#</th><th>Player</th><th>Lvl</th><th>PVP Kills</th><th>RSS Raided</th>';
+    html += '</tr></thead><tbody>';
+
+    for (let i = 0; i < players.length; i++) {
+      const p = players[i];
+      const pkDelta = p['players_killed' + suf] || 0;
+      const rrDelta = p['resources_raided' + suf] || 0;
+      if (pkDelta === 0 && rrDelta === 0) continue;
+
+      html += '<tr>';
+      html += `<td>${i + 1}</td>`;
+      html += `<td>${playerLink(p)}</td>`;
+      html += `<td>${p.level}</td>`;
+      html += `<td>${gainCellHtml(p.players_killed || 0, pkDelta)}</td>`;
+      html += `<td>${gainCellHtml(p.resources_raided || 0, rrDelta)}</td>`;
+      html += '</tr>';
+    }
+
+    if (players.every(p => (p['players_killed' + suf] || 0) === 0 && (p['resources_raided' + suf] || 0) === 0)) {
+      html += '<tr><td colspan="5" class="empty">No PVP activity</td></tr>';
+    }
+
+    html += '</tbody></table></div>';
+    return html;
+  }
+
+  // ===== ACTIVITY (PVE) =====
+  function renderActivity() {
+    const ncc = getAlliance(NCC_ID);
+    const thc = getAlliance(THC_ID);
+    if (!ncc || !thc) return '<div class="empty">Alliance data not found</div>';
+
+    const suf = `_delta_${period}d`;
+    const nccPlayers = getPlayers(NCC_ID);
+    const thcPlayers = getPlayers(THC_ID);
+
+    const nccHkDelta = ncc['total_hk' + suf] || 0;
+    const thcHkDelta = thc['total_hk' + suf] || 0;
+    const nccMinedDelta = ncc['total_mined' + suf] || 0;
+    const thcMinedDelta = thc['total_mined' + suf] || 0;
+
+    let html = '';
+
+    // Summary cards
+    html += '<div class="cards" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr))">';
+
+    html += '<div class="card">';
+    html += `<div class="label">NCC Hostiles Killed (${period}d)</div>`;
+    html += `<div class="value" style="color:#4dabf7">${formatAbbr(nccHkDelta)}</div>`;
+    html += `<div class="delta">Total: ${formatAbbr(ncc.total_hk)}</div>`;
+    html += '</div>';
+
+    html += '<div class="card">';
+    html += `<div class="label">THC Hostiles Killed (${period}d)</div>`;
+    html += `<div class="value" style="color:#fb923c">${formatAbbr(thcHkDelta)}</div>`;
+    html += `<div class="delta">Total: ${formatAbbr(thc.total_hk)}</div>`;
+    html += '</div>';
+
+    html += '<div class="card">';
+    html += `<div class="label">NCC Mined (${period}d)</div>`;
+    html += `<div class="value" style="color:#4dabf7">${formatAbbr(nccMinedDelta)}</div>`;
+    html += `<div class="delta">Total: ${formatAbbr(ncc.total_mined)}</div>`;
+    html += '</div>';
+
+    html += '<div class="card">';
+    html += `<div class="label">THC Mined (${period}d)</div>`;
+    html += `<div class="value" style="color:#fb923c">${formatAbbr(thcMinedDelta)}</div>`;
+    html += `<div class="delta">Total: ${formatAbbr(thc.total_mined)}</div>`;
+    html += '</div>';
+
+    html += '</div>';
+
+    // Comparison bars
+    html += '<div class="compare-section">';
+    html += comparisonBar(`Hostiles Killed (${period}d gain)`, nccHkDelta, thcHkDelta);
+    html += comparisonBar(`Resources Mined (${period}d gain)`, nccMinedDelta, thcMinedDelta);
+    html += '</div>';
+
+    // Top PVE players
+    html += `<div class="section-header">Top PVE Players — ${period}-Day Gains</div>`;
+
+    const hkSort = (a, b) => (b['hostiles_killed' + suf] || 0) - (a['hostiles_killed' + suf] || 0);
+    const topNcc = [...nccPlayers].sort(hkSort).slice(0, 20);
+    const topThc = [...thcPlayers].sort(hkSort).slice(0, 20);
+
+    html += '<div class="dual-tables">';
+    html += '<div>';
+    html += '<div class="table-label table-label-a">[NCC] Discovery</div>';
+    html += pveTable(topNcc, suf);
+    html += '</div>';
+    html += '<div>';
+    html += '<div class="table-label table-label-b">[THC] The High Command</div>';
+    html += pveTable(topThc, suf);
+    html += '</div>';
+    html += '</div>';
+
+    return html;
+  }
+
+  function pveTable(players, suf) {
+    let html = '<div class="table-wrap"><table><thead><tr>';
+    html += '<th>#</th><th>Player</th><th>Lvl</th><th>Hostiles Killed</th><th>RSS Mined</th>';
+    html += '</tr></thead><tbody>';
+
+    for (let i = 0; i < players.length; i++) {
+      const p = players[i];
+      const hkDelta = p['hostiles_killed' + suf] || 0;
+      const minedDelta = p['resources_mined' + suf] || 0;
+      if (hkDelta === 0 && minedDelta === 0) continue;
+
+      html += '<tr>';
+      html += `<td>${i + 1}</td>`;
+      html += `<td>${playerLink(p)}</td>`;
+      html += `<td>${p.level}</td>`;
+      html += `<td>${gainCellHtml(p.hostiles_killed || 0, hkDelta)}</td>`;
+      html += `<td>${gainCellHtml(p.resources_mined || 0, minedDelta)}</td>`;
+      html += '</tr>';
+    }
+
+    if (players.every(p => (p['hostiles_killed' + suf] || 0) === 0 && (p['resources_mined' + suf] || 0) === 0)) {
+      html += '<tr><td colspan="5" class="empty">No PVE activity</td></tr>';
+    }
+
+    html += '</tbody></table></div>';
+    return html;
+  }
+
+  // ===== FULL ROSTER =====
+  function renderRoster() {
+    const nccPlayers = getPlayers(NCC_ID);
+    const thcPlayers = getPlayers(THC_ID);
+    const suf = `_delta_${period}d`;
+
+    const sortByPower = (a, b) => (b.power || 0) - (a.power || 0);
+
+    let html = `<div class="section-header">Full Roster Comparison — ${period}-Day Gains</div>`;
+    html += '<div class="dual-tables">';
+
+    html += '<div>';
+    html += `<div class="table-label table-label-a">[NCC] Discovery — ${nccPlayers.length} members</div>`;
+    html += rosterTable([...nccPlayers].sort(sortByPower), suf);
+    html += '</div>';
+
+    html += '<div>';
+    html += `<div class="table-label table-label-b">[THC] The High Command — ${thcPlayers.length} members</div>`;
+    html += rosterTable([...thcPlayers].sort(sortByPower), suf);
+    html += '</div>';
+
+    html += '</div>';
+    return html;
+  }
+
+  function rosterTable(players, suf) {
+    let html = '<div class="table-wrap" style="max-height:600px;overflow-y:auto"><table><thead><tr>';
+    html += '<th>#</th><th>Player</th><th>Lvl</th><th>Power</th><th>PVP Kills</th><th>Hostiles</th><th>Mined</th><th>Raided</th>';
+    html += '</tr></thead><tbody>';
+
+    for (let i = 0; i < players.length; i++) {
+      const p = players[i];
+      html += '<tr>';
+      html += `<td>${i + 1}</td>`;
+      html += `<td>${playerLink(p)}</td>`;
+      html += `<td>${p.level}</td>`;
+      html += `<td>${gainCellHtml(p.power || 0, p['power' + suf] || 0)}</td>`;
+      html += `<td>${gainCellHtml(p.players_killed || 0, p['players_killed' + suf] || 0)}</td>`;
+      html += `<td>${gainCellHtml(p.hostiles_killed || 0, p['hostiles_killed' + suf] || 0)}</td>`;
+      html += `<td>${gainCellHtml(p.resources_mined || 0, p['resources_mined' + suf] || 0)}</td>`;
+      html += `<td>${gainCellHtml(p.resources_raided || 0, p['resources_raided' + suf] || 0)}</td>`;
+      html += '</tr>';
+    }
+
+    html += '</tbody></table></div>';
+    return html;
+  }
+
+})();
+</script>
+</body>
+</html>
