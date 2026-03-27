@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Alliance Intel — NCC vs THC</title>
+<title>THC War Tracker</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -449,7 +449,7 @@
 <body>
 <div class="container">
   <header>
-    <h1><span>Alliance</span> Intel</h1>
+    <h1><span>THC</span> War Tracker</h1>
     <div class="matchup-subtitle">
       <span class="team-a">NCC</span><span class="vs">vs</span><span class="team-b">THC</span>
     </div>
@@ -461,14 +461,14 @@
     <a href="calendar">Calendar</a>
     <a href="server" class="nav-admin">Server <span class="nav-lock" aria-hidden="true">&#128274;</span></a>
     <a href="leaderboard" class="nav-admin">Leaderboard <span class="nav-lock" aria-hidden="true">&#128274;</span></a>
-    <a href="intel" class="active nav-admin">Intel <span class="nav-lock" aria-hidden="true">&#128274;</span></a>
+    <a href="intel" class="active nav-admin">War Tracker <span class="nav-lock" aria-hidden="true">&#128274;</span></a>
     <a href="/roe-admin/" class="nav-admin">ROE Violations <span class="nav-lock" aria-hidden="true">&#128274;</span></a>
     <a href="admin" class="nav-admin">Admin <span class="nav-lock" aria-hidden="true">&#128274;</span></a>
   </nav>
 
   <div id="login-gate">
     <div class="login-box">
-      <h2>Alliance Intel</h2>
+      <h2>THC War Tracker</h2>
       <input type="password" id="pw-input" placeholder="Enter password" autocomplete="off">
       <button id="pw-btn">Enter</button>
       <div class="login-error" id="pw-error"></div>
@@ -476,7 +476,7 @@
   </div>
 
   <div id="content" style="display:none">
-    <div class="loading">Loading intel data...</div>
+    <div class="loading">Loading war tracker data...</div>
   </div>
 
   <footer style="display:none" id="footer-el">
@@ -566,6 +566,13 @@
     return `<a class="player-link" href="player?id=${encodeURIComponent(p.id)}">${esc(p.name)}</a>`;
   }
 
+  function periodLabel() {
+    return period === 'war' ? 'War' : `${period}-Day`;
+  }
+  function periodShort() {
+    return period === 'war' ? 'war' : `${period}d`;
+  }
+
   function advantageLabel(va, vb) {
     if (va > vb) return '<span class="advantage advantage-a">NCC leads</span>';
     if (vb > va) return '<span class="advantage advantage-b">THC leads</span>';
@@ -600,8 +607,8 @@
   // --- State ---
   let allianceData = null;
   let playerData = null;
-  let currentTab = 'overview';
-  let period = 7;
+  let currentTab = 'combat';
+  let period = 1;
 
   function loadData() {
     const t = Date.now();
@@ -639,7 +646,7 @@
 
     // Period bar
     html += '<div class="period-bar">';
-    for (const [d, label] of [[1, '1 Day'], [7, '7 Days'], [30, '30 Days']]) {
+    for (const [d, label] of [[1, '1 Day'], [7, '7 Days'], [30, '30 Days'], ['war', 'Since War']]) {
       const cls = period === d ? ' active' : '';
       html += `<button class="period-btn${cls}" data-period="${d}">${label}</button>`;
     }
@@ -647,7 +654,6 @@
 
     // Tab bar
     const tabs = [
-      ['overview', 'Overview'],
       ['combat', 'Combat (PVP)'],
       ['activity', 'Activity (PVE)'],
       ['roster', 'Full Roster'],
@@ -665,7 +671,8 @@
     // Period handlers
     document.querySelectorAll('.period-btn').forEach(btn => {
       btn.addEventListener('click', () => {
-        period = parseInt(btn.dataset.period);
+        const v = btn.dataset.period;
+        period = isNaN(v) ? v : parseInt(v);
         renderPage();
       });
     });
@@ -686,84 +693,10 @@
     if (!el) return;
 
     switch (currentTab) {
-      case 'overview': el.innerHTML = renderOverview(); break;
       case 'combat':   el.innerHTML = renderCombat();   break;
       case 'activity': el.innerHTML = renderActivity();  break;
       case 'roster':   el.innerHTML = renderRoster();    break;
     }
-  }
-
-  // ===== OVERVIEW =====
-  function renderOverview() {
-    const ncc = getAlliance(NCC_ID);
-    const thc = getAlliance(THC_ID);
-    if (!ncc || !thc) return '<div class="empty">Alliance data not found</div>';
-
-    const suf = `_delta_${period}d`;
-
-    // Scorecard
-    let html = '<div class="scorecard">';
-    html += '<div class="scorecard-team">';
-    html += `<div class="scorecard-tag scorecard-tag-a">[${esc(ncc.alliance_tag)}]</div>`;
-    html += `<div class="scorecard-name">${esc(ncc.alliance_name || 'Discovery')}</div>`;
-    html += `<div class="scorecard-stat" style="color:#4dabf7">${ncc.member_count}</div>`;
-    html += '<div style="font-size:0.75rem;color:#636e7b">Members</div>';
-    html += '</div>';
-
-    html += '<div class="scorecard-divider">VS</div>';
-
-    html += '<div class="scorecard-team">';
-    html += `<div class="scorecard-tag scorecard-tag-b">[${esc(thc.alliance_tag)}]</div>`;
-    html += `<div class="scorecard-name">${esc(thc.alliance_name || 'The High Command')}</div>`;
-    html += `<div class="scorecard-stat" style="color:#fb923c">${thc.member_count}</div>`;
-    html += '<div style="font-size:0.75rem;color:#636e7b">Members</div>';
-    html += '</div>';
-    html += '</div>';
-
-    // Comparison bars — totals
-    html += '<div class="section-header">All-Time Totals</div>';
-    html += '<div class="compare-section">';
-    html += comparisonBar('Total Power', ncc.total_power, thc.total_power);
-    html += comparisonBar('PVP Kills', ncc.total_pvp, thc.total_pvp);
-    html += comparisonBar('Hostile Kills', ncc.total_hk, thc.total_hk);
-    html += comparisonBar('Resources Mined', ncc.total_mined, thc.total_mined);
-    html += comparisonBar('Resources Raided', ncc.total_raided, thc.total_raided);
-    html += '</div>';
-
-    // Comparison bars — deltas
-    html += `<div class="section-header">${period}-Day Gains</div>`;
-    html += '<div class="compare-section">';
-    html += comparisonBar('Power Growth', ncc['total_power' + suf] || 0, thc['total_power' + suf] || 0);
-    html += comparisonBar('PVP Kills', ncc['total_pvp' + suf] || 0, thc['total_pvp' + suf] || 0);
-    html += comparisonBar('Hostile Kills', ncc['total_hk' + suf] || 0, thc['total_hk' + suf] || 0);
-    html += comparisonBar('Resources Mined', ncc['total_mined' + suf] || 0, thc['total_mined' + suf] || 0);
-    html += comparisonBar('Resources Raided', ncc['total_raided' + suf] || 0, thc['total_raided' + suf] || 0);
-    html += '</div>';
-
-    // Per-member averages
-    const nccPlayers = getPlayers(NCC_ID);
-    const thcPlayers = getPlayers(THC_ID);
-    const nccCount = nccPlayers.length || 1;
-    const thcCount = thcPlayers.length || 1;
-
-    const avgFields = [
-      { key: 'power', label: 'Avg Power' },
-      { key: 'players_killed', label: 'Avg PVP Kills' },
-      { key: 'hostiles_killed', label: 'Avg Hostile Kills' },
-      { key: 'resources_mined', label: 'Avg Resources Mined' },
-      { key: 'resources_raided', label: 'Avg Resources Raided' },
-    ];
-
-    html += '<div class="section-header">Per-Member Averages</div>';
-    html += '<div class="compare-section">';
-    for (const f of avgFields) {
-      const aN = Math.round(nccPlayers.reduce((s, p) => s + (p[f.key] || 0), 0) / nccCount);
-      const bN = Math.round(thcPlayers.reduce((s, p) => s + (p[f.key] || 0), 0) / thcCount);
-      html += comparisonBar(f.label, aN, bN);
-    }
-    html += '</div>';
-
-    return html;
   }
 
   // ===== COMBAT (PVP) =====
@@ -772,7 +705,7 @@
     const thc = getAlliance(THC_ID);
     if (!ncc || !thc) return '<div class="empty">Alliance data not found</div>';
 
-    const suf = `_delta_${period}d`;
+    const suf = period === 'war' ? '_delta_war' : `_delta_${period}d`;
     const nccPlayers = getPlayers(NCC_ID);
     const thcPlayers = getPlayers(THC_ID);
 
@@ -781,32 +714,31 @@
     const thcPvpDelta = thc['total_pvp' + suf] || 0;
     const nccRaidDelta = ncc['total_raided' + suf] || 0;
     const thcRaidDelta = thc['total_raided' + suf] || 0;
-
     let html = '';
 
     // Summary cards
     html += '<div class="cards" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr))">';
 
     html += '<div class="card">';
-    html += `<div class="label">NCC PVP Kills (${period}d)</div>`;
+    html += `<div class="label">NCC PVP Kills (${periodShort()})</div>`;
     html += `<div class="value" style="color:#4dabf7">${formatAbbr(nccPvpDelta)}</div>`;
     html += `<div class="delta">Total: ${formatAbbr(ncc.total_pvp)}</div>`;
     html += '</div>';
 
     html += '<div class="card">';
-    html += `<div class="label">THC PVP Kills (${period}d)</div>`;
+    html += `<div class="label">THC PVP Kills (${periodShort()})</div>`;
     html += `<div class="value" style="color:#fb923c">${formatAbbr(thcPvpDelta)}</div>`;
     html += `<div class="delta">Total: ${formatAbbr(thc.total_pvp)}</div>`;
     html += '</div>';
 
     html += '<div class="card">';
-    html += `<div class="label">NCC Raided (${period}d)</div>`;
+    html += `<div class="label">NCC Raided (${periodShort()})</div>`;
     html += `<div class="value" style="color:#4dabf7">${formatAbbr(nccRaidDelta)}</div>`;
     html += `<div class="delta">Total: ${formatAbbr(ncc.total_raided)}</div>`;
     html += '</div>';
 
     html += '<div class="card">';
-    html += `<div class="label">THC Raided (${period}d)</div>`;
+    html += `<div class="label">THC Raided (${periodShort()})</div>`;
     html += `<div class="value" style="color:#fb923c">${formatAbbr(thcRaidDelta)}</div>`;
     html += `<div class="delta">Total: ${formatAbbr(thc.total_raided)}</div>`;
     html += '</div>';
@@ -815,12 +747,12 @@
 
     // Comparison bars
     html += '<div class="compare-section">';
-    html += comparisonBar(`PVP Kills (${period}d gain)`, nccPvpDelta, thcPvpDelta);
-    html += comparisonBar(`Resources Raided (${period}d gain)`, nccRaidDelta, thcRaidDelta);
+    html += comparisonBar(`PVP Kills (${periodShort()} gain)`, nccPvpDelta, thcPvpDelta);
+    html += comparisonBar(`Resources Raided (${periodShort()} gain)`, nccRaidDelta, thcRaidDelta);
     html += '</div>';
 
     // Top PVP players from each side
-    html += `<div class="section-header">Top PVP Players — ${period}-Day Gains</div>`;
+    html += `<div class="section-header">Top PVP Players — ${periodLabel()} Gains</div>`;
 
     const pvpSort = (a, b) => (b['players_killed' + suf] || 0) - (a['players_killed' + suf] || 0);
     const topNcc = [...nccPlayers].sort(pvpSort).slice(0, 20);
@@ -874,7 +806,7 @@
     const thc = getAlliance(THC_ID);
     if (!ncc || !thc) return '<div class="empty">Alliance data not found</div>';
 
-    const suf = `_delta_${period}d`;
+    const suf = period === 'war' ? '_delta_war' : `_delta_${period}d`;
     const nccPlayers = getPlayers(NCC_ID);
     const thcPlayers = getPlayers(THC_ID);
 
@@ -889,25 +821,25 @@
     html += '<div class="cards" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr))">';
 
     html += '<div class="card">';
-    html += `<div class="label">NCC Hostiles Killed (${period}d)</div>`;
+    html += `<div class="label">NCC Hostiles Killed (${periodShort()})</div>`;
     html += `<div class="value" style="color:#4dabf7">${formatAbbr(nccHkDelta)}</div>`;
     html += `<div class="delta">Total: ${formatAbbr(ncc.total_hk)}</div>`;
     html += '</div>';
 
     html += '<div class="card">';
-    html += `<div class="label">THC Hostiles Killed (${period}d)</div>`;
+    html += `<div class="label">THC Hostiles Killed (${periodShort()})</div>`;
     html += `<div class="value" style="color:#fb923c">${formatAbbr(thcHkDelta)}</div>`;
     html += `<div class="delta">Total: ${formatAbbr(thc.total_hk)}</div>`;
     html += '</div>';
 
     html += '<div class="card">';
-    html += `<div class="label">NCC Mined (${period}d)</div>`;
+    html += `<div class="label">NCC Mined (${periodShort()})</div>`;
     html += `<div class="value" style="color:#4dabf7">${formatAbbr(nccMinedDelta)}</div>`;
     html += `<div class="delta">Total: ${formatAbbr(ncc.total_mined)}</div>`;
     html += '</div>';
 
     html += '<div class="card">';
-    html += `<div class="label">THC Mined (${period}d)</div>`;
+    html += `<div class="label">THC Mined (${periodShort()})</div>`;
     html += `<div class="value" style="color:#fb923c">${formatAbbr(thcMinedDelta)}</div>`;
     html += `<div class="delta">Total: ${formatAbbr(thc.total_mined)}</div>`;
     html += '</div>';
@@ -916,12 +848,12 @@
 
     // Comparison bars
     html += '<div class="compare-section">';
-    html += comparisonBar(`Hostiles Killed (${period}d gain)`, nccHkDelta, thcHkDelta);
-    html += comparisonBar(`Resources Mined (${period}d gain)`, nccMinedDelta, thcMinedDelta);
+    html += comparisonBar(`Hostiles Killed (${periodShort()} gain)`, nccHkDelta, thcHkDelta);
+    html += comparisonBar(`Resources Mined (${periodShort()} gain)`, nccMinedDelta, thcMinedDelta);
     html += '</div>';
 
     // Top PVE players
-    html += `<div class="section-header">Top PVE Players — ${period}-Day Gains</div>`;
+    html += `<div class="section-header">Top PVE Players — ${periodLabel()} Gains</div>`;
 
     const hkSort = (a, b) => (b['hostiles_killed' + suf] || 0) - (a['hostiles_killed' + suf] || 0);
     const topNcc = [...nccPlayers].sort(hkSort).slice(0, 20);
@@ -973,11 +905,11 @@
   function renderRoster() {
     const nccPlayers = getPlayers(NCC_ID);
     const thcPlayers = getPlayers(THC_ID);
-    const suf = `_delta_${period}d`;
+    const suf = period === 'war' ? '_delta_war' : `_delta_${period}d`;
 
     const sortByPower = (a, b) => (b.power || 0) - (a.power || 0);
 
-    let html = `<div class="section-header">Full Roster Comparison — ${period}-Day Gains</div>`;
+    let html = `<div class="section-header">Full Roster Comparison — ${periodLabel()} Gains</div>`;
     html += '<div class="dual-tables">';
 
     html += '<div>';

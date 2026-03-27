@@ -36,6 +36,7 @@ ROE_VIOLATION_TYPES = {
 TRACKED_FIELDS = [
     "level", "power", "helps", "rss_contrib", "iso_contrib",
     "players_killed", "hostiles_killed", "resources_mined", "resources_raided",
+    "power_destroyed",
 ]
 
 SCHEMA = """
@@ -62,6 +63,7 @@ CREATE TABLE IF NOT EXISTS daily_snapshots (
     hostiles_killed INTEGER,
     resources_mined INTEGER,
     resources_raided INTEGER,
+    power_destroyed INTEGER,
     rank_title      TEXT,
     join_date       TEXT,
     alliance_id     TEXT,
@@ -264,6 +266,8 @@ def get_db():
         conn.execute("ALTER TABLE daily_snapshots ADD COLUMN name TEXT")
     if "alliance_name" not in cols:
         conn.execute("ALTER TABLE daily_snapshots ADD COLUMN alliance_name TEXT")
+    if "power_destroyed" not in cols:
+        conn.execute("ALTER TABLE daily_snapshots ADD COLUMN power_destroyed INTEGER")
     roe_cols = {r[1] for r in conn.execute("PRAGMA table_info(roe_violations)")}
     if roe_cols and "screenshots" not in roe_cols:
         conn.execute("ALTER TABLE roe_violations ADD COLUMN screenshots TEXT")
@@ -364,8 +368,8 @@ def upsert_players(conn, mapped_players, date):
             INSERT INTO daily_snapshots
                 (player_id, date, name, level, power, helps, rss_contrib, iso_contrib,
                  players_killed, hostiles_killed, resources_mined, resources_raided,
-                 rank_title, join_date, alliance_id, alliance_tag, alliance_name)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                 power_destroyed, rank_title, join_date, alliance_id, alliance_tag, alliance_name)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(player_id, date) DO UPDATE SET
                 name = excluded.name,
                 level = excluded.level,
@@ -377,6 +381,7 @@ def upsert_players(conn, mapped_players, date):
                 hostiles_killed = excluded.hostiles_killed,
                 resources_mined = excluded.resources_mined,
                 resources_raided = excluded.resources_raided,
+                power_destroyed = excluded.power_destroyed,
                 rank_title = excluded.rank_title,
                 join_date = excluded.join_date,
                 alliance_id = excluded.alliance_id,
@@ -394,6 +399,7 @@ def upsert_players(conn, mapped_players, date):
             m.get("hostiles_killed", 0),
             m.get("resources_mined", 0),
             m.get("resources_raided", 0),
+            m.get("power_destroyed", 0),
             m.get("rank", ""),
             m.get("join_date", ""),
             str(m.get("alliance_id", "") or ""),
@@ -950,10 +956,13 @@ def export_server_history_json(conn):
         json.dump(history, f, ensure_ascii=False)
 
 
+WAR_START_DATE = "2026-03-26"  # NCC vs THC war declared 12 AM EDT
+
+
 def export_server_alliances_json(conn):
     """Query all alliances on the server and write data/server_alliances.json.
 
-    Aggregates player data by alliance for the most recent date, with 1d/7d/30d deltas.
+    Aggregates player data by alliance for the most recent date, with 1d/7d/30d/war deltas.
     """
     delta_periods = [1, 7, 30]
 
@@ -979,6 +988,13 @@ def export_server_alliances_json(conn):
             dd = earliest_date
         delta_dates[days] = dd
 
+    # War delta: snapshot on or just before the war start date
+    war_row = conn.execute("""
+        SELECT MAX(date) FROM daily_snapshots WHERE date <= ?
+    """, (WAR_START_DATE,)).fetchone()
+    war_date = war_row[0] if war_row and war_row[0] else None
+    delta_dates["war"] = war_date
+
     # Get pull timestamp
     pull_row = conn.execute(
         "SELECT pulled_at FROM pull_log ORDER BY id DESC LIMIT 1"
@@ -995,7 +1011,8 @@ def export_server_alliances_json(conn):
                SUM(players_killed) as total_pvp,
                SUM(hostiles_killed) as total_hk,
                SUM(resources_mined) as total_mined,
-               SUM(resources_raided) as total_raided
+               SUM(resources_raided) as total_raided,
+               SUM(COALESCE(power_destroyed, 0)) as total_pd
         FROM daily_snapshots
         WHERE date = ? AND alliance_id IS NOT NULL AND alliance_id != '' AND alliance_id != '0'
         GROUP BY alliance_id
@@ -1011,15 +1028,17 @@ def export_server_alliances_json(conn):
         ("total_hk", "SUM(hostiles_killed)"),
         ("total_mined", "SUM(resources_mined)"),
         ("total_raided", "SUM(resources_raided)"),
+        ("total_pd", "SUM(COALESCE(power_destroyed, 0))"),
     ]
     agg_sql = ", ".join(f"{sql} as {name}" for name, sql in delta_fields)
 
-    # Get past stats by alliance for each delta period
-    past_stats = {}  # {days: {alliance_id: {field: value}}}
-    for days in delta_periods:
-        dd = delta_dates[days]
+    # Get past stats by alliance for each delta period (including war)
+    all_periods = delta_periods + ["war"]
+    past_stats = {}  # {period_key: {alliance_id: {field: value}}}
+    for period_key in all_periods:
+        dd = delta_dates[period_key]
         if not dd:
-            past_stats[days] = {}
+            past_stats[period_key] = {}
             continue
         past_rows = conn.execute(f"""
             SELECT alliance_id, {agg_sql}
@@ -1027,7 +1046,7 @@ def export_server_alliances_json(conn):
             WHERE date = ? AND alliance_id IS NOT NULL AND alliance_id != '' AND alliance_id != '0'
             GROUP BY alliance_id
         """, (dd,)).fetchall()
-        past_stats[days] = {
+        past_stats[period_key] = {
             r[0]: {name: r[i + 1] or 0 for i, (name, _) in enumerate(delta_fields)}
             for r in past_rows
         }
@@ -1051,7 +1070,7 @@ def export_server_alliances_json(conn):
 
     alliances = []
     for rank, r in enumerate(rows, 1):
-        aid, atag, count, power, avg_lvl, max_lvl, pvp, hk, mined, raided = r
+        aid, atag, count, power, avg_lvl, max_lvl, pvp, hk, mined, raided, pd = r
         alliance = {
             "alliance_id": aid,
             "alliance_tag": atag or "",
@@ -1064,6 +1083,7 @@ def export_server_alliances_json(conn):
             "total_hk": hk or 0,
             "total_mined": mined or 0,
             "total_raided": raided or 0,
+            "total_pd": pd or 0,
         }
         current_vals = {
             "total_power": power or 0,
@@ -1073,16 +1093,18 @@ def export_server_alliances_json(conn):
             "total_hk": hk or 0,
             "total_mined": mined or 0,
             "total_raided": raided or 0,
+            "total_pd": pd or 0,
         }
-        for days in delta_periods:
-            past_alliance = past_stats[days].get(aid)
+        for period_key in all_periods:
+            suffix = f"{period_key}d" if isinstance(period_key, int) else period_key
+            past_alliance = past_stats[period_key].get(aid)
             if past_alliance is None:
                 past_alliance = earliest_stats.get(aid, {})
             for field_name, _ in delta_fields:
                 past_val = past_alliance.get(field_name, 0)
                 if field_name == "avg_level":
                     past_val = round(past_val) if past_val else 0
-                alliance[f"{field_name}_delta_{days}d"] = current_vals[field_name] - (past_val or 0)
+                alliance[f"{field_name}_delta_{suffix}"] = current_vals[field_name] - (past_val or 0)
         alliances.append(alliance)
 
     # Compute avg activity score per alliance from server_players.json
@@ -1105,8 +1127,10 @@ def export_server_alliances_json(conn):
         "pulled_at": pulled_at,
         "as_of_date": latest_date,
         "delta_dates": {
-            f"{days}d": delta_dates[days] or latest_date
-            for days in delta_periods
+            **(
+                {f"{days}d": delta_dates[days] or latest_date for days in delta_periods}
+            ),
+            "war": delta_dates.get("war") or latest_date,
         },
         "alliance_count": len(alliances),
         "alliances": alliances,
@@ -1147,6 +1171,12 @@ def export_server_players_json(conn):
             dd = earliest_date
         delta_dates[days] = dd
 
+    # War delta: snapshot on or just before the war start date
+    war_row = conn.execute("""
+        SELECT MAX(date) FROM daily_snapshots WHERE date <= ?
+    """, (WAR_START_DATE,)).fetchone()
+    delta_dates["war"] = war_row[0] if war_row and war_row[0] else None
+
     # Get pull timestamp
     pull_row = conn.execute(
         "SELECT pulled_at FROM pull_log ORDER BY id DESC LIMIT 1"
@@ -1158,34 +1188,37 @@ def export_server_players_json(conn):
         SELECT ds.player_id, p.name, ds.alliance_id, ds.alliance_tag,
                ds.level, ds.power, ds.helps, ds.rss_contrib, ds.iso_contrib,
                ds.players_killed, ds.hostiles_killed, ds.resources_mined,
-               ds.resources_raided, ds.alliance_name
+               ds.resources_raided, ds.alliance_name,
+               COALESCE(ds.power_destroyed, 0)
         FROM daily_snapshots ds
         JOIN players p ON p.player_id = ds.player_id
         WHERE ds.date = ?
         ORDER BY ds.power DESC
     """, (latest_date,)).fetchall()
 
-    # Load past snapshots for each delta period
-    past_snapshots = {}  # {days: {player_id: {field: value, ...}}}
-    for days in delta_periods:
-        dd = delta_dates[days]
+    # Load past snapshots for each delta period (including war)
+    all_periods = delta_periods + ["war"]
+    past_snapshots = {}  # {period_key: {player_id: {field: value, ...}}}
+    for period_key in all_periods:
+        dd = delta_dates[period_key]
         if not dd:
-            past_snapshots[days] = {}
+            past_snapshots[period_key] = {}
             continue
         past_rows = conn.execute("""
             SELECT player_id, level, power, helps, rss_contrib, iso_contrib,
                    players_killed, hostiles_killed, resources_mined, resources_raided,
-                   alliance_id, alliance_tag
+                   alliance_id, alliance_tag, COALESCE(power_destroyed, 0)
             FROM daily_snapshots
             WHERE date = ?
         """, (dd,)).fetchall()
-        past_snapshots[days] = {
+        past_snapshots[period_key] = {
             r[0]: {
                 "level": r[1] or 0, "power": r[2] or 0, "helps": r[3] or 0,
                 "rss_contrib": r[4] or 0, "iso_contrib": r[5] or 0,
                 "players_killed": r[6] or 0, "hostiles_killed": r[7] or 0,
                 "resources_mined": r[8] or 0, "resources_raided": r[9] or 0,
                 "alliance_id": r[10], "alliance_tag": r[11] or "",
+                "power_destroyed": r[12] or 0,
             }
             for r in past_rows
         }
@@ -1194,7 +1227,8 @@ def export_server_players_json(conn):
     earliest_rows = conn.execute("""
         SELECT ds.player_id, ds.level, ds.power, ds.helps, ds.rss_contrib,
                ds.iso_contrib, ds.players_killed, ds.hostiles_killed,
-               ds.resources_mined, ds.resources_raided, ds.alliance_id, ds.alliance_tag
+               ds.resources_mined, ds.resources_raided, ds.alliance_id, ds.alliance_tag,
+               COALESCE(ds.power_destroyed, 0)
         FROM daily_snapshots ds
         INNER JOIN (
             SELECT player_id, MIN(date) as min_date
@@ -1208,6 +1242,7 @@ def export_server_players_json(conn):
             "players_killed": r[6] or 0, "hostiles_killed": r[7] or 0,
             "resources_mined": r[8] or 0, "resources_raided": r[9] or 0,
             "alliance_id": r[10], "alliance_tag": r[11] or "",
+            "power_destroyed": r[12] or 0,
         }
         for r in earliest_rows
     }
@@ -1215,13 +1250,14 @@ def export_server_players_json(conn):
     players = []
     for r in rows:
         (pid, name, aid, atag, level, power, helps, rss_c, iso_c,
-         pk, hk, rm, rr, aname) = r
+         pk, hk, rm, rr, aname, pd) = r
 
         current_vals = {
             "level": level or 0, "power": power or 0, "helps": helps or 0,
             "rss_contrib": rss_c or 0, "iso_contrib": iso_c or 0,
             "players_killed": pk or 0, "hostiles_killed": hk or 0,
             "resources_mined": rm or 0, "resources_raided": rr or 0,
+            "power_destroyed": pd or 0,
         }
 
         player = {
@@ -1238,11 +1274,12 @@ def export_server_players_json(conn):
         # longer period before falling back to earliest.  This prevents
         # inflated deltas when a player was simply missing from one
         # snapshot date but present in a longer window.
-        for days in delta_periods:
-            past = past_snapshots[days].get(pid)
-            if not past:
+        for period_key in all_periods:
+            suffix = f"{period_key}d" if isinstance(period_key, int) else period_key
+            past = past_snapshots[period_key].get(pid)
+            if not past and isinstance(period_key, int):
                 for longer in delta_periods:
-                    if longer > days:
+                    if longer > period_key:
                         past = past_snapshots[longer].get(pid)
                         if past:
                             break
@@ -1250,7 +1287,7 @@ def export_server_players_json(conn):
                 past = earliest_snapshot.get(pid)
             for field in TRACKED_FIELDS:
                 delta = current_vals[field] - past[field] if past else 0
-                player[f"{field}_delta_{days}d"] = delta
+                player[f"{field}_delta_{suffix}"] = delta
 
         # Alliance movement detection (check 1d, then 7d, then 30d)
         # Falls back to earliest snapshot so moves are caught even when a
@@ -1337,8 +1374,10 @@ def export_server_players_json(conn):
         "pulled_at": pulled_at,
         "as_of_date": latest_date,
         "delta_dates": {
-            f"{days}d": delta_dates[days] or latest_date
-            for days in delta_periods
+            **(
+                {f"{days}d": delta_dates[days] or latest_date for days in delta_periods}
+            ),
+            "war": delta_dates.get("war") or latest_date,
         },
         "player_count": len(players),
         "players": players,

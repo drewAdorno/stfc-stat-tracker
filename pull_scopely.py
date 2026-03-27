@@ -618,6 +618,7 @@ def map_player(hex_id, ranking, profile, alliance_info, stats, resources_raided=
     hostiles_killed = int(stats.get("hostiles_killed", 0))
     players_killed = int(stats.get("players_killed", 0))
     resources_mined = int(stats.get("resources_mined", 0))
+    power_destroyed = int(stats.get("power_destroyed", 0))
 
     return {
         "id": hex_id,
@@ -631,6 +632,7 @@ def map_player(hex_id, ranking, profile, alliance_info, stats, resources_raided=
         "hostiles_killed": hostiles_killed,
         "resources_mined": resources_mined,
         "resources_raided": resources_raided,
+        "power_destroyed": power_destroyed,
         "alliance_tag": alliance_tag,
         "alliance_name": alliance_name,
         "alliance_id": alliance_id,
