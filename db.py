@@ -990,7 +990,7 @@ def export_server_alliances_json(conn):
 
     # War delta: snapshot on or just before the war start date
     war_row = conn.execute("""
-        SELECT MAX(date) FROM daily_snapshots WHERE date <= ?
+        SELECT MAX(date) FROM daily_snapshots WHERE date < ?
     """, (WAR_START_DATE,)).fetchone()
     war_date = war_row[0] if war_row and war_row[0] else None
     delta_dates["war"] = war_date
@@ -1173,7 +1173,7 @@ def export_server_players_json(conn):
 
     # War delta: snapshot on or just before the war start date
     war_row = conn.execute("""
-        SELECT MAX(date) FROM daily_snapshots WHERE date <= ?
+        SELECT MAX(date) FROM daily_snapshots WHERE date < ?
     """, (WAR_START_DATE,)).fetchone()
     delta_dates["war"] = war_row[0] if war_row and war_row[0] else None
 
