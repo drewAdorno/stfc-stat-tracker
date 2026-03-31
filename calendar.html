@@ -4,210 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NCC Event Calendar</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="lcars.css">
 <style>
-  :root {
-    --bg: #07111f;
-    --panel: rgba(10, 20, 37, 0.88);
-    --panel-strong: rgba(16, 29, 50, 0.96);
-    --border: rgba(120, 154, 195, 0.18);
-    --text: #e7eefb;
-    --muted: #8fa2bf;
-    --dim: #60738f;
-    --cyan: #71d7ff;
-    --gold: #ffd36a;
-    --green: #73f0b8;
-    --pink: #ff8ee3;
-    --shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'Instrument Sans', sans-serif;
-    color: var(--text);
-    min-height: 100vh;
-    line-height: 1.5;
-    background:
-      radial-gradient(circle at 15% 20%, rgba(63, 140, 255, 0.18), transparent 34%),
-      radial-gradient(circle at 85% 18%, rgba(255, 211, 106, 0.14), transparent 28%),
-      radial-gradient(circle at 50% 100%, rgba(53, 120, 201, 0.14), transparent 32%),
-      linear-gradient(180deg, #05101d 0%, #091625 38%, #07111f 100%);
-  }
-
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    opacity: 0.24;
-    background-image:
-      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-    background-size: 28px 28px;
-    mask-image: linear-gradient(180deg, rgba(0,0,0,0.7), transparent 90%);
-  }
-
-  .container {
-    width: min(1520px, calc(100vw - 32px));
-    margin: 0 auto;
-    padding: 24px 0 44px;
-  }
-
-  header {
-    position: relative;
-    padding: 34px 32px 30px;
-    margin-bottom: 18px;
-    border: 1px solid var(--border);
-    border-radius: 28px;
-    overflow: hidden;
-    background:
-      linear-gradient(135deg, rgba(10, 24, 43, 0.94), rgba(11, 23, 38, 0.82)),
-      var(--panel-strong);
-    box-shadow: var(--shadow);
-  }
-
-  header::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background:
-      linear-gradient(125deg, rgba(113, 215, 255, 0.12), transparent 35%),
-      linear-gradient(315deg, rgba(255, 211, 106, 0.09), transparent 34%);
-    pointer-events: none;
-  }
-
-  .kicker {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 14px;
-    padding: 7px 12px;
-    border: 1px solid rgba(113, 215, 255, 0.24);
-    border-radius: 999px;
-    color: var(--cyan);
-    font-family: 'Chakra Petch', sans-serif;
-    font-size: 0.82rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    background: rgba(8, 20, 36, 0.5);
-  }
-
-  .hero-grid {
-    position: relative;
-    display: grid;
-    grid-template-columns: minmax(0, 1.5fr) minmax(320px, 0.9fr);
-    gap: 24px;
-    align-items: end;
-  }
-
-  h1 {
-    font-family: 'Chakra Petch', sans-serif;
-    font-size: clamp(2.2rem, 4.5vw, 4.25rem);
-    line-height: 0.95;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    margin-bottom: 12px;
-  }
-
-  h1 span { color: var(--cyan); }
-
-  .hero-copy p {
-    max-width: 760px;
-    color: var(--muted);
-    font-size: 1rem;
-  }
-
-  .hero-side {
-    display: grid;
-    gap: 12px;
-  }
-
-  .signal-card {
-    padding: 16px 18px;
-    border-radius: 22px;
-    border: 1px solid var(--border);
-    background: rgba(7, 16, 29, 0.72);
-    backdrop-filter: blur(12px);
-  }
-
-  .signal-label {
-    color: var(--dim);
-    font-size: 0.74rem;
-    text-transform: uppercase;
-    letter-spacing: 0.16em;
-    margin-bottom: 6px;
-  }
-
-  .signal-value {
-    font-family: 'Chakra Petch', sans-serif;
-    font-size: 1.15rem;
-    color: var(--text);
-  }
-
-  nav {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin: 0 0 18px;
-  }
-
-  nav a {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 9px 16px;
-    border-radius: 999px;
-    border: 1px solid var(--border);
-    background: rgba(11, 22, 39, 0.78);
-    color: var(--muted);
-    text-decoration: none;
-    font-size: 0.88rem;
-    transition: 0.16s ease;
-  }
-
-  nav a:hover,
-  nav a.active {
-    color: var(--text);
-    border-color: rgba(113, 215, 255, 0.36);
-    background: rgba(28, 62, 110, 0.55);
-  }
-  .nav-lock { font-size: 0.78rem; opacity: 0.75; }
-  .nav-admin::after {
-    content: 'ADMIN';
-    display: inline-flex;
-    align-items: center;
-    padding: 2px 6px;
-    border-radius: 999px;
-    background: rgba(255, 142, 227, 0.12);
-    border: 1px solid rgba(255, 142, 227, 0.22);
-    color: var(--pink);
-    font-size: 0.62rem;
-    letter-spacing: 0.08em;
-  }
-
-  .control-shell,
-  .summary-shell,
-  .week-shell,
-  .agenda-shell {
-    border: 1px solid var(--border);
-    background: var(--panel);
-    backdrop-filter: blur(12px);
-    box-shadow: var(--shadow);
-  }
-
+  /* === Calendar-specific layout === */
   .control-shell {
     display: grid;
     grid-template-columns: auto 1fr minmax(210px, auto) auto;
     gap: 16px;
     align-items: center;
     padding: 16px 18px;
-    border-radius: 24px;
-    margin-bottom: 18px;
+    border: 1px solid var(--border-glow);
+    background: var(--bg-panel);
+    border-radius: var(--radius);
+    margin-bottom: 12px;
   }
 
   .week-nav {
@@ -218,18 +27,20 @@
   .week-nav button {
     min-width: 112px;
     padding: 10px 14px;
-    border-radius: 999px;
-    border: 1px solid var(--border);
-    background: rgba(13, 24, 42, 0.8);
-    color: var(--text);
-    font-family: inherit;
+    border-radius: 4px;
+    border: 1px solid rgba(255,153,51,0.12);
+    background: rgba(255,153,51,0.06);
+    color: var(--lcars-gold);
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
     cursor: pointer;
     transition: 0.15s ease;
   }
 
   .week-nav button:hover:not(:disabled) {
-    border-color: rgba(113, 215, 255, 0.36);
-    color: var(--cyan);
+    border-color: var(--lcars-orange);
+    color: var(--lcars-orange);
+    background: rgba(255,153,51,0.1);
   }
 
   .week-nav button:disabled {
@@ -242,32 +53,36 @@
   }
 
   .week-heading .eyebrow {
-    color: var(--dim);
-    font-size: 0.75rem;
+    color: var(--text-dim);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.65rem;
     letter-spacing: 0.18em;
     text-transform: uppercase;
   }
 
   .week-heading .range {
-    font-family: 'Chakra Petch', sans-serif;
-    font-size: clamp(1.4rem, 2.6vw, 2rem);
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(1.2rem, 2.6vw, 1.6rem);
     letter-spacing: 0.04em;
     text-transform: uppercase;
+    color: var(--lcars-orange);
   }
 
   .week-heading .subline {
-    color: var(--muted);
-    font-size: 0.9rem;
+    color: var(--text-mid);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.82rem;
     margin-top: 2px;
   }
 
   .capture-pill {
     justify-self: end;
     padding: 11px 14px;
-    border-radius: 18px;
-    border: 1px solid rgba(255, 211, 106, 0.22);
-    background: rgba(35, 29, 14, 0.42);
-    color: #f6ddb0;
+    border-radius: 4px;
+    border: 1px solid rgba(255,153,51,0.12);
+    background: rgba(255,153,51,0.06);
+    color: var(--lcars-gold);
+    font-family: 'Share Tech Mono', monospace;
     font-size: 0.83rem;
     text-align: right;
   }
@@ -279,8 +94,9 @@
   }
 
   .filter-shell label {
-    color: var(--dim);
-    font-size: 0.72rem;
+    color: var(--text-dim);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.62rem;
     letter-spacing: 0.16em;
     text-transform: uppercase;
   }
@@ -288,58 +104,72 @@
   .filter-shell input {
     width: 100%;
     padding: 10px 12px;
-    border-radius: 14px;
-    border: 1px solid var(--border);
-    background: rgba(13, 24, 42, 0.8);
-    color: var(--text);
-    font: inherit;
+    border-radius: 4px;
+    border: 1px solid rgba(255,153,51,0.12);
+    background: var(--bg-input, #0d0d1a);
+    color: var(--text-bright);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+  }
+
+  .filter-shell input:focus {
+    border-color: var(--lcars-orange);
+    outline: none;
   }
 
   .filter-hint {
-    color: var(--dim);
+    color: var(--text-dim);
+    font-family: 'Share Tech Mono', monospace;
     font-size: 0.76rem;
   }
 
+  /* === Summary cards === */
   .summary-shell {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 12px;
-    padding: 14px;
-    border-radius: 24px;
-    margin-bottom: 18px;
+    gap: 4px;
+    padding: 0;
+    margin-bottom: 12px;
   }
 
   .summary-card {
     padding: 14px 16px;
-    border-radius: 20px;
-    border: 1px solid rgba(255,255,255,0.04);
-    background: linear-gradient(180deg, rgba(17, 30, 50, 0.9), rgba(12, 22, 37, 0.7));
+    border: 1px solid rgba(255,153,51,0.08);
+    border-radius: var(--radius);
+    border-left: 3px solid var(--lcars-amber);
+    background: var(--bg-panel);
   }
 
   .summary-card .label {
-    color: var(--dim);
+    color: var(--text-dim);
+    font-family: 'Orbitron', sans-serif;
     text-transform: uppercase;
     letter-spacing: 0.16em;
-    font-size: 0.7rem;
-    margin-bottom: 6px;
+    font-size: 0.62rem;
+    margin-bottom: 4px;
   }
 
   .summary-card .value {
-    font-family: 'Chakra Petch', sans-serif;
-    font-size: 1.5rem;
-    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--lcars-gold);
   }
 
   .summary-card .detail {
-    color: var(--muted);
-    font-size: 0.84rem;
+    color: var(--text-mid);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.78rem;
     margin-top: 4px;
   }
 
+  /* === Week grid shell === */
   .week-shell {
-    padding: 18px;
-    border-radius: 28px;
-    margin-bottom: 18px;
+    padding: 16px;
+    border: 1px solid rgba(255,153,51,0.08);
+    border-radius: var(--radius);
+    background: var(--bg-panel);
+    margin-bottom: 12px;
     overflow-x: auto;
   }
 
@@ -354,22 +184,25 @@
 
   .section-heading h2,
   .agenda-heading h2 {
-    font-family: 'Chakra Petch', sans-serif;
-    font-size: 1.35rem;
-    letter-spacing: 0.08em;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--lcars-orange);
     text-transform: uppercase;
   }
 
   .section-heading p,
   .agenda-heading p {
-    color: var(--muted);
-    font-size: 0.92rem;
+    color: var(--text-mid);
+    font-size: 0.82rem;
   }
 
+  /* === Week grid === */
   .week-grid {
     display: grid;
     grid-template-columns: repeat(7, minmax(120px, 1fr));
-    gap: 10px;
+    gap: 4px;
     min-width: 900px;
     align-items: stretch;
     grid-auto-rows: minmax(78px, auto);
@@ -378,33 +211,32 @@
   .schedule-day,
   .schedule-slot,
   .schedule-bar {
-    border-radius: 20px;
-    border: 1px solid rgba(255,255,255,0.06);
-    background: rgba(9, 18, 31, 0.86);
+    border-radius: var(--radius);
+    border: 1px solid rgba(255,153,51,0.06);
+    background: var(--bg-card);
   }
 
   .schedule-day {
     padding: 14px 14px 12px;
-  }
-
-  .schedule-day {
-    background: linear-gradient(180deg, rgba(24, 42, 70, 0.72), rgba(14, 26, 45, 0.42));
+    background: linear-gradient(180deg, rgba(255,153,51,0.08), var(--bg-card));
   }
 
   .schedule-day.today {
-    border-color: rgba(113, 215, 255, 0.42);
-    box-shadow: inset 0 0 0 1px rgba(113, 215, 255, 0.16);
+    border-color: var(--lcars-orange);
+    box-shadow: inset 0 0 0 1px rgba(255,153,51,0.2);
   }
 
   .schedule-day-name {
-    font-family: 'Chakra Petch', sans-serif;
-    font-size: 0.96rem;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.8rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
+    color: var(--lcars-gold);
   }
 
   .schedule-day-date {
-    color: var(--muted);
+    color: var(--text-mid);
+    font-family: 'Share Tech Mono', monospace;
     font-size: 0.82rem;
     margin-top: 2px;
   }
@@ -413,9 +245,10 @@
     display: inline-flex;
     margin-top: 10px;
     padding: 4px 9px;
-    border-radius: 999px;
-    background: rgba(113, 215, 255, 0.08);
-    color: var(--cyan);
+    border-radius: 4px;
+    background: rgba(255,153,51,0.08);
+    color: var(--lcars-orange);
+    font-family: 'Share Tech Mono', monospace;
     font-size: 0.72rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
@@ -423,18 +256,18 @@
 
   .schedule-slot {
     min-height: 78px;
-    background: linear-gradient(180deg, rgba(15, 28, 47, 0.95), rgba(9, 18, 31, 0.88));
+    background: var(--bg-card);
   }
 
   .schedule-slot.today {
-    border-color: rgba(113, 215, 255, 0.24);
+    border-color: rgba(255,153,51,0.2);
   }
 
   .schedule-bar:hover,
   .schedule-bar:focus-visible {
     transform: translateY(-1px);
-    border-color: color-mix(in srgb, var(--accent, var(--cyan)) 42%, rgba(255,255,255,0.08));
-    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.24);
+    border-color: color-mix(in srgb, var(--accent, var(--lcars-teal)) 42%, rgba(255,255,255,0.08));
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
     outline: none;
   }
 
@@ -445,13 +278,12 @@
     min-height: 92px;
     padding: 12px 14px;
     text-align: left;
-    color: var(--text);
+    color: var(--text-bright);
     font: inherit;
     cursor: pointer;
     overflow: hidden;
     background:
-      linear-gradient(135deg, color-mix(in srgb, var(--accent, var(--cyan)) 24%, rgba(9, 18, 31, 0.92)), rgba(9, 18, 31, 0.96)),
-      rgba(9, 18, 31, 0.92);
+      linear-gradient(135deg, color-mix(in srgb, var(--accent, var(--lcars-teal)) 18%, var(--bg-card)), var(--bg-card));
   }
 
   .schedule-bar::before {
@@ -459,7 +291,7 @@
     position: absolute;
     inset: 0 auto 0 0;
     width: 4px;
-    background: var(--accent, var(--cyan));
+    background: var(--accent, var(--lcars-teal));
   }
 
   .schedule-bar-copy {
@@ -471,13 +303,15 @@
   }
 
   .schedule-bar-title {
+    font-family: 'Rajdhani', sans-serif;
     font-size: 0.92rem;
     font-weight: 600;
     line-height: 1.16;
   }
 
   .schedule-bar-sub {
-    color: var(--muted);
+    color: var(--text-mid);
+    font-family: 'Share Tech Mono', monospace;
     font-size: 0.78rem;
     line-height: 1.25;
   }
@@ -492,37 +326,39 @@
     min-height: 82px;
   }
 
+  /* === Day column view === */
   .day-column {
     display: flex;
     flex-direction: column;
     min-height: 320px;
-    border-radius: 22px;
-    border: 1px solid var(--border);
-    background:
-      linear-gradient(180deg, rgba(15, 28, 47, 0.95), rgba(9, 18, 31, 0.88));
+    border-radius: var(--radius);
+    border: 1px solid rgba(255,153,51,0.08);
+    background: var(--bg-card);
     overflow: hidden;
   }
 
   .day-column.today {
-    border-color: rgba(113, 215, 255, 0.42);
-    box-shadow: inset 0 0 0 1px rgba(113, 215, 255, 0.16);
+    border-color: var(--lcars-orange);
+    box-shadow: inset 0 0 0 1px rgba(255,153,51,0.2);
   }
 
   .day-head {
     padding: 16px 16px 14px;
-    border-bottom: 1px solid rgba(255,255,255,0.06);
-    background: linear-gradient(180deg, rgba(24, 42, 70, 0.72), rgba(14, 26, 45, 0.42));
+    border-bottom: 1px solid rgba(255,153,51,0.06);
+    background: linear-gradient(180deg, rgba(255,153,51,0.08), transparent);
   }
 
   .day-name {
-    font-family: 'Chakra Petch', sans-serif;
-    font-size: 1rem;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.8rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
+    color: var(--lcars-gold);
   }
 
   .day-date {
-    color: var(--muted);
+    color: var(--text-mid);
+    font-family: 'Share Tech Mono', monospace;
     font-size: 0.86rem;
     margin-top: 2px;
   }
@@ -532,9 +368,10 @@
     align-items: center;
     margin-top: 10px;
     padding: 4px 9px;
-    border-radius: 999px;
-    background: rgba(113, 215, 255, 0.08);
-    color: var(--cyan);
+    border-radius: 4px;
+    background: rgba(255,153,51,0.08);
+    color: var(--lcars-orange);
+    font-family: 'Share Tech Mono', monospace;
     font-size: 0.74rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
@@ -548,20 +385,21 @@
     align-content: start;
   }
 
+  /* === Event cards === */
   .event-card,
   .empty-card {
-    border-radius: 18px;
-    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: var(--radius);
+    border: 1px solid rgba(255,153,51,0.06);
     overflow: hidden;
   }
 
   .event-card {
     width: 100%;
     padding: 14px 14px 13px;
-    background: rgba(6, 13, 24, 0.86);
+    background: var(--bg-card);
     position: relative;
     text-align: left;
-    color: var(--text);
+    color: var(--text-bright);
     font: inherit;
     cursor: pointer;
     transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
@@ -572,15 +410,15 @@
     position: absolute;
     inset: 0 0 auto 0;
     height: 3px;
-    background: var(--accent, var(--cyan));
+    background: var(--accent, var(--lcars-teal));
     opacity: 0.9;
   }
 
   .event-card:hover,
   .event-card:focus-visible {
     transform: translateY(-2px);
-    border-color: color-mix(in srgb, var(--accent, var(--cyan)) 40%, rgba(255,255,255,0.08));
-    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.26);
+    border-color: color-mix(in srgb, var(--accent, var(--lcars-teal)) 40%, rgba(255,255,255,0.08));
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.4);
     outline: none;
   }
 
@@ -592,6 +430,7 @@
     margin-bottom: 10px;
   }
 
+  /* === Event type badges === */
   .type-badge,
   .status-badge,
   .level-badge,
@@ -599,27 +438,29 @@
     display: inline-flex;
     align-items: center;
     padding: 4px 8px;
-    border-radius: 999px;
+    border-radius: 4px;
+    font-family: 'Share Tech Mono', monospace;
     font-size: 0.7rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     white-space: nowrap;
   }
 
-  .type-badge.type-sms { background: rgba(113, 215, 255, 0.12); color: var(--cyan); }
-  .type-badge.type-slb { background: rgba(255, 142, 227, 0.14); color: var(--pink); }
-  .type-badge.type-rlb { background: rgba(255, 211, 106, 0.14); color: var(--gold); }
+  .type-badge.type-sms { background: rgba(102,204,204,0.1); color: var(--lcars-teal); border: 1px solid rgba(102,204,204,0.2); }
+  .type-badge.type-slb { background: rgba(204,119,255,0.1); color: var(--lcars-purple); border: 1px solid rgba(204,119,255,0.2); }
+  .type-badge.type-rlb { background: rgba(255,204,102,0.1); color: var(--lcars-gold); border: 1px solid rgba(255,204,102,0.2); }
   .type-badge.type-alb,
-  .type-badge.type-ams { background: rgba(115, 240, 184, 0.12); color: var(--green); }
-  .type-badge.type-other { background: rgba(164, 177, 199, 0.14); color: #c8d6ea; }
+  .type-badge.type-ams { background: rgba(85,204,85,0.1); color: var(--lcars-green); border: 1px solid rgba(85,204,85,0.2); }
+  .type-badge.type-other { background: rgba(153,153,255,0.1); color: var(--lcars-blue); border: 1px solid rgba(153,153,255,0.2); }
 
   .status-badge {
-    border: 1px solid rgba(255,255,255,0.08);
-    color: var(--muted);
-    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,153,51,0.12);
+    color: var(--text-mid);
+    background: rgba(255,153,51,0.04);
   }
 
   .event-title {
+    font-family: 'Rajdhani', sans-serif;
     font-size: 0.96rem;
     font-weight: 600;
     line-height: 1.2;
@@ -634,17 +475,19 @@
   }
 
   .level-badge {
-    color: var(--gold);
-    background: rgba(255, 211, 106, 0.1);
+    color: var(--lcars-gold);
+    background: rgba(255,204,102,0.08);
+    border: 1px solid rgba(255,204,102,0.15);
   }
 
   .series-badge {
-    color: var(--muted);
-    background: rgba(255,255,255,0.05);
+    color: var(--text-mid);
+    background: rgba(255,153,51,0.04);
+    border: 1px solid rgba(255,153,51,0.08);
   }
 
   .activity-copy {
-    color: var(--muted);
+    color: var(--text-mid);
     font-size: 0.84rem;
   }
 
@@ -654,16 +497,17 @@
     gap: 10px;
     align-items: center;
     margin-top: 4px;
-    color: var(--dim);
+    color: var(--text-dim);
+    font-family: 'Share Tech Mono', monospace;
     font-size: 0.76rem;
   }
 
   .event-datechip {
-    color: #d8e6f8;
+    color: var(--text-bright);
   }
 
   .event-open {
-    color: var(--accent, var(--cyan));
+    color: var(--accent, var(--lcars-teal));
     letter-spacing: 0.08em;
     text-transform: uppercase;
   }
@@ -672,30 +516,35 @@
     display: grid;
     place-items: center;
     min-height: 112px;
-    color: var(--dim);
+    color: var(--text-dim);
+    font-family: 'Share Tech Mono', monospace;
     font-size: 0.82rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    background: rgba(8, 14, 24, 0.7);
+    background: var(--bg-card);
     border-style: dashed;
+    border-color: rgba(255,153,51,0.08);
   }
 
+  /* === Agenda section === */
   .agenda-shell {
-    padding: 18px;
-    border-radius: 28px;
+    padding: 16px;
+    border: 1px solid rgba(255,153,51,0.08);
+    border-radius: var(--radius);
+    background: var(--bg-panel);
   }
 
   .agenda-table-wrap {
     overflow-x: auto;
-    border-radius: 22px;
-    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: var(--radius);
+    border: 1px solid rgba(255,153,51,0.08);
   }
 
   table {
     width: 100%;
     border-collapse: collapse;
     min-width: 980px;
-    background: rgba(8, 16, 28, 0.9);
+    background: var(--bg-panel);
   }
 
   thead th {
@@ -703,54 +552,59 @@
     text-align: left;
     position: sticky;
     top: 0;
-    background: rgba(12, 24, 42, 0.97);
-    color: var(--dim);
-    font-size: 0.73rem;
-    letter-spacing: 0.16em;
+    background: rgba(255,153,51,0.06);
+    color: var(--text-dim);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 1.5px;
     text-transform: uppercase;
-    border-bottom: 1px solid rgba(255,255,255,0.07);
+    border-bottom: 1px solid rgba(255,153,51,0.1);
   }
 
   tbody td {
     padding: 16px 14px;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
+    border-bottom: 1px solid rgba(255,153,51,0.04);
     vertical-align: top;
     font-size: 0.92rem;
   }
 
-  tbody tr:hover { background: rgba(19, 36, 61, 0.42); }
+  tbody tr:hover { background: rgba(255,153,51,0.03); }
   tbody tr:last-child td { border-bottom: none; }
   tbody tr[data-event-id] { cursor: pointer; }
 
   .date-cell {
     min-width: 160px;
-    font-family: 'Chakra Petch', sans-serif;
+    font-family: 'Share Tech Mono', monospace;
     letter-spacing: 0.04em;
+    color: var(--lcars-gold);
   }
 
   .title-cell strong {
     display: block;
     margin-bottom: 5px;
+    font-family: 'Rajdhani', sans-serif;
     font-size: 0.98rem;
   }
 
   .row-sub {
-    color: var(--dim);
+    color: var(--text-dim);
     font-size: 0.82rem;
   }
 
   .activity-cell {
-    color: var(--muted);
+    color: var(--text-mid);
     max-width: 420px;
   }
 
   .status-bar {
     margin-top: 16px;
-    color: var(--dim);
-    font-size: 0.85rem;
+    color: var(--text-dim);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.78rem;
     text-align: center;
   }
 
+  /* === Modal === */
   .modal-shell[hidden] {
     display: none;
   }
@@ -767,7 +621,7 @@
   .modal-backdrop {
     position: absolute;
     inset: 0;
-    background: rgba(3, 8, 16, 0.72);
+    background: rgba(10, 10, 18, 0.8);
     backdrop-filter: blur(10px);
   }
 
@@ -777,22 +631,22 @@
     width: min(760px, calc(100vw - 24px));
     max-height: min(88vh, 940px);
     overflow: auto;
-    border-radius: 28px;
-    border: 1px solid rgba(255,255,255,0.08);
-    background:
-      radial-gradient(circle at top right, color-mix(in srgb, var(--accent, var(--cyan)) 18%, transparent), transparent 34%),
-      linear-gradient(180deg, rgba(14, 26, 43, 0.98), rgba(8, 16, 28, 0.97));
-    box-shadow: 0 30px 90px rgba(0, 0, 0, 0.45);
+    border-radius: var(--radius);
+    border: 1px solid rgba(255,153,51,0.15);
+    background: var(--bg-panel);
+    box-shadow: 0 30px 90px rgba(0, 0, 0, 0.6);
   }
 
   .modal-head {
     padding: 22px 22px 16px;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
+    border-bottom: 1px solid rgba(255,153,51,0.1);
+    background: linear-gradient(135deg, rgba(255,153,51,0.08), transparent 40%);
   }
 
   .modal-kicker {
-    color: var(--accent, var(--cyan));
-    font-size: 0.78rem;
+    color: var(--lcars-orange);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.68rem;
     letter-spacing: 0.18em;
     text-transform: uppercase;
     margin-bottom: 10px;
@@ -806,16 +660,19 @@
   }
 
   .modal-title {
-    font-family: 'Chakra Petch', sans-serif;
-    font-size: clamp(1.5rem, 4vw, 2.3rem);
-    line-height: 0.98;
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(1.2rem, 4vw, 1.8rem);
+    font-weight: 700;
+    line-height: 1.1;
     letter-spacing: 0.04em;
     text-transform: uppercase;
+    color: var(--lcars-orange);
   }
 
   .modal-date {
     margin-top: 10px;
-    color: var(--muted);
+    color: var(--text-mid);
+    font-family: 'Share Tech Mono', monospace;
     font-size: 0.95rem;
     letter-spacing: 0.04em;
   }
@@ -823,12 +680,19 @@
   .modal-close {
     width: 40px;
     height: 40px;
-    border-radius: 999px;
-    border: 1px solid rgba(255,255,255,0.1);
-    background: rgba(255,255,255,0.04);
-    color: var(--text);
-    font: inherit;
+    border-radius: 4px;
+    border: 1px solid rgba(255,153,51,0.15);
+    background: rgba(255,153,51,0.06);
+    color: var(--lcars-orange);
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
     cursor: pointer;
+    transition: 0.15s;
+  }
+
+  .modal-close:hover {
+    background: var(--lcars-orange);
+    color: var(--bg-deep);
   }
 
   .modal-meta {
@@ -846,26 +710,27 @@
 
   .modal-card {
     padding: 16px 16px 14px;
-    border-radius: 20px;
-    border: 1px solid rgba(255,255,255,0.06);
-    background: rgba(255,255,255,0.03);
+    border-radius: var(--radius);
+    border: 1px solid rgba(255,153,51,0.08);
+    background: var(--bg-card);
   }
 
   .modal-label {
-    color: var(--dim);
-    font-size: 0.74rem;
+    color: var(--text-dim);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.62rem;
     letter-spacing: 0.16em;
     text-transform: uppercase;
     margin-bottom: 7px;
   }
 
   .modal-copy {
-    color: var(--text);
+    color: var(--text-bright);
     font-size: 0.98rem;
   }
 
   .modal-copy.muted {
-    color: var(--muted);
+    color: var(--text-mid);
   }
 
   body.modal-open {
@@ -875,20 +740,14 @@
   .empty-state {
     padding: 42px 18px;
     text-align: center;
-    color: var(--muted);
+    color: var(--text-mid);
+    font-family: 'Share Tech Mono', monospace;
   }
 
-  footer {
-    text-align: center;
-    margin-top: 20px;
-    color: var(--dim);
-    font-size: 0.82rem;
-  }
-
+  /* === Responsive === */
   @media (max-width: 1200px) {
-    .hero-grid,
     .summary-shell {
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(2, 1fr);
     }
 
     .control-shell {
@@ -902,25 +761,13 @@
   }
 
   @media (max-width: 760px) {
-    .container {
-      width: min(100vw - 20px, 1520px);
-      padding-top: 12px;
-    }
-
-    header,
-    .control-shell,
-    .week-shell,
-    .agenda-shell {
-      border-radius: 22px;
-    }
-
-    header {
-      padding: 26px 18px 22px;
-    }
-
     .control-shell {
       grid-template-columns: 1fr;
       text-align: center;
+    }
+
+    .summary-shell {
+      grid-template-columns: 1fr;
     }
 
     .week-nav {
@@ -946,119 +793,113 @@
 </style>
 </head>
 <body>
-<div class="container">
-  <header>
-    <div class="kicker">Weekly Ops Board</div>
-    <div class="hero-grid">
-      <div class="hero-copy">
-        <h1><span>NCC</span> Event Calendar</h1>
-        <p>
-          This board is running from a manually entered weekly schedule for now.
-          Instead of waiting on `events.json`, it turns the dates you give directly into a readable
-          seven-day ops calendar, including split schedules like Mar 9,12 or Mar 9-10,14-15.
-        </p>
+
+<div class="lcars-bar">
+  <div class="lcars-cap"></div>
+  <div class="lcars-title-block">
+    <h1>Event Calendar</h1>
+    <span class="subtitle">NCC WEEKLY OPS BOARD</span>
+  </div>
+  <div class="lcars-end"></div>
+</div>
+
+<div class="lcars-layout">
+  <div class="lcars-sidebar">
+    <div class="seg seg-orange" style="height:80px"></div>
+    <div class="seg seg-amber" style="height:40px"></div>
+    <div class="seg seg-blue" style="height:60px"></div>
+    <div class="seg seg-purple" style="height:30px"></div>
+    <div class="seg seg-teal" style="height:50px"></div>
+    <div class="seg seg-amber"></div>
+  </div>
+  <div class="lcars-main">
+    <nav>
+      <a href="index">Tracker</a>
+      <a href="calendar" class="active">Calendar</a>
+      <a href="server" class="nav-admin">Server <span class="nav-lock">&#128274;</span></a>
+      <a href="leaderboard" class="nav-admin">Leaderboard <span class="nav-lock">&#128274;</span></a>
+      <a href="ncc_thc_war">War Tracker</a>
+      <a href="/roe-admin/" class="nav-admin">ROE Violations <span class="nav-lock">&#128274;</span></a>
+      <a href="admin" class="nav-admin">Admin <span class="nav-lock">&#128274;</span></a>
+    </nav>
+
+    <section class="control-shell">
+      <div class="week-nav">
+        <button id="prev-week" type="button">&larr; Prev Week</button>
+        <button id="next-week" type="button">Next Week &rarr;</button>
       </div>
-      <div class="hero-side">
-        <div class="signal-card">
-          <div class="signal-label">Display Mode</div>
-          <div class="signal-value">Manual Week Feed</div>
+      <div class="week-heading">
+        <div class="eyebrow">Weekly Window</div>
+        <div class="range" id="week-range">Loading...</div>
+        <div class="subline" id="week-subline">Loading the current seven-day schedule</div>
+      </div>
+      <div class="filter-shell">
+        <label for="ops-filter">Ops Level Filter</label>
+        <input id="ops-filter" type="number" min="1" max="70" inputmode="numeric" placeholder="Enter your ops level">
+        <div class="filter-hint" id="ops-filter-hint">Showing all ops brackets</div>
+      </div>
+      <div class="capture-pill" id="capture-pill">No schedule loaded</div>
+    </section>
+
+    <section class="summary-shell">
+      <div class="summary-card">
+        <div class="label">Events In Week</div>
+        <div class="value" id="summary-events">0</div>
+        <div class="detail" id="summary-focus">No tactical events loaded</div>
+      </div>
+      <div class="summary-card">
+        <div class="label">Daily Peak</div>
+        <div class="value" id="summary-peak">-</div>
+        <div class="detail" id="summary-peak-detail">No events scheduled</div>
+      </div>
+      <div class="summary-card">
+        <div class="label">Leaderboard Count</div>
+        <div class="value" id="summary-leaderboard">0</div>
+        <div class="detail">SLB, RLB, ALB, AMS entries in this week</div>
+      </div>
+      <div class="summary-card">
+        <div class="label">Primary Lane</div>
+        <div class="value" id="summary-primary">-</div>
+        <div class="detail" id="summary-primary-detail">Waiting on event types</div>
+      </div>
+    </section>
+
+    <section class="week-shell">
+      <div class="section-heading">
+        <div>
+          <h2>Week Schedule</h2>
+          <p>Events render like calendar bars: one rectangle stretches across each contiguous run of days. Click a bar to open the full event summary.</p>
         </div>
-        <div class="signal-card">
-          <div class="signal-label">Data Feed</div>
-          <div class="signal-value" id="feed-status">Loading manual schedule</div>
+      </div>
+      <div class="week-grid" id="week-grid"></div>
+    </section>
+
+    <section class="agenda-shell">
+      <div class="agenda-heading">
+        <div>
+          <h2>Week Agenda</h2>
+          <p>Dense table view for quick scanning. Click a row to open the full event summary.</p>
         </div>
       </div>
-    </div>
-  </header>
-
-  <nav>
-    <a href="index">Tracker</a>
-    <a href="calendar" class="active">Calendar</a>
-    <a href="server" class="nav-admin">Server <span class="nav-lock" aria-hidden="true">&#128274;</span></a>
-    <a href="leaderboard" class="nav-admin">Leaderboard <span class="nav-lock" aria-hidden="true">&#128274;</span></a>
-    <a href="ncc_thc_war">War Tracker</a>
-    <a href="/roe-admin/" class="nav-admin">ROE Violations <span class="nav-lock" aria-hidden="true">&#128274;</span></a>
-    <a href="admin" class="nav-admin">Admin <span class="nav-lock" aria-hidden="true">&#128274;</span></a>
-  </nav>
-
-  <section class="control-shell">
-    <div class="week-nav">
-      <button id="prev-week" type="button">&larr; Prev Week</button>
-      <button id="next-week" type="button">Next Week &rarr;</button>
-    </div>
-    <div class="week-heading">
-      <div class="eyebrow">Weekly Window</div>
-      <div class="range" id="week-range">Loading...</div>
-      <div class="subline" id="week-subline">Loading the current seven-day schedule</div>
-    </div>
-    <div class="filter-shell">
-      <label for="ops-filter">Ops Level Filter</label>
-      <input id="ops-filter" type="number" min="1" max="70" inputmode="numeric" placeholder="Enter your ops level">
-      <div class="filter-hint" id="ops-filter-hint">Showing all ops brackets</div>
-    </div>
-    <div class="capture-pill" id="capture-pill">No schedule loaded</div>
-  </section>
-
-  <section class="summary-shell">
-    <div class="summary-card">
-      <div class="label">Events In Week</div>
-      <div class="value" id="summary-events">0</div>
-      <div class="detail" id="summary-focus">No tactical events loaded</div>
-    </div>
-    <div class="summary-card">
-      <div class="label">Daily Peak</div>
-      <div class="value" id="summary-peak">-</div>
-      <div class="detail" id="summary-peak-detail">No events scheduled</div>
-    </div>
-    <div class="summary-card">
-      <div class="label">Leaderboard Count</div>
-      <div class="value" id="summary-leaderboard">0</div>
-      <div class="detail">SLB, RLB, ALB, AMS entries in this week</div>
-    </div>
-    <div class="summary-card">
-      <div class="label">Primary Lane</div>
-      <div class="value" id="summary-primary">-</div>
-      <div class="detail" id="summary-primary-detail">Waiting on event types</div>
-    </div>
-  </section>
-
-  <section class="week-shell">
-    <div class="section-heading">
-      <div>
-        <h2>Week Schedule</h2>
-        <p>Events render like calendar bars: one rectangle stretches across each contiguous run of days. Click a bar to open the full event summary.</p>
+      <div class="agenda-table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Type</th>
+              <th>Level</th>
+              <th>Title</th>
+              <th>Activity</th>
+            </tr>
+          </thead>
+          <tbody id="agenda-body"></tbody>
+        </table>
       </div>
-    </div>
-    <div class="week-grid" id="week-grid"></div>
-  </section>
+      <div class="status-bar" id="status-bar"></div>
+    </section>
 
-  <section class="agenda-shell">
-    <div class="agenda-heading">
-      <div>
-        <h2>Week Agenda</h2>
-        <p>Dense table view for quick scanning. Click a row to open the full event summary.</p>
-      </div>
-    </div>
-    <div class="agenda-table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Type</th>
-            <th>Level</th>
-            <th>Title</th>
-            <th>Activity</th>
-          </tr>
-        </thead>
-        <tbody id="agenda-body"></tbody>
-      </table>
-    </div>
-    <div class="status-bar" id="status-bar"></div>
-  </section>
-
-  <footer>
-    Weekly event schedule entered directly and shown as a focused ops board.
-  </footer>
+    <footer>Data sourced from Scopely game APIs</footer>
+  </div>
 </div>
 
 <div class="modal-shell" id="event-modal" hidden>
@@ -1396,7 +1237,6 @@ function formatDateSpan(activeDates) {
   const startDate = new Date(startTs * 1000);
   const endDate = new Date(endTs * 1000);
   const startLabel = MONTH_NAMES[startDate.getMonth()] + ' ' + startDate.getDate();
-
   if (startTs === endTs) return startLabel;
   if (startDate.getMonth() === endDate.getMonth()) {
     return startLabel + '-' + endDate.getDate();

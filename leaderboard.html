@@ -4,357 +4,86 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Server 716 Leaderboard</title>
+<link rel="stylesheet" href="lcars.css">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    background: #0a0e17;
-    color: #c8d6e5;
-    min-height: 100vh;
-    line-height: 1.5;
-  }
-
-  .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
-
-  /* Header */
-  header {
-    text-align: center;
-    padding: 30px 0 20px;
-    border-bottom: 1px solid #1a2332;
-    margin-bottom: 24px;
-  }
-  header h1 {
-    font-size: 1.8rem;
-    color: #e2e8f0;
-    letter-spacing: 1px;
-  }
-  header h1 span { color: #4dabf7; }
-  .updated {
-    font-size: 0.85rem;
-    color: #636e7b;
-    margin-top: 6px;
-  }
-
-  /* Nav */
-  nav {
-    display: flex;
-    justify-content: center;
-    gap: 6px;
-    flex-wrap: wrap;
-    margin-bottom: 24px;
-  }
-  nav a {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: #111827;
-    border: 1px solid #1e2d3d;
-    color: #8899aa;
-    padding: 6px 16px;
-    border-radius: 6px;
-    text-decoration: none;
-    font-size: 0.85rem;
-    transition: all 0.15s;
-  }
-  nav a:hover { border-color: #4dabf7; color: #c8d6e5; }
-  nav a.active { background: #4dabf7; color: #0a0e17; border-color: #4dabf7; font-weight: 600; }
-  .nav-lock { font-size: 0.78rem; opacity: 0.75; }
-  .nav-admin::after {
-    content: 'ADMIN';
-    display: inline-flex;
-    align-items: center;
-    padding: 2px 6px;
-    border-radius: 999px;
-    background: #f8717122;
-    border: 1px solid #f8717140;
-    color: #fca5a5;
-    font-size: 0.62rem;
-    letter-spacing: 0.08em;
-  }
-
-  /* Login */
-  #login-gate {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 60vh;
-  }
-  .login-box {
-    background: #111827;
-    border: 1px solid #1e2d3d;
-    border-radius: 12px;
-    padding: 40px;
-    text-align: center;
-    max-width: 360px;
-    width: 100%;
-  }
-  .login-box h2 {
-    color: #e2e8f0;
-    font-size: 1.3rem;
-    margin-bottom: 20px;
-  }
-  .login-box input {
-    width: 100%;
-    padding: 10px 14px;
-    background: #0a0e17;
-    border: 1px solid #1e2d3d;
-    border-radius: 6px;
-    color: #c8d6e5;
-    font-size: 1rem;
-    font-family: inherit;
-    margin-bottom: 14px;
-  }
-  .login-box input:focus {
-    outline: none;
-    border-color: #4dabf7;
-  }
-  .login-box button {
-    width: 100%;
-    padding: 10px;
-    background: #4dabf7;
-    color: #0a0e17;
-    border: none;
-    border-radius: 6px;
-    font-size: 1rem;
-    font-weight: 600;
-    font-family: inherit;
-    cursor: pointer;
-    transition: background 0.15s;
-  }
-  .login-box button:hover { background: #74c0fc; }
-  .login-error {
-    color: #f87171;
-    font-size: 0.85rem;
-    margin-top: 10px;
-    min-height: 1.2em;
-  }
-
-  /* Tabs */
-  .tab-bar {
-    display: flex;
-    gap: 6px;
-    margin-bottom: 24px;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-  .tab-btn {
-    background: #111827;
-    border: 1px solid #1e2d3d;
-    color: #8899aa;
-    padding: 8px 18px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 0.85rem;
-    font-family: inherit;
-    transition: all 0.15s;
-  }
-  .tab-btn:hover { border-color: #4dabf7; color: #c8d6e5; }
-  .tab-btn.active {
-    background: #4dabf7;
-    color: #0a0e17;
-    border-color: #4dabf7;
-    font-weight: 600;
-  }
-
-  /* Tables */
-  .table-wrap {
-    overflow-x: auto;
-    border: 1px solid #1e2d3d;
-    border-radius: 10px;
-  }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  th, td {
-    padding: 10px 14px;
-    text-align: left;
-    white-space: nowrap;
-  }
-  th {
-    background: #111827;
-    color: #8899aa;
-    font-size: 0.78rem;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    cursor: pointer;
-    user-select: none;
-    position: sticky;
-    top: 0;
-  }
-  th:hover { color: #4dabf7; }
-  th .arrow { margin-left: 4px; font-size: 0.7rem; }
-  tr { border-bottom: 1px solid #1a2332; }
-  tr:last-child { border-bottom: none; }
-  tr:hover td { background: #111827; }
-  td { font-size: 0.9rem; }
-  tr.ncc-row td { background: #111d2e; }
-
-  /* Summary cards */
-  .cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 14px;
-    margin-bottom: 20px;
-  }
-  .card {
-    background: #111827;
-    border: 1px solid #1e2d3d;
-    border-radius: 10px;
-    padding: 16px;
-    text-align: center;
-  }
-  .card .label {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: #636e7b;
-    margin-bottom: 4px;
-  }
-  .card .value {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #4dabf7;
-  }
-  .card .sub {
-    font-size: 0.78rem;
-    color: #636e7b;
-    margin-top: 2px;
-  }
-
   /* Search input */
   .search-wrap {
-    margin-bottom: 20px;
+    margin-bottom: 12px;
     text-align: center;
   }
   .search-input {
     width: 100%;
     max-width: 500px;
-    padding: 10px 16px;
-    background: #111827;
-    border: 1px solid #1e2d3d;
-    border-radius: 8px;
-    color: #c8d6e5;
+    padding: 8px 14px;
+    background: var(--bg-input);
+    border: 1px solid rgba(255,153,51,0.12);
+    border-radius: 4px;
+    color: var(--text-bright);
     font-size: 1rem;
-    font-family: inherit;
+    font-family: 'Share Tech Mono', monospace;
   }
   .search-input:focus {
     outline: none;
-    border-color: #4dabf7;
+    border-color: var(--lcars-orange);
   }
   .search-hint {
     font-size: 0.78rem;
-    color: #4a5568;
+    color: var(--text-dim);
     margin-top: 6px;
-  }
-
-  /* Period selector bar */
-  .period-bar {
-    display: flex;
-    justify-content: center;
-    gap: 6px;
-    margin-bottom: 20px;
-  }
-  .period-btn {
-    background: #111827;
-    border: 1px solid #1e2d3d;
-    color: #8899aa;
-    padding: 6px 16px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 0.85rem;
-    font-family: inherit;
-    transition: all 0.15s;
-  }
-  .period-btn:hover { border-color: #4dabf7; color: #c8d6e5; }
-  .period-btn.active {
-    background: #4dabf7;
-    color: #0a0e17;
-    border-color: #4dabf7;
-    font-weight: 600;
-  }
-
-  /* Delta display in table cells */
-  .cell-sub { display: block; font-size: 0.7rem; color: #4a5568; margin-top: 1px; }
-  .cell-delta-main {
-    display: block;
-    font-size: 0.9rem;
-    font-weight: 600;
-  }
-
-  /* Delta colors */
-  .delta-pos { color: #34d399; }
-  .delta-neg { color: #f87171; }
-  .delta-zero { color: #3a4250; }
-
-  /* Player name links */
-  .player-link { color: #4dabf7; text-decoration: none; }
-  .player-link:hover { text-decoration: underline; }
-
-  /* Loading / Error */
-  .loading {
-    text-align: center;
-    padding: 60px 0;
-    color: #636e7b;
-    font-size: 1.1rem;
-  }
-  .error { color: #f87171; }
-
-  .empty {
-    color: #4a5568;
-    font-style: italic;
-    padding: 20px 0;
-    text-align: center;
   }
 
   /* Filter controls */
   .filter-bar {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 20px;
+    gap: 8px;
+    margin-bottom: 12px;
     justify-content: center;
     align-items: center;
   }
   .filter-toggle {
-    background: #111827;
-    border: 1px solid #1e2d3d;
-    color: #8899aa;
+    background: rgba(255,153,51,0.06);
+    border: 1px solid rgba(255,153,51,0.12);
+    color: var(--lcars-gold);
     padding: 6px 14px;
-    border-radius: 6px;
+    border-radius: 4px;
     cursor: pointer;
     font-size: 0.82rem;
-    font-family: inherit;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
     transition: all 0.15s;
   }
-  .filter-toggle:hover { border-color: #4dabf7; color: #c8d6e5; }
+  .filter-toggle:hover {
+    border-color: var(--lcars-orange);
+    color: var(--lcars-orange);
+  }
   .filter-toggle.active {
-    background: #1e3a5f;
-    color: #4dabf7;
-    border-color: #4dabf7;
-    font-weight: 600;
+    background: var(--lcars-orange);
+    color: var(--bg-deep);
+    border-color: var(--lcars-orange);
+    font-weight: 700;
   }
   .filter-input-wrap {
     display: flex;
     align-items: center;
     gap: 6px;
     font-size: 0.82rem;
-    color: #8899aa;
+    color: var(--text-mid);
+    font-family: 'Rajdhani', sans-serif;
   }
   .filter-input-wrap input {
     width: 80px;
     padding: 5px 10px;
-    background: #111827;
-    border: 1px solid #1e2d3d;
-    border-radius: 6px;
-    color: #c8d6e5;
+    background: var(--bg-input);
+    border: 1px solid rgba(255,153,51,0.12);
+    border-radius: 4px;
+    color: var(--text-bright);
     font-size: 0.85rem;
-    font-family: inherit;
+    font-family: 'Share Tech Mono', monospace;
   }
   .filter-input-wrap input:focus {
     outline: none;
-    border-color: #4dabf7;
+    border-color: var(--lcars-orange);
   }
 
   /* Recruit score badges */
@@ -365,75 +94,180 @@
     font-size: 0.75rem;
     font-weight: 700;
     letter-spacing: 0.5px;
+    font-family: 'Share Tech Mono', monospace;
   }
-  .badge-hot { background: #7f1d1d; color: #fca5a5; }
-  .badge-warm { background: #78350f; color: #fcd34d; }
-  .badge-cool { background: #1a3a2a; color: #86efac; }
-  .badge-cold { background: #1e3a5f; color: #93c5fd; }
+  .badge-hot  { background: rgba(255,85,85,0.15); color: var(--lcars-red); border: 1px solid rgba(255,85,85,0.3); }
+  .badge-warm { background: rgba(255,153,51,0.15); color: var(--lcars-orange); border: 1px solid rgba(255,153,51,0.3); }
+  .badge-cool { background: rgba(85,204,85,0.15); color: var(--lcars-green); border: 1px solid rgba(85,204,85,0.3); }
+  .badge-cold { background: rgba(153,153,255,0.15); color: var(--lcars-blue); border: 1px solid rgba(153,153,255,0.3); }
 
   /* Result count */
   .result-count {
     text-align: center;
     font-size: 0.85rem;
-    color: #636e7b;
-    margin-bottom: 12px;
+    color: var(--text-dim);
+    font-family: 'Share Tech Mono', monospace;
+    margin-bottom: 8px;
   }
 
-  /* Footer */
-  footer {
+  /* Login gate */
+  #login-gate {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 60vh;
+  }
+  .login-box {
+    background: var(--bg-panel);
+    border: 1px solid rgba(255,153,51,0.12);
+    border-radius: var(--radius);
+    padding: 40px;
     text-align: center;
-    padding: 24px 0;
-    margin-top: 28px;
-    border-top: 1px solid #1a2332;
-    font-size: 0.8rem;
-    color: #4a5568;
+    max-width: 360px;
+    width: 100%;
   }
-  footer a { color: #4dabf7; text-decoration: none; }
-  footer a:hover { text-decoration: underline; }
+  .login-box h2 {
+    font-family: 'Orbitron', sans-serif;
+    color: var(--lcars-orange);
+    font-size: 1.1rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .login-box input {
+    width: 100%;
+    padding: 10px 14px;
+    background: var(--bg-input);
+    border: 1px solid rgba(255,153,51,0.12);
+    border-radius: 4px;
+    color: var(--text-bright);
+    font-size: 1rem;
+    font-family: 'Share Tech Mono', monospace;
+    margin-bottom: 14px;
+  }
+  .login-box input:focus {
+    outline: none;
+    border-color: var(--lcars-orange);
+  }
+  .login-box button {
+    width: 100%;
+    padding: 10px;
+    background: var(--lcars-orange);
+    color: var(--bg-deep);
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: 700;
+    font-family: 'Rajdhani', sans-serif;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .login-box button:hover { background: var(--lcars-gold); }
+  .login-error {
+    color: var(--lcars-red);
+    font-size: 0.85rem;
+    font-family: 'Share Tech Mono', monospace;
+    margin-top: 10px;
+    min-height: 1.2em;
+  }
 
-  @media (max-width: 600px) {
-    .container { padding: 12px; }
-    header h1 { font-size: 1.3rem; }
-    .filter-bar { gap: 6px; }
+  /* NCC row highlight */
+  tr.ncc-row td { background: rgba(102,204,204,0.04); }
+
+  .empty {
+    color: var(--text-dim);
+    font-style: italic;
+    padding: 20px 0;
+    text-align: center;
+    font-family: 'Share Tech Mono', monospace;
+  }
+
+  /* Tab bar uses period-btn styling */
+  .tab-bar {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .tab-btn {
+    background: rgba(255,153,51,0.06);
+    border: 1px solid rgba(255,153,51,0.12);
+    color: var(--lcars-gold);
+    padding: 6px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    font-family: 'Rajdhani', sans-serif;
+    transition: all 0.15s;
+  }
+  .tab-btn:hover {
+    border-color: var(--lcars-orange);
+    color: var(--lcars-orange);
+  }
+  .tab-btn.active {
+    background: var(--lcars-orange);
+    color: var(--bg-deep);
+    border-color: var(--lcars-orange);
+    font-weight: 700;
   }
 </style>
-<link rel="stylesheet" href="theme.css">
 </head>
 <body>
-<div class="container">
-  <header>
-    <h1><span>Server 716</span> Leaderboard</h1>
+
+<!-- LCARS Top Bar -->
+<div class="lcars-bar">
+  <div class="lcars-cap"></div>
+  <div class="lcars-title-block">
+    <h1>Leaderboard</h1>
+    <span class="subtitle">SERVER 716 RANKINGS</span>
+  </div>
+  <div class="lcars-end"></div>
+</div>
+
+<div class="lcars-layout">
+  <!-- Sidebar -->
+  <div class="lcars-sidebar">
+    <div class="seg seg-orange" style="height:80px"></div>
+    <div class="seg seg-amber" style="height:40px"></div>
+    <div class="seg seg-blue" style="height:60px"></div>
+    <div class="seg seg-purple" style="height:30px"></div>
+    <div class="seg seg-teal" style="height:50px"></div>
+    <div class="seg seg-amber"></div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="lcars-main">
+    <nav>
+      <a href="index">Tracker</a>
+      <a href="calendar">Calendar</a>
+      <a href="server" class="nav-admin">Server <span class="nav-lock">&#128274;</span></a>
+      <a href="leaderboard" class="active nav-admin">Leaderboard <span class="nav-lock">&#128274;</span></a>
+      <a href="ncc_thc_war">War Tracker</a>
+      <a href="/roe-admin/" class="nav-admin">ROE Violations <span class="nav-lock">&#128274;</span></a>
+      <a href="admin" class="nav-admin">Admin <span class="nav-lock">&#128274;</span></a>
+    </nav>
+
     <div class="updated" id="updated"></div>
-  </header>
 
-  <nav>
-    <a href="index">Tracker</a>
-    <a href="calendar">Calendar</a>
-    <a href="server" class="nav-admin">Server <span class="nav-lock" aria-hidden="true">&#128274;</span></a>
-    <a href="leaderboard" class="active nav-admin">Leaderboard <span class="nav-lock" aria-hidden="true">&#128274;</span></a>
-    <a href="ncc_thc_war">War Tracker</a>
-    <a href="/roe-admin/" class="nav-admin">ROE Violations <span class="nav-lock" aria-hidden="true">&#128274;</span></a>
-    <a href="admin" class="nav-admin">Admin <span class="nav-lock" aria-hidden="true">&#128274;</span></a>
-  </nav>
-
-  <div id="login-gate">
-    <div class="login-box">
-      <h2>Player Leaderboard</h2>
-      <input type="password" id="pw-input" placeholder="Enter password" autocomplete="off">
-      <button id="pw-btn">Enter</button>
-      <div class="login-error" id="pw-error"></div>
+    <div id="login-gate">
+      <div class="login-box">
+        <h2>Player Leaderboard</h2>
+        <input type="password" id="pw-input" placeholder="Enter password" autocomplete="off">
+        <button id="pw-btn">Enter</button>
+        <div class="login-error" id="pw-error"></div>
+      </div>
     </div>
-  </div>
 
-  <div id="content" style="display:none">
-    <div class="loading">Loading player data...</div>
-  </div>
+    <div id="content" style="display:none">
+      <div class="loading">Loading player data...</div>
+    </div>
 
-  <footer style="display:none" id="footer-el">
-    Data sourced from Scopely game APIs
-    &middot; <a href="index">Main Dashboard</a>
-    &middot; <a href="server">Server Analytics</a>
-  </footer>
+    <footer style="display:none" id="footer-el">
+      Data sourced from Scopely game APIs
+    </footer>
+  </div>
 </div>
 
 <script>
@@ -751,7 +585,7 @@
     if (playerData.delta_dates) {
       const baseDate = playerData.delta_dates[`${lbPeriod}d`];
       if (baseDate) {
-        html += `<div style="text-align:center;font-size:0.78rem;color:#4a5568;margin-bottom:16px;">Comparing against ${baseDate}</div>`;
+        html += `<div style="text-align:center;font-size:0.78rem;color:var(--text-dim);margin-bottom:16px;">Comparing against ${baseDate}</div>`;
       }
     }
 
@@ -1012,9 +846,9 @@
       // Alliance with member count hint
       if (p.alliance_tag) {
         const mc = allianceMemberCounts[p.alliance_tag] || 0;
-        html += `<td>${esc(p.alliance_tag)} <span style="font-size:0.7rem;color:#4a5568">(${mc})</span></td>`;
+        html += `<td>${esc(p.alliance_tag)} <span style="font-size:0.7rem;color:var(--text-dim)">(${mc})</span></td>`;
       } else {
-        html += '<td><span style="color:#636e7b">None</span></td>';
+        html += '<td><span style="color:var(--text-dim)">None</span></td>';
       }
 
       // Level

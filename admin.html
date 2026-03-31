@@ -4,76 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NCC Admin Dashboard</title>
+<link rel="stylesheet" href="lcars.css">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    background: #0a0e17;
-    color: #c8d6e5;
-    min-height: 100vh;
-    line-height: 1.5;
-  }
-
-  .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
-
-  /* Header */
-  header {
-    text-align: center;
-    padding: 30px 0 20px;
-    border-bottom: 1px solid #1a2332;
-    margin-bottom: 24px;
-  }
-  header h1 {
-    font-size: 1.8rem;
-    color: #e2e8f0;
-    letter-spacing: 1px;
-  }
-  header h1 span { color: #4dabf7; }
-  .updated {
-    font-size: 0.85rem;
-    color: #636e7b;
-    margin-top: 6px;
-  }
-
-  /* Nav */
-  nav {
-    display: flex;
-    justify-content: center;
-    gap: 6px;
-    flex-wrap: wrap;
-    margin-bottom: 24px;
-  }
-  nav a {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: #111827;
-    border: 1px solid #1e2d3d;
-    color: #8899aa;
-    padding: 6px 16px;
-    border-radius: 6px;
-    text-decoration: none;
-    font-size: 0.85rem;
-    transition: all 0.15s;
-  }
-  nav a:hover { border-color: #4dabf7; color: #c8d6e5; }
-  nav a.active { background: #4dabf7; color: #0a0e17; border-color: #4dabf7; font-weight: 600; }
-  .nav-lock { font-size: 0.78rem; opacity: 0.75; }
-  .nav-admin::after {
-    content: 'ADMIN';
-    display: inline-flex;
-    align-items: center;
-    padding: 2px 6px;
-    border-radius: 999px;
-    background: #f8717122;
-    border: 1px solid #f8717140;
-    color: #fca5a5;
-    font-size: 0.62rem;
-    letter-spacing: 0.08em;
-  }
-
-  /* Login */
+  /* Login gate */
   #login-gate {
     display: flex;
     justify-content: center;
@@ -81,96 +14,74 @@
     min-height: 60vh;
   }
   .login-box {
-    background: #111827;
-    border: 1px solid #1e2d3d;
-    border-radius: 12px;
+    background: var(--bg-panel);
+    border: 1px solid rgba(255,153,51,0.12);
+    border-radius: var(--radius);
     padding: 40px;
     text-align: center;
     max-width: 360px;
     width: 100%;
   }
   .login-box h2 {
-    color: #e2e8f0;
-    font-size: 1.3rem;
+    font-family: 'Orbitron', sans-serif;
+    color: var(--lcars-orange);
+    font-size: 1.1rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
     margin-bottom: 20px;
   }
   .login-box input {
     width: 100%;
     padding: 10px 14px;
-    background: #0a0e17;
-    border: 1px solid #1e2d3d;
-    border-radius: 6px;
-    color: #c8d6e5;
+    background: var(--bg-input);
+    border: 1px solid rgba(255,153,51,0.12);
+    border-radius: 4px;
+    color: var(--text-bright);
     font-size: 1rem;
-    font-family: inherit;
+    font-family: 'Share Tech Mono', monospace;
     margin-bottom: 14px;
   }
   .login-box input:focus {
     outline: none;
-    border-color: #4dabf7;
+    border-color: var(--lcars-orange);
   }
   .login-box button {
     width: 100%;
     padding: 10px;
-    background: #4dabf7;
-    color: #0a0e17;
+    background: var(--lcars-orange);
+    color: var(--bg-deep);
     border: none;
-    border-radius: 6px;
+    border-radius: 4px;
     font-size: 1rem;
-    font-weight: 600;
-    font-family: inherit;
+    font-weight: 700;
+    font-family: 'Rajdhani', sans-serif;
     cursor: pointer;
     transition: background 0.15s;
   }
-  .login-box button:hover { background: #74c0fc; }
+  .login-box button:hover { background: var(--lcars-gold); }
   .login-error {
-    color: #f87171;
+    color: var(--lcars-red);
     font-size: 0.85rem;
+    font-family: 'Share Tech Mono', monospace;
     margin-top: 10px;
     min-height: 1.2em;
   }
 
   /* Sections */
   .section {
-    margin-bottom: 32px;
+    margin-bottom: 24px;
   }
   .section-header {
-    font-size: 1.15rem;
-    color: #e2e8f0;
-    font-weight: 600;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #1e2d3d;
-    margin-bottom: 16px;
-  }
-
-  /* Tables */
-  .table-wrap {
-    overflow-x: auto;
-    border: 1px solid #1e2d3d;
-    border-radius: 10px;
-  }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  th, td {
-    padding: 10px 14px;
-    text-align: left;
-    white-space: nowrap;
-  }
-  th {
-    background: #111827;
-    color: #8899aa;
-    font-size: 0.78rem;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--lcars-orange);
     text-transform: uppercase;
-    letter-spacing: 0.8px;
-    position: sticky;
-    top: 0;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255,153,51,0.08);
+    margin-bottom: 12px;
   }
-  tr { border-bottom: 1px solid #1a2332; }
-  tr:last-child { border-bottom: none; }
-  tr:hover td { background: #111827; }
-  td { font-size: 0.9rem; }
 
   /* Activity badges */
   .activity-badge {
@@ -179,34 +90,31 @@
     border-radius: 4px;
     font-size: 0.78rem;
     font-weight: 600;
+    font-family: 'Rajdhani', sans-serif;
   }
-  .activity-high   { background: #0d946822; color: #34d399; border: 1px solid #0d946844; }
-  .activity-medium { background: #d9770622; color: #fb923c; border: 1px solid #d9770644; }
-  .activity-low    { background: #dc262622; color: #f87171; border: 1px solid #dc262644; }
-  .activity-none   { background: #4a556822; color: #636e7b; border: 1px solid #4a556844; }
+  .activity-high   { background: rgba(85,204,85,0.12); color: var(--lcars-green); border: 1px solid rgba(85,204,85,0.25); }
+  .activity-medium { background: rgba(255,153,51,0.12); color: var(--lcars-orange); border: 1px solid rgba(255,153,51,0.25); }
+  .activity-low    { background: rgba(255,85,85,0.12); color: var(--lcars-red); border: 1px solid rgba(255,85,85,0.25); }
+  .activity-none   { background: rgba(85,85,102,0.12); color: var(--text-dim); border: 1px solid rgba(85,85,102,0.25); }
 
-  /* Delta colors */
-  .delta-pos { color: #34d399; }
-  .delta-neg { color: #f87171; }
-  .delta-zero { color: #3a4250; }
-
-  /* Cards grid for bottom contributors */
+  /* Mini cards */
   .mini-cards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 16px;
+    gap: 12px;
   }
   .mini-card {
-    background: #111827;
-    border: 1px solid #1e2d3d;
-    border-radius: 10px;
+    background: var(--bg-card);
+    border: 1px solid rgba(255,153,51,0.08);
+    border-radius: var(--radius);
     padding: 16px;
   }
   .mini-card h3 {
-    font-size: 0.85rem;
-    color: #8899aa;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.65rem;
+    color: var(--text-mid);
     text-transform: uppercase;
-    letter-spacing: 0.8px;
+    letter-spacing: 1.5px;
     margin-bottom: 10px;
   }
   .mini-card ol {
@@ -219,37 +127,40 @@
     font-size: 0.88rem;
     display: flex;
     justify-content: space-between;
-    border-bottom: 1px solid #1a2332;
+    border-bottom: 1px solid rgba(255,153,51,0.04);
   }
   .mini-card ol li:last-child { border-bottom: none; }
   .mini-card ol li::before {
     content: counter(rank) ".";
-    color: #636e7b;
+    color: var(--text-dim);
     margin-right: 8px;
     font-weight: 600;
     min-width: 1.5em;
+    font-family: 'Share Tech Mono', monospace;
   }
   .mini-card .li-name { flex: 1; }
   .mini-card .li-val {
-    color: #636e7b;
+    color: var(--text-dim);
     font-variant-numeric: tabular-nums;
+    font-family: 'Share Tech Mono', monospace;
   }
 
   /* Activity distribution */
   .activity-dist {
     display: flex;
-    gap: 14px;
+    gap: 12px;
     flex-wrap: wrap;
   }
   .activity-dist-item {
-    background: #111827;
-    border: 1px solid #1e2d3d;
-    border-radius: 10px;
+    background: var(--bg-card);
+    border: 1px solid rgba(255,153,51,0.08);
+    border-radius: var(--radius);
     padding: 16px 24px;
     text-align: center;
     min-width: 120px;
   }
   .activity-dist-item .rd-count {
+    font-family: 'Share Tech Mono', monospace;
     font-size: 1.8rem;
     font-weight: 700;
     margin-bottom: 4px;
@@ -257,120 +168,123 @@
   .activity-dist-item .rd-label {
     font-size: 0.8rem;
     font-weight: 600;
+    font-family: 'Rajdhani', sans-serif;
   }
 
   /* Power movers grid */
   .movers-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 16px;
+    gap: 12px;
   }
 
   /* Empty state */
   .empty {
-    color: #4a5568;
+    color: var(--text-dim);
     font-style: italic;
     padding: 12px 0;
+    font-family: 'Share Tech Mono', monospace;
   }
 
-  /* Player name links */
-  .player-link { color: #4dabf7; text-decoration: none; }
-  .player-link:hover { text-decoration: underline; }
-
   /* Inventory */
-  .inv-date { color: #636e7b; font-size: 0.85rem; margin-bottom: 10px; }
+  .inv-date {
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    font-family: 'Share Tech Mono', monospace;
+    margin-bottom: 10px;
+  }
   .section-note {
-    color: #8fa6bb;
+    color: var(--text-mid);
     font-size: 0.92rem;
     margin-bottom: 14px;
   }
+
+  /* ROE stat cards */
   .stat-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 14px;
+    gap: 10px;
     margin-bottom: 16px;
   }
   .stat-card {
-    background:
-      linear-gradient(160deg, rgba(77,171,247,0.12), rgba(17,24,39,0.85)),
-      #111827;
-    border: 1px solid #1e2d3d;
-    border-radius: 12px;
+    background: var(--bg-panel);
+    border: 1px solid rgba(255,85,85,0.15);
+    border-left: 3px solid var(--lcars-red);
+    border-radius: var(--radius);
     padding: 16px 18px;
     min-height: 98px;
-    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22);
   }
   .stat-label {
-    color: #8fa6bb;
-    font-size: 0.76rem;
+    font-family: 'Orbitron', sans-serif;
+    color: var(--text-dim);
+    font-size: 0.62rem;
     text-transform: uppercase;
-    letter-spacing: 1.1px;
+    letter-spacing: 1.5px;
     margin-bottom: 8px;
   }
   .stat-value {
-    color: #f8fbff;
+    color: var(--text-bright);
+    font-family: 'Share Tech Mono', monospace;
     font-size: 1.9rem;
     font-weight: 700;
     line-height: 1;
     margin-bottom: 6px;
   }
   .stat-sub {
-    color: #6f8498;
+    color: var(--text-dim);
     font-size: 0.82rem;
+    font-family: 'Share Tech Mono', monospace;
   }
-  .cmd-box {
-    background: linear-gradient(180deg, rgba(18, 28, 43, 0.98), rgba(9, 14, 23, 0.98));
-    border: 1px solid #23405c;
-    border-radius: 12px;
-    padding: 14px 16px;
-    margin-bottom: 18px;
-    overflow-x: auto;
-  }
-  .cmd-box code {
-    color: #8fe0ff;
-    font-size: 0.9rem;
-    font-family: Consolas, 'Courier New', monospace;
-    white-space: nowrap;
-  }
+
+  /* ROE action link */
   .section-action-link {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 10px 14px;
-    border-radius: 999px;
-    background: linear-gradient(135deg, rgba(77,171,247,0.18), rgba(77,171,247,0.08));
-    border: 1px solid #27527b;
-    color: #a8dbff;
+    padding: 8px 14px;
+    border-radius: 4px;
+    background: rgba(255,153,51,0.06);
+    border: 1px solid rgba(255,153,51,0.15);
+    color: var(--lcars-gold);
     text-decoration: none;
     font-size: 0.88rem;
     font-weight: 600;
-    margin-bottom: 18px;
+    font-family: 'Rajdhani', sans-serif;
+    margin-bottom: 14px;
+    transition: all 0.15s;
   }
   .section-action-link:hover {
-    border-color: #4dabf7;
-    color: #d7efff;
+    border-color: var(--lcars-orange);
+    color: var(--lcars-orange);
   }
+
+  /* Cell helpers */
   .cell-sub {
     display: block;
-    color: #6f8498;
+    color: var(--text-dim);
     font-size: 0.78rem;
     margin-top: 2px;
   }
+
+  /* Alliance chip */
   .alliance-chip {
     display: inline-block;
     padding: 2px 8px;
     border-radius: 999px;
-    border: 1px solid #27435e;
-    background: rgba(77, 171, 247, 0.12);
-    color: #9bd3ff;
+    border: 1px solid rgba(102,204,204,0.25);
+    background: rgba(102,204,204,0.08);
+    color: var(--lcars-teal);
     font-size: 0.76rem;
     font-weight: 600;
     letter-spacing: 0.4px;
+    font-family: 'Share Tech Mono', monospace;
   }
+
+  /* Notes and screenshots */
   .notes-cell {
     max-width: 320px;
     white-space: normal;
-    color: #b9c8d6;
+    color: var(--text-mid);
   }
   .screenshot-cell {
     min-width: 180px;
@@ -380,10 +294,10 @@
     width: 72px;
     height: 72px;
     margin: 0 8px 8px 0;
-    border-radius: 14px;
+    border-radius: var(--radius);
     overflow: hidden;
-    border: 1px solid #27435e;
-    background: rgba(10, 14, 24, 0.9);
+    border: 1px solid rgba(255,153,51,0.12);
+    background: var(--bg-deep);
   }
   .screenshot-thumb img {
     width: 100%;
@@ -392,69 +306,81 @@
     display: block;
   }
 
-  /* Loading / Error */
-  .loading {
-    text-align: center;
-    padding: 60px 0;
-    color: #636e7b;
-    font-size: 1.1rem;
+  /* Command box */
+  .cmd-box {
+    background: var(--bg-input);
+    border: 1px solid rgba(255,153,51,0.12);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-bottom: 14px;
+    overflow-x: auto;
   }
-  .error { color: #f87171; }
-
-  /* Footer */
-  footer {
-    text-align: center;
-    padding: 24px 0;
-    margin-top: 28px;
-    border-top: 1px solid #1a2332;
-    font-size: 0.8rem;
-    color: #4a5568;
+  .cmd-box code {
+    color: var(--lcars-teal);
+    font-size: 0.9rem;
+    font-family: 'Share Tech Mono', monospace;
+    white-space: nowrap;
   }
-  footer a { color: #4dabf7; text-decoration: none; }
-  footer a:hover { text-decoration: underline; }
 
   @media (max-width: 600px) {
-    .container { padding: 12px; }
-    header h1 { font-size: 1.3rem; }
     .movers-grid { grid-template-columns: 1fr; }
   }
 </style>
-<link rel="stylesheet" href="theme.css">
 </head>
 <body>
-<div class="container">
-  <header>
-    <h1><span>NCC</span> Admin Dashboard</h1>
+
+<!-- LCARS Top Bar -->
+<div class="lcars-bar">
+  <div class="lcars-cap"></div>
+  <div class="lcars-title-block">
+    <h1>Admin</h1>
+    <span class="subtitle">ALLIANCE OVERSIGHT</span>
+  </div>
+  <div class="lcars-end"></div>
+</div>
+
+<div class="lcars-layout">
+  <!-- Sidebar -->
+  <div class="lcars-sidebar">
+    <div class="seg seg-orange" style="height:80px"></div>
+    <div class="seg seg-amber" style="height:40px"></div>
+    <div class="seg seg-blue" style="height:60px"></div>
+    <div class="seg seg-purple" style="height:30px"></div>
+    <div class="seg seg-teal" style="height:50px"></div>
+    <div class="seg seg-amber"></div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="lcars-main">
+    <nav>
+      <a href="index">Tracker</a>
+      <a href="calendar">Calendar</a>
+      <a href="server" class="nav-admin">Server <span class="nav-lock">&#128274;</span></a>
+      <a href="leaderboard" class="nav-admin">Leaderboard <span class="nav-lock">&#128274;</span></a>
+      <a href="ncc_thc_war">War Tracker</a>
+      <a href="/roe-admin/" class="nav-admin">ROE Violations <span class="nav-lock">&#128274;</span></a>
+      <a href="admin" class="active nav-admin">Admin <span class="nav-lock">&#128274;</span></a>
+    </nav>
+
     <div class="updated" id="updated"></div>
-  </header>
 
-  <nav>
-    <a href="index">Tracker</a>
-    <a href="calendar">Calendar</a>
-    <a href="server" class="nav-admin">Server <span class="nav-lock" aria-hidden="true">&#128274;</span></a>
-    <a href="leaderboard" class="nav-admin">Leaderboard <span class="nav-lock" aria-hidden="true">&#128274;</span></a>
-    <a href="ncc_thc_war">War Tracker</a>
-    <a href="/roe-admin/" class="nav-admin">ROE Violations <span class="nav-lock" aria-hidden="true">&#128274;</span></a>
-    <a href="admin" class="active nav-admin">Admin <span class="nav-lock" aria-hidden="true">&#128274;</span></a>
-  </nav>
-
-  <div id="login-gate">
-    <div class="login-box">
-      <h2>Alliance Leaders Only</h2>
-      <input type="password" id="pw-input" placeholder="Enter password" autocomplete="off">
-      <button id="pw-btn">Enter</button>
-      <div class="login-error" id="pw-error"></div>
+    <div id="login-gate">
+      <div class="login-box">
+        <h2>Alliance Leaders Only</h2>
+        <input type="password" id="pw-input" placeholder="Enter password" autocomplete="off">
+        <button id="pw-btn">Enter</button>
+        <div class="login-error" id="pw-error"></div>
+      </div>
     </div>
-  </div>
 
-  <div id="content" style="display:none">
-    <div class="loading">Loading alliance data...</div>
-  </div>
+    <div id="content" style="display:none">
+      <div class="loading">Loading alliance data...</div>
+    </div>
 
-  <footer style="display:none" id="footer-el">
-    Data sourced from Scopely game APIs
-    &middot; <a href="index.html">Main Dashboard</a>
-  </footer>
+    <footer style="display:none" id="footer-el">
+      Data sourced from Scopely game APIs
+    </footer>
+  </div>
 </div>
 
 <script>
@@ -807,7 +733,7 @@
           <td><span class="${activityClass(score)}">${activityLabel(score)}</span></td>
           <td>${esc(m.level)}</td>
           <td>${esc(m.power)}</td>
-          <td style="color:#f87171; font-weight:600">${m.daysInactive}</td>
+          <td style="color:var(--lcars-red); font-weight:600">${m.daysInactive}</td>
         </tr>`;
       }
       s += '</tbody></table></div>';

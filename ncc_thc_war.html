@@ -3,246 +3,73 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>THC War Tracker</title>
+<title>War Tracker - NCC vs THC</title>
+<link rel="stylesheet" href="lcars.css">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    background: #0a0e17;
-    color: #c8d6e5;
-    min-height: 100vh;
-    line-height: 1.5;
-  }
-
-  .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
-
-  /* Header */
-  header {
+  /* Matchup subtitle */
+  .matchup-subtitle {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.85rem;
+    color: var(--text-mid);
+    margin: 4px 0 8px;
     text-align: center;
-    padding: 30px 0 20px;
-    border-bottom: 1px solid #1a2332;
-    margin-bottom: 24px;
-  }
-  header h1 {
-    font-size: 1.8rem;
-    color: #e2e8f0;
     letter-spacing: 1px;
   }
-  header h1 span { color: #4dabf7; }
-  .updated {
-    font-size: 0.85rem;
-    color: #636e7b;
-    margin-top: 6px;
-  }
-  .matchup-subtitle {
-    font-size: 1.1rem;
-    color: #8899aa;
-    margin-top: 8px;
-    letter-spacing: 0.5px;
-  }
-  .matchup-subtitle .team-a { color: #4dabf7; font-weight: 600; }
-  .matchup-subtitle .team-b { color: #fb923c; font-weight: 600; }
-  .matchup-subtitle .vs { color: #636e7b; margin: 0 6px; }
+  .matchup-subtitle .team-a { color: var(--lcars-teal); font-weight: 700; }
+  .matchup-subtitle .team-b { color: var(--lcars-orange); font-weight: 700; }
+  .matchup-subtitle .vs { color: var(--text-dim); margin: 0 8px; }
 
-  .login-box {
-    background: #111827;
-    border: 1px solid #1e2d3d;
-    border-radius: 12px;
-    padding: 40px;
-    text-align: center;
-    max-width: 360px;
-    width: 100%;
-  }
-  .login-box h2 {
-    color: #e2e8f0;
-    font-size: 1.3rem;
-    margin-bottom: 20px;
-  }
-  .login-box input {
-    width: 100%;
-    padding: 10px 14px;
-    background: #0a0e17;
-    border: 1px solid #1e2d3d;
-    border-radius: 6px;
-    color: #c8d6e5;
-    font-size: 1rem;
-    font-family: inherit;
-    margin-bottom: 14px;
-  }
-  .login-box input:focus {
-    outline: none;
-    border-color: #4dabf7;
-  }
-  .login-box button {
-    width: 100%;
-    padding: 10px;
-    background: #4dabf7;
-    color: #0a0e17;
-    border: none;
-    border-radius: 6px;
-    font-size: 1rem;
-    font-weight: 600;
-    font-family: inherit;
-    cursor: pointer;
-    transition: background 0.15s;
-  }
-  .login-box button:hover { background: #74c0fc; }
-  .login-error {
-    color: #f87171;
-    font-size: 0.85rem;
-    margin-top: 10px;
-    min-height: 1.2em;
-  }
-
-  /* Tabs */
+  /* Tab bar uses period-btn styling */
   .tab-bar {
     display: flex;
-    gap: 6px;
-    margin-bottom: 24px;
+    gap: 4px;
+    margin-bottom: 12px;
     flex-wrap: wrap;
     justify-content: center;
   }
   .tab-btn {
-    background: #111827;
-    border: 1px solid #1e2d3d;
-    color: #8899aa;
-    padding: 8px 18px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 0.85rem;
-    font-family: inherit;
-    transition: all 0.15s;
-  }
-  .tab-btn:hover { border-color: #4dabf7; color: #c8d6e5; }
-  .tab-btn.active {
-    background: #4dabf7;
-    color: #0a0e17;
-    border-color: #4dabf7;
-    font-weight: 600;
-  }
-
-  /* Period selector */
-  .period-bar {
-    display: flex;
-    justify-content: center;
-    gap: 6px;
-    margin-bottom: 24px;
-  }
-  .period-btn {
-    background: #111827;
-    border: 1px solid #1e2d3d;
-    color: #8899aa;
+    background: rgba(255,153,51,0.06);
+    border: 1px solid rgba(255,153,51,0.12);
+    color: var(--lcars-gold);
     padding: 6px 16px;
-    border-radius: 6px;
+    border-radius: 4px;
     cursor: pointer;
     font-size: 0.85rem;
-    font-family: inherit;
+    font-weight: 600;
+    font-family: 'Rajdhani', sans-serif;
     transition: all 0.15s;
   }
-  .period-btn:hover { border-color: #4dabf7; color: #c8d6e5; }
-  .period-btn.active {
-    background: #4dabf7;
-    color: #0a0e17;
-    border-color: #4dabf7;
-    font-weight: 600;
+  .tab-btn:hover {
+    border-color: var(--lcars-orange);
+    color: var(--lcars-orange);
   }
-
-  /* Summary cards */
-  .cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 14px;
-    margin-bottom: 20px;
-  }
-  .card {
-    background: #111827;
-    border: 1px solid #1e2d3d;
-    border-radius: 10px;
-    padding: 16px;
-    text-align: center;
-  }
-  .card .label {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: #636e7b;
-    margin-bottom: 4px;
-  }
-  .card .value {
-    font-size: 1.5rem;
+  .tab-btn.active {
+    background: var(--lcars-orange);
+    color: var(--bg-deep);
+    border-color: var(--lcars-orange);
     font-weight: 700;
-    color: #4dabf7;
   }
-  .card .delta {
-    font-size: 0.8rem;
-    margin-top: 2px;
-    min-height: 1.2em;
-  }
-
-  /* Tables */
-  .table-wrap {
-    overflow-x: auto;
-    border: 1px solid #1e2d3d;
-    border-radius: 10px;
-  }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  th, td {
-    padding: 10px 14px;
-    text-align: left;
-    white-space: nowrap;
-  }
-  th {
-    background: #111827;
-    color: #8899aa;
-    font-size: 0.78rem;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    cursor: pointer;
-    user-select: none;
-    position: sticky;
-    top: 0;
-  }
-  th:hover { color: #4dabf7; }
-  th .arrow { margin-left: 4px; font-size: 0.7rem; }
-  tr { border-bottom: 1px solid #1a2332; }
-  tr:last-child { border-bottom: none; }
-  tr:hover td { background: #111827; }
-  td { font-size: 0.9rem; }
-
-  /* Delta colors */
-  .delta-pos { color: #34d399; }
-  .delta-neg { color: #f87171; }
-  .delta-zero { color: #4a5568; }
-
-  /* Player link */
-  .player-link {
-    color: #4dabf7;
-    text-decoration: none;
-  }
-  .player-link:hover { text-decoration: underline; }
 
   /* Comparison bars */
   .compare-section {
-    margin-bottom: 28px;
+    margin-bottom: 20px;
   }
   .compare-row {
     margin-bottom: 16px;
   }
   .compare-label {
-    font-size: 0.78rem;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.65rem;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    color: #636e7b;
+    letter-spacing: 1.5px;
+    color: var(--text-dim);
     margin-bottom: 6px;
     display: flex;
     justify-content: space-between;
     align-items: center;
   }
   .compare-label .advantage {
+    font-family: 'Rajdhani', sans-serif;
     font-size: 0.7rem;
     padding: 2px 8px;
     border-radius: 4px;
@@ -250,9 +77,9 @@
     letter-spacing: 0;
     text-transform: none;
   }
-  .advantage-a { background: #4dabf722; color: #4dabf7; }
-  .advantage-b { background: #fb923c22; color: #fb923c; }
-  .advantage-tie { background: #4a556822; color: #4a5568; }
+  .advantage-a { background: rgba(102,204,204,0.12); color: var(--lcars-teal); }
+  .advantage-b { background: rgba(255,153,51,0.12); color: var(--lcars-orange); }
+  .advantage-tie { background: rgba(85,85,102,0.15); color: var(--text-dim); }
 
   .bar-pair {
     display: flex;
@@ -265,15 +92,16 @@
     gap: 10px;
   }
   .bar-tag {
-    font-size: 0.78rem;
-    font-weight: 600;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 700;
     width: 40px;
     text-align: right;
     flex-shrink: 0;
   }
   .bar-track {
     flex: 1;
-    background: #1a2332;
+    background: rgba(255,153,51,0.06);
     border-radius: 4px;
     height: 24px;
     position: relative;
@@ -284,15 +112,16 @@
     border-radius: 4px;
     transition: width 0.4s ease;
   }
-  .bar-fill-a { background: #4dabf7; }
-  .bar-fill-b { background: #fb923c; }
+  .bar-fill-a { background: var(--lcars-teal); }
+  .bar-fill-b { background: var(--lcars-orange); }
   .bar-value {
+    font-family: 'Share Tech Mono', monospace;
     font-size: 0.82rem;
     width: 80px;
     flex-shrink: 0;
   }
-  .bar-value-a { color: #4dabf7; }
-  .bar-value-b { color: #fb923c; }
+  .bar-value-a { color: var(--lcars-teal); }
+  .bar-value-b { color: var(--lcars-orange); }
 
   /* Scorecard */
   .scorecard {
@@ -300,48 +129,55 @@
     justify-content: center;
     align-items: center;
     gap: 32px;
-    margin-bottom: 28px;
+    margin-bottom: 20px;
     padding: 20px;
-    background: #111827;
-    border: 1px solid #1e2d3d;
-    border-radius: 10px;
+    background: var(--bg-panel);
+    border: 1px solid rgba(255,153,51,0.08);
+    border-radius: var(--radius);
   }
   .scorecard-team {
     text-align: center;
   }
   .scorecard-tag {
-    font-size: 1.4rem;
-    font-weight: 700;
-    letter-spacing: 1px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 900;
+    letter-spacing: 2px;
   }
-  .scorecard-tag-a { color: #4dabf7; }
-  .scorecard-tag-b { color: #fb923c; }
+  .scorecard-tag-a { color: var(--lcars-teal); }
+  .scorecard-tag-b { color: var(--lcars-orange); }
   .scorecard-name {
-    font-size: 0.78rem;
-    color: #636e7b;
+    font-size: 0.72rem;
+    color: var(--text-dim);
     margin-top: 2px;
+    font-family: 'Share Tech Mono', monospace;
   }
   .scorecard-stat {
+    font-family: 'Share Tech Mono', monospace;
     font-size: 2rem;
     font-weight: 700;
     margin-top: 4px;
   }
   .scorecard-divider {
+    font-family: 'Orbitron', sans-serif;
     font-size: 1.2rem;
-    color: #4a5568;
+    color: var(--text-dim);
     font-weight: 700;
     letter-spacing: 2px;
   }
 
   /* Section headers */
   .section-header {
-    font-size: 1rem;
-    font-weight: 600;
-    color: #8899aa;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--lcars-orange);
+    text-transform: uppercase;
     padding-bottom: 8px;
-    border-bottom: 1px solid #1a2332;
-    margin-bottom: 16px;
-    margin-top: 28px;
+    border-bottom: 1px solid rgba(255,153,51,0.08);
+    margin-bottom: 12px;
+    margin-top: 20px;
   }
   .section-header:first-child { margin-top: 0; }
 
@@ -349,77 +185,138 @@
   .dual-tables {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 20px;
+    gap: 12px;
   }
   .dual-tables .table-label {
-    font-size: 0.82rem;
-    font-weight: 600;
-    margin-bottom: 8px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
     padding: 6px 12px;
-    border-radius: 6px;
+    border-radius: 4px;
   }
-  .table-label-a { color: #4dabf7; background: #4dabf712; border: 1px solid #4dabf730; }
-  .table-label-b { color: #fb923c; background: #fb923c12; border: 1px solid #fb923c30; }
+  .table-label-a { color: var(--lcars-teal); background: rgba(102,204,204,0.08); border: 1px solid rgba(102,204,204,0.2); }
+  .table-label-b { color: var(--lcars-orange); background: rgba(255,153,51,0.08); border: 1px solid rgba(255,153,51,0.2); }
 
-  /* Gain cell */
-  .cell-delta-main { display: block; font-weight: 600; font-size: 0.88rem; }
-  .cell-sub { display: block; font-size: 0.72rem; color: #636e7b; }
-
-  /* Loading */
-  .loading {
-    text-align: center;
-    padding: 40px;
-    color: #636e7b;
-    font-size: 1.1rem;
-  }
-  .error { color: #f87171; }
   .empty {
-    color: #4a5568;
+    color: var(--text-dim);
     font-style: italic;
     padding: 20px 0;
     text-align: center;
+    font-family: 'Share Tech Mono', monospace;
   }
 
-  /* Footer */
-  footer {
+  /* Login */
+  .login-box {
+    background: var(--bg-panel);
+    border: 1px solid rgba(255,153,51,0.12);
+    border-radius: var(--radius);
+    padding: 40px;
     text-align: center;
-    padding: 24px 0;
-    margin-top: 28px;
-    border-top: 1px solid #1a2332;
-    font-size: 0.8rem;
-    color: #4a5568;
+    max-width: 360px;
+    width: 100%;
   }
-  footer a { color: #4dabf7; text-decoration: none; }
-  footer a:hover { text-decoration: underline; }
+  .login-box h2 {
+    font-family: 'Orbitron', sans-serif;
+    color: var(--lcars-orange);
+    font-size: 1.1rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .login-box input {
+    width: 100%;
+    padding: 10px 14px;
+    background: var(--bg-input);
+    border: 1px solid rgba(255,153,51,0.12);
+    border-radius: 4px;
+    color: var(--text-bright);
+    font-size: 1rem;
+    font-family: 'Share Tech Mono', monospace;
+    margin-bottom: 14px;
+  }
+  .login-box input:focus {
+    outline: none;
+    border-color: var(--lcars-orange);
+  }
+  .login-box button {
+    width: 100%;
+    padding: 10px;
+    background: var(--lcars-orange);
+    color: var(--bg-deep);
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: 700;
+    font-family: 'Rajdhani', sans-serif;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .login-box button:hover { background: var(--lcars-gold); }
+  .login-error {
+    color: var(--lcars-red);
+    font-size: 0.85rem;
+    font-family: 'Share Tech Mono', monospace;
+    margin-top: 10px;
+    min-height: 1.2em;
+  }
 
   @media (max-width: 600px) {
-    .container { padding: 12px; }
-    header h1 { font-size: 1.3rem; }
     .dual-tables { grid-template-columns: 1fr; }
     .scorecard { gap: 16px; }
     .scorecard-stat { font-size: 1.4rem; }
   }
 </style>
-<link rel="stylesheet" href="theme.css">
 </head>
 <body>
-<div class="container">
-  <header>
-    <h1><span>THC</span> War Tracker</h1>
+
+<!-- LCARS Top Bar -->
+<div class="lcars-bar">
+  <div class="lcars-cap"></div>
+  <div class="lcars-title-block">
+    <h1>War Tracker</h1>
+    <span class="subtitle">NCC vs THC</span>
+  </div>
+  <div class="lcars-end"></div>
+</div>
+
+<div class="lcars-layout">
+  <!-- Sidebar -->
+  <div class="lcars-sidebar">
+    <div class="seg seg-orange" style="height:80px"></div>
+    <div class="seg seg-amber" style="height:40px"></div>
+    <div class="seg seg-blue" style="height:60px"></div>
+    <div class="seg seg-purple" style="height:30px"></div>
+    <div class="seg seg-teal" style="height:50px"></div>
+    <div class="seg seg-amber"></div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="lcars-main">
+    <nav>
+      <a href="index">Tracker</a>
+      <a href="calendar">Calendar</a>
+      <a href="server" class="nav-admin">Server <span class="nav-lock">&#128274;</span></a>
+      <a href="leaderboard" class="nav-admin">Leaderboard <span class="nav-lock">&#128274;</span></a>
+      <a href="ncc_thc_war" class="active">War Tracker</a>
+      <a href="/roe-admin/" class="nav-admin">ROE Violations <span class="nav-lock">&#128274;</span></a>
+      <a href="admin" class="nav-admin">Admin <span class="nav-lock">&#128274;</span></a>
+    </nav>
+
     <div class="matchup-subtitle">
       <span class="team-a">NCC</span><span class="vs">vs</span><span class="team-b">THC</span>
     </div>
     <div class="updated" id="updated"></div>
-  </header>
 
-  <div id="content">
-    <div class="loading">Loading war tracker data...</div>
+    <div id="content">
+      <div class="loading">Loading war tracker data...</div>
+    </div>
+
+    <footer id="footer-el">
+      Data sourced from Scopely game APIs
+    </footer>
   </div>
-
-  <footer id="footer-el">
-    Data sourced from Scopely game APIs
-    &middot; <a href="index">Main Dashboard</a>
-  </footer>
 </div>
 
 <script>
@@ -495,13 +392,13 @@
     html += '<div class="bar-pair">';
 
     html += '<div class="bar-row">';
-    html += '<span class="bar-tag" style="color:#4dabf7">NCC</span>';
+    html += '<span class="bar-tag" style="color:var(--lcars-teal)">NCC</span>';
     html += `<div class="bar-track"><div class="bar-fill bar-fill-a" style="width:${pctA}%"></div></div>`;
     html += `<span class="bar-value bar-value-a">${formatAbbr(va)}</span>`;
     html += '</div>';
 
     html += '<div class="bar-row">';
-    html += '<span class="bar-tag" style="color:#fb923c">THC</span>';
+    html += '<span class="bar-tag" style="color:var(--lcars-orange)">THC</span>';
     html += `<div class="bar-track"><div class="bar-fill bar-fill-b" style="width:${pctB}%"></div></div>`;
     html += `<span class="bar-value bar-value-b">${formatAbbr(vb)}</span>`;
     html += '</div>';
@@ -627,25 +524,25 @@
 
     html += '<div class="card">';
     html += `<div class="label">NCC PVP Kills (${periodShort()})</div>`;
-    html += `<div class="value" style="color:#4dabf7">${formatAbbr(nccPvpDelta)}</div>`;
+    html += `<div class="value" style="color:var(--lcars-teal)">${formatAbbr(nccPvpDelta)}</div>`;
     html += `<div class="delta">Total: ${formatAbbr(ncc.total_pvp)}</div>`;
     html += '</div>';
 
     html += '<div class="card">';
     html += `<div class="label">THC PVP Kills (${periodShort()})</div>`;
-    html += `<div class="value" style="color:#fb923c">${formatAbbr(thcPvpDelta)}</div>`;
+    html += `<div class="value" style="color:var(--lcars-orange)">${formatAbbr(thcPvpDelta)}</div>`;
     html += `<div class="delta">Total: ${formatAbbr(thc.total_pvp)}</div>`;
     html += '</div>';
 
     html += '<div class="card">';
     html += `<div class="label">NCC Raided (${periodShort()})</div>`;
-    html += `<div class="value" style="color:#4dabf7">${formatAbbr(nccRaidDelta)}</div>`;
+    html += `<div class="value" style="color:var(--lcars-teal)">${formatAbbr(nccRaidDelta)}</div>`;
     html += `<div class="delta">Total: ${formatAbbr(ncc.total_raided)}</div>`;
     html += '</div>';
 
     html += '<div class="card">';
     html += `<div class="label">THC Raided (${periodShort()})</div>`;
-    html += `<div class="value" style="color:#fb923c">${formatAbbr(thcRaidDelta)}</div>`;
+    html += `<div class="value" style="color:var(--lcars-orange)">${formatAbbr(thcRaidDelta)}</div>`;
     html += `<div class="delta">Total: ${formatAbbr(thc.total_raided)}</div>`;
     html += '</div>';
 
@@ -728,25 +625,25 @@
 
     html += '<div class="card">';
     html += `<div class="label">NCC Hostiles Killed (${periodShort()})</div>`;
-    html += `<div class="value" style="color:#4dabf7">${formatAbbr(nccHkDelta)}</div>`;
+    html += `<div class="value" style="color:var(--lcars-teal)">${formatAbbr(nccHkDelta)}</div>`;
     html += `<div class="delta">Total: ${formatAbbr(ncc.total_hk)}</div>`;
     html += '</div>';
 
     html += '<div class="card">';
     html += `<div class="label">THC Hostiles Killed (${periodShort()})</div>`;
-    html += `<div class="value" style="color:#fb923c">${formatAbbr(thcHkDelta)}</div>`;
+    html += `<div class="value" style="color:var(--lcars-orange)">${formatAbbr(thcHkDelta)}</div>`;
     html += `<div class="delta">Total: ${formatAbbr(thc.total_hk)}</div>`;
     html += '</div>';
 
     html += '<div class="card">';
     html += `<div class="label">NCC Mined (${periodShort()})</div>`;
-    html += `<div class="value" style="color:#4dabf7">${formatAbbr(nccMinedDelta)}</div>`;
+    html += `<div class="value" style="color:var(--lcars-teal)">${formatAbbr(nccMinedDelta)}</div>`;
     html += `<div class="delta">Total: ${formatAbbr(ncc.total_mined)}</div>`;
     html += '</div>';
 
     html += '<div class="card">';
     html += `<div class="label">THC Mined (${periodShort()})</div>`;
-    html += `<div class="value" style="color:#fb923c">${formatAbbr(thcMinedDelta)}</div>`;
+    html += `<div class="value" style="color:var(--lcars-orange)">${formatAbbr(thcMinedDelta)}</div>`;
     html += `<div class="delta">Total: ${formatAbbr(thc.total_mined)}</div>`;
     html += '</div>';
 
