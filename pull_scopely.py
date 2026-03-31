@@ -84,8 +84,8 @@ RANK_ID_MAP = {
     4186399962: "Admiral",
     1869972635: "Commodore",
     3423897132: "Premier",
-    1967264300: "Operative",
-    4071078643: "Agent",
+    1967264300: "Agent",
+    4071078643: "Operative",
 }
 
 # Platform request delay (CDN, no auth) — CDN handles rapid requests fine
