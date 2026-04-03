@@ -26,11 +26,15 @@ NCC_ALLIANCE_ID = "2616095065411838478"
 NCC_ALLIANCE_NAME = "Discovery"
 SERVER = 716
 ROE_VIOLATION_TYPES = {
-    "opc hit": "OPC hit",
-    "upc hit": "OPC hit",
+    "upc hit": "UPC hit",
+    "upc": "UPC hit",
+    "mining": "UPC hit",
+    "miner": "UPC hit",
     "token space hit": "Token space hit",
+    "token space": "Token space hit",
+    "token": "Token space hit",
     "armada interference": "Armada interference",
-    "friendly alliance hit": "Friendly alliance hit",
+    "armada": "Armada interference",
 }
 
 TRACKED_FIELDS = [

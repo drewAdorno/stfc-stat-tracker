@@ -50,6 +50,43 @@ def fetch_player_candidates(conn, query: str, limit: int = 8) -> List[Dict[str, 
                 }
                 for row in rows
             ]
+
+    # Fallback: search past names in daily_snapshots (catches name changes)
+    history_checks = [
+        ("ds_hist.name = ? COLLATE NOCASE", normalized),
+        ("ds_hist.name LIKE ? COLLATE NOCASE", normalized + "%"),
+    ]
+    history_sql = """
+        SELECT DISTINCT p.player_id,
+               p.name,
+               COALESCE(ds.alliance_id, p.alliance_id, '') AS alliance_id,
+               COALESCE(ds.alliance_tag, p.alliance_tag, '') AS alliance_tag,
+               COALESCE(ds.alliance_name, '') AS alliance_name
+        FROM daily_snapshots ds_hist
+        JOIN players p ON p.player_id = ds_hist.player_id
+        LEFT JOIN daily_snapshots ds
+            ON ds.player_id = p.player_id
+           AND ds.date = (
+               SELECT MAX(date) FROM daily_snapshots WHERE player_id = p.player_id
+           )
+        WHERE {where_clause}
+        ORDER BY p.name COLLATE NOCASE
+        LIMIT ?
+    """
+    for where_clause, value in history_checks:
+        rows = conn.execute(history_sql.format(where_clause=where_clause), (value, limit)).fetchall()
+        if rows:
+            return [
+                {
+                    "player_id": str(row[0] or ""),
+                    "name": row[1] or "",
+                    "alliance_id": row[2] or "",
+                    "alliance_tag": row[3] or "",
+                    "alliance_name": row[4] or "",
+                }
+                for row in rows
+            ]
+
     return []
 
 

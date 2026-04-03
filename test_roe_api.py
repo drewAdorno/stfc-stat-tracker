@@ -58,7 +58,7 @@ class TestRoeApi:
             "/api/roe/violations",
             json={
                 "offender_query": "BadGuy",
-                "violation_type": "OPC hit",
+                "violation_type": "UPC hit",
                 "victim_name": "Victim",
                 "screenshots": "/roe_uploads/shot-1.png",
                 "notes": "Caught on survey",
@@ -90,7 +90,7 @@ class TestRoeApi:
             "/api/roe/violations",
             json={
                 "offender_query": "BadGuy",
-                "violation_type": "Friendly alliance hit",
+                "violation_type": "UPC hit",
             },
             headers=_headers(),
         )
@@ -105,4 +105,4 @@ class TestRoeApi:
         list_response = client.get("/api/roe/violations", headers=_headers())
         assert list_response.status_code == 200
         listing = list_response.json()
-        assert listing["violations"][0]["violation_type"] == "Friendly alliance hit"
+        assert listing["violations"][0]["violation_type"] == "UPC hit"

@@ -49,7 +49,7 @@ class TestRoeViolations:
             offender_alliance_name="Foe Alliance",
             victim_player_id="n1",
             victim_name="Victim",
-            violation_type="OPC hit",
+            violation_type="UPC hit",
             reported_by="OfficerOne",
             offense_date="2026-03-13",
             screenshots="https://example.com/shot-1.png",
@@ -99,7 +99,7 @@ class TestRoeViolations:
         conn, _ = test_db
 
         with pytest.raises(ValueError):
-            db_mod.record_roe_violation(conn, offender_name="", violation_type="OPC hit")
+            db_mod.record_roe_violation(conn, offender_name="", violation_type="UPC hit")
 
         with pytest.raises(ValueError):
             db_mod.record_roe_violation(conn, offender_name="BadGuy", violation_type="")
@@ -113,7 +113,7 @@ class TestRoeViolations:
         db_mod.record_roe_violation(
             conn,
             offender_name="MysteryGuy",
-            violation_type="OPC hit",
+            violation_type="UPC hit",
             offense_date="2026-03-14",
         )
 

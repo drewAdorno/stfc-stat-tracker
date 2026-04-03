@@ -20,6 +20,7 @@ from dotenv import load_dotenv
 from db import (
     NCC_ALLIANCE_ID,
     RESOURCE_NAMES,
+    ROE_VIOLATION_TYPES,
     TRACKED_FIELDS,
     _format_abbr,
     get_db,
@@ -35,6 +36,7 @@ from db import (
     search_players,
     unlink_discord,
 )
+from roe_service import create_violation
 
 load_dotenv()
 
@@ -422,6 +424,268 @@ async def handle_mention(message):
     await message.reply(reply)
 
 
+# --- ROE Violation Ingestion ---
+
+_ROE_VALID_TYPES = sorted(set(ROE_VIOLATION_TYPES.values()))
+
+_ROE_PARSE_PROMPT = f"""You parse forum posts from a Star Trek Fleet Command (STFC) ROE (Rules of Engagement) violation reporting channel. Each forum post IS a violation report. Assume it is a violation unless it's clearly an example/template.
+
+The 3 ROE rules are:
+1. No hitting UPC miners (Under-Protected Cargo)
+2. No hitting in token systems
+3. No hitting active armadas
+
+Valid violation types (use exactly one):
+{chr(10).join(f'- {t}' for t in _ROE_VALID_TYPES)}
+
+Respond with ONLY a JSON object (no markdown, no code fences):
+{{"is_violation": true, "offender_name": "player who violated ROE", "violation_type": "one of the types above", "victim_name": "player who was hit (if mentioned, otherwise empty string)", "system_name": "in-game system/location (if mentioned, otherwise empty string)", "notes": "any other relevant details (otherwise empty string)", "offense_date": "YYYY-MM-DD if a specific date is mentioned, otherwise empty string"}}
+
+Return is_violation: false ONLY if:
+- The post is an example/template
+- The offender's player or alliance is already KOS (Kill On Sight) — they're already marked hostile
+{{"is_violation": false}}
+
+Every other post IS a violation — even if resolved or apologized, it still happened.
+
+Critical rules:
+- Thread titles are usually "[TAG] PlayerName" — the name in the title is the offender
+- Posts with only screenshots and no text are still violations — use the thread title
+- If the violation type is unclear, default to "UPC hit"
+- Player names are in-game names, not Discord usernames"""
+
+
+# KOS list cache — refreshed from diplomacy channel
+_kos_names: set[str] = set()
+_kos_player_ids: dict[str, str] = {}  # player_id -> name as listed in KOS
+_kos_message_id: int | None = None  # message ID of the KOS list
+_kos_last_refresh: float = 0
+_KOS_REFRESH_INTERVAL = 300  # 5 minutes
+
+_KOS_NAME_CHANGE_QUIPS = [
+    "How adorable — {old} thinks a new name will save them. They go by **{new}** now. As if the Continuum could be fooled.",
+    "Oh, how delightful! **{old}** has reinvented themselves as **{new}**. The audacity of mortals never ceases to amuse.",
+    "A name change? Really? **{old}** is now **{new}**. I've witnessed stars collapse with more subtlety.",
+    "**{old}** now masquerades as **{new}**. A transparent disguise, even by mortal standards.",
+    "The entity formerly known as **{old}** now answers to **{new}**. The Continuum sees all, mon ami.",
+]
+
+
+async def _refresh_kos_list():
+    """Refresh the KOS name set and player_id mapping from the diplomacy channel."""
+    global _kos_names, _kos_player_ids, _kos_message_id, _kos_last_refresh
+    import time as _time
+    now = _time.time()
+    if now - _kos_last_refresh < _KOS_REFRESH_INTERVAL and _kos_names:
+        return
+    try:
+        channel = client.get_channel(DIPLOMACY_CHANNEL_ID)
+        if not channel:
+            channel = await client.fetch_channel(DIPLOMACY_CHANNEL_ID)
+        names = set()
+        name_list = []
+        msg_id = None
+        async for msg in channel.history(limit=100):
+            if msg.author.bot:
+                continue
+            for line in msg.content.splitlines():
+                line = line.strip()
+                if line.startswith("* "):
+                    name = line[2:].strip()
+                    if name:
+                        names.add(name.lower())
+                        name_list.append(name)
+                        if msg_id is None:
+                            msg_id = msg.id
+        _kos_names = names
+        _kos_message_id = msg_id
+        _kos_last_refresh = now
+
+        # Resolve names to player_ids
+        conn = get_db()
+        try:
+            pid_map = {}
+            for name in name_list:
+                row = conn.execute(
+                    "SELECT player_id FROM players WHERE name = ? COLLATE NOCASE",
+                    (name,),
+                ).fetchone()
+                if row:
+                    pid_map[row[0]] = name
+            _kos_player_ids = pid_map
+        finally:
+            conn.close()
+    except Exception as e:
+        print(f"KOS list refresh error: {e}")
+
+
+def _is_kos(offender_name: str) -> bool:
+    """Check if an offender name is on the KOS list (case-insensitive)."""
+    return offender_name.strip().lower() in _kos_names
+
+
+async def kos_name_monitor_loop():
+    """Check hourly if any KOS player changed their in-game name."""
+    await client.wait_until_ready()
+    import random as _random
+
+    while not client.is_closed():
+        try:
+            await _refresh_kos_list()
+            if not _kos_player_ids:
+                await asyncio.sleep(3600)
+                continue
+
+            conn = get_db()
+            try:
+                changes = []
+                for pid, kos_name in list(_kos_player_ids.items()):
+                    row = conn.execute(
+                        "SELECT name FROM players WHERE player_id = ?", (pid,)
+                    ).fetchone()
+                    if row and row[0] and row[0].lower() != kos_name.lower():
+                        changes.append((pid, kos_name, row[0]))
+            finally:
+                conn.close()
+
+            if changes:
+                channel = client.get_channel(DIPLOMACY_CHANNEL_ID)
+                if not channel:
+                    channel = await client.fetch_channel(DIPLOMACY_CHANNEL_ID)
+
+                for pid, old_name, new_name in changes:
+                    # Post Q notification
+                    quip = _random.choice(_KOS_NAME_CHANGE_QUIPS).format(
+                        old=old_name, new=new_name
+                    )
+                    await channel.send(f"🔄 **KOS Name Change Detected**\n{quip}")
+
+                    # Update the cached mapping
+                    _kos_player_ids[pid] = new_name
+                    _kos_names.discard(old_name.lower())
+                    _kos_names.add(new_name.lower())
+
+                # Try to edit the original KOS list message
+                if _kos_message_id:
+                    try:
+                        kos_msg = await channel.fetch_message(_kos_message_id)
+                        new_content = kos_msg.content
+                        for _, old_name, new_name in changes:
+                            new_content = new_content.replace(
+                                f"* {old_name}", f"* {new_name}"
+                            )
+                        if new_content != kos_msg.content:
+                            await kos_msg.edit(content=new_content)
+                    except Exception as e:
+                        print(f"KOS message edit error: {e}")
+
+                # Force refresh on next check
+                global _kos_last_refresh
+                _kos_last_refresh = 0
+
+        except Exception as e:
+            print(f"KOS name monitor error: {e}")
+
+        await asyncio.sleep(3600)
+
+
+def _parse_roe_response(text: str) -> dict | None:
+    """Parse Claude's JSON response for ROE extraction."""
+    text = text.strip()
+    if text.startswith("```"):
+        text = text.split("\n", 1)[-1].rsplit("```", 1)[0].strip()
+    try:
+        data = json.loads(text)
+    except (json.JSONDecodeError, ValueError):
+        return None
+    if not data.get("is_violation"):
+        return None
+    if not data.get("offender_name"):
+        return None
+    return data
+
+
+async def _parse_roe_thread(thread_name: str, content: str, author_name: str, num_attachments: int) -> dict | None:
+    """Use Claude to parse a forum thread post into structured ROE data."""
+    if not content.strip() and num_attachments == 0 and not thread_name.strip():
+        return None
+    user_text = f"Thread title: {thread_name}\n\n"
+    user_text += f"First message:\n{content.strip()[:2000]}\n"
+    if num_attachments:
+        user_text += f"\n[{num_attachments} screenshot(s) attached]"
+    user_text += f"\n[Posted by: {author_name}]"
+    try:
+        response = claude.messages.create(
+            model="claude-haiku-4-5-20251001",
+            max_tokens=256,
+            system=_ROE_PARSE_PROMPT,
+            messages=[{"role": "user", "content": user_text}],
+        )
+        return _parse_roe_response(response.content[0].text)
+    except Exception as e:
+        print(f"ROE parse error: {e}")
+        return None
+
+
+def _is_roe_forum_post(message: discord.Message) -> bool:
+    """Check if a message is the first post in a ROE forum thread."""
+    channel = message.channel
+    if not isinstance(channel, discord.Thread):
+        return False
+    if getattr(channel, "parent_id", None) != ROE_CHANNEL_ID:
+        return False
+    # Only process the opening message of the thread (id matches thread id)
+    return str(message.id) == str(channel.id)
+
+
+async def _process_roe_thread(message: discord.Message) -> dict | None:
+    """Process the opening post of a ROE forum thread. Returns result dict or None."""
+    thread = message.channel
+    parsed = await _parse_roe_thread(
+        thread.name,
+        message.content,
+        message.author.display_name,
+        len(message.attachments),
+    )
+    if not parsed:
+        return None
+
+    attachment_urls = [a.url for a in message.attachments]
+    screenshots = ", ".join(attachment_urls)
+    jump_url = message.jump_url
+
+    conn = get_db()
+    try:
+        # Dedup by source_ref
+        existing = conn.execute(
+            "SELECT id FROM roe_violations WHERE source_ref = ?",
+            (jump_url,),
+        ).fetchone()
+        if existing:
+            return None
+
+        result = create_violation(
+            conn,
+            offender_query=parsed["offender_name"],
+            violation_type=parsed["violation_type"],
+            reported_by=message.author.display_name,
+            victim_name=parsed.get("victim_name", ""),
+            system_name=parsed.get("system_name", ""),
+            screenshots=screenshots,
+            notes=parsed.get("notes", ""),
+            offense_date=parsed.get("offense_date", ""),
+            source="discord",
+            source_ref=jump_url,
+        )
+        result["parsed"] = parsed
+        return result
+    except ValueError as exc:
+        await message.reply(f"Could not record violation: {exc}")
+        return None
+    finally:
+        conn.close()
+
+
 @client.event
 async def on_ready():
     tree.copy_global_to(guild=GUILD_ID)
@@ -430,6 +694,7 @@ async def on_ready():
     client.loop.create_task(territory_reminder_loop())
     client.loop.create_task(alliance_alert_loop())
     client.loop.create_task(daily_report_loop())
+    client.loop.create_task(kos_name_monitor_loop())
 
 
 @client.event
@@ -438,6 +703,150 @@ async def on_message(message):
         return
     if client.user in message.mentions:
         await handle_mention(message)
+    if _is_roe_forum_post(message):
+        await _refresh_kos_list()
+        result = await _process_roe_thread(message)
+        if result:
+            identity = result["identity"]
+            parsed = result["parsed"]
+            vid = result["violation_id"]
+            offender_name = identity.get("name", "?")
+            player_id = identity.get("player_id", "")
+            alliance_tag = identity.get("alliance_tag", "")
+            kos = _is_kos(offender_name)
+
+            # Build offender display value
+            offender_val = offender_name
+            if alliance_tag:
+                offender_val += f" [{alliance_tag}]"
+            if player_id:
+                offender_val += f"\n[View on tracker](https://ncctracker.top/player?id={player_id})"
+
+            # Warnings for missing data
+            warnings = []
+            if not player_id:
+                warnings.append("Could not match offender to a tracked player. Please update the thread title to `[TAG] PlayerName`.")
+            if not alliance_tag:
+                warnings.append("Could not determine alliance tag. Please include the alliance tag in the thread title, e.g. `[OAK] PlayerName`.")
+
+            if kos:
+                desc = (
+                    f"**{offender_name}** is already on the KOS list. "
+                    "No further action needed — kill on sight."
+                )
+                if warnings:
+                    desc += "\n\n" + "\n".join(f"⚠️ {w}" for w in warnings)
+                embed = discord.Embed(
+                    title="⚠️ KOS Player — Ticket Can Be Closed",
+                    description=desc,
+                    color=0xFFA500,
+                )
+                embed.add_field(name="Offender", value=offender_val, inline=True)
+                embed.add_field(name="Type", value=parsed.get("violation_type", "?"), inline=True)
+                embed.set_footer(text=f"Violation #{vid} (KOS) • ncctracker.top")
+            else:
+                desc = None
+                if warnings:
+                    desc = "\n".join(f"⚠️ {w}" for w in warnings)
+                embed = discord.Embed(
+                    title="ROE Violation Recorded",
+                    description=desc,
+                    color=0xFF4444,
+                )
+                embed.add_field(name="Offender", value=offender_val, inline=True)
+                embed.add_field(name="Type", value=parsed.get("violation_type", "?"), inline=True)
+                victim = parsed.get("victim_name", "")
+                if victim:
+                    embed.add_field(name="Victim", value=victim, inline=True)
+                system = parsed.get("system_name", "")
+                if system:
+                    embed.add_field(name="System", value=system, inline=True)
+                embed.add_field(name="Reported by", value=message.author.display_name, inline=True)
+                embed.set_footer(text=f"Violation #{vid} • ncctracker.top")
+            await message.reply(embed=embed)
+
+
+@client.event
+async def on_thread_update(before: discord.Thread, after: discord.Thread):
+    """Re-process ROE violation when a forum thread title is updated."""
+    if getattr(after, "parent_id", None) != ROE_CHANNEL_ID:
+        return
+    if before.name == after.name:
+        return
+
+    # Fetch the opening message (same id as thread)
+    try:
+        first_msg = await after.fetch_message(after.id)
+    except Exception:
+        return
+    if first_msg.author.bot:
+        return
+
+    # Re-parse with the new title
+    parsed = await _parse_roe_thread(
+        after.name,
+        first_msg.content,
+        first_msg.author.display_name,
+        len(first_msg.attachments),
+    )
+    if not parsed:
+        return
+
+    jump_url = first_msg.jump_url
+    conn = get_db()
+    try:
+        from roe_service import detect_identity, merge_identity
+        identity = detect_identity(conn, parsed["offender_name"])
+        identity = merge_identity(identity, fallback_name=parsed["offender_name"])
+        player_id = identity.get("player_id", "")
+        alliance_tag = identity.get("alliance_tag", "")
+
+        # Update the existing violation record
+        updated = conn.execute("""
+            UPDATE roe_violations
+            SET offender_name = ?,
+                offender_player_id = COALESCE(NULLIF(?, ''), offender_player_id),
+                offender_alliance_id = COALESCE(NULLIF(?, ''), offender_alliance_id),
+                offender_alliance_tag = COALESCE(NULLIF(?, ''), offender_alliance_tag),
+                offender_alliance_name = COALESCE(NULLIF(?, ''), offender_alliance_name)
+            WHERE source_ref = ?
+        """, (
+            identity.get("name", parsed["offender_name"]),
+            player_id,
+            identity.get("alliance_id", ""),
+            alliance_tag,
+            identity.get("alliance_name", ""),
+            jump_url,
+        )).rowcount
+        conn.commit()
+
+        if not updated:
+            return
+
+        # Export updated JSON
+        from db import export_roe_violations_json
+        export_roe_violations_json(conn)
+
+        # Post update confirmation
+        offender_val = identity.get("name", parsed["offender_name"])
+        if alliance_tag:
+            offender_val += f" [{alliance_tag}]"
+        if player_id:
+            offender_val += f"\n[View on tracker](https://ncctracker.top/player?id={player_id})"
+
+        embed = discord.Embed(
+            title="ROE Violation Updated",
+            description=f"Thread title changed to **{after.name}** — violation record updated.",
+            color=0x00BFFF,
+        )
+        embed.add_field(name="Offender", value=offender_val, inline=True)
+        if not player_id:
+            embed.description += "\n\n⚠️ Still could not match offender to a tracked player."
+        if not alliance_tag:
+            embed.description += "\n\n⚠️ Still could not determine alliance tag."
+        await after.send(embed=embed)
+    finally:
+        conn.close()
 
 
 # --- Territory Reminders ---
@@ -447,6 +856,8 @@ TERRITORY_CHANNEL_ID = 1452766274127138939
 CHAT_CHANNEL_ID = 1452757187188490292
 ACTIVITY_CHANNEL_ID = 1479693128850997258
 JOIN_CHANNEL_ID = 1453385101382647922
+ROE_CHANNEL_ID = 1453416725088309310
+DIPLOMACY_CHANNEL_ID = 1482501328952365216
 _STATE_DIR = Path(__file__).parent / "data"
 
 
