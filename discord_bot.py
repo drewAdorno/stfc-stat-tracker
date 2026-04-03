@@ -891,6 +891,7 @@ async def roe_nudge_loop():
                 # Find the last message time and the handler
                 handler = None
                 last_activity = thread.created_at
+                guild = thread.guild
                 try:
                     async for msg in thread.history(limit=20):
                         # Track most recent activity
@@ -901,10 +902,14 @@ async def roe_nudge_loop():
                             continue
                         if msg.id == thread.id:
                             continue  # skip opening post
-                        if handler is None and hasattr(msg.author, "roles"):
-                            role_ids = [r.id for r in msg.author.roles]
-                            if ADMIRAL_ROLE_ID in role_ids or COMMODORE_ROLE_ID in role_ids:
-                                handler = msg.author
+                        if handler is None:
+                            try:
+                                member = guild.get_member(msg.author.id) or await guild.fetch_member(msg.author.id)
+                                role_ids = [r.id for r in member.roles]
+                                if ADMIRAL_ROLE_ID in role_ids or COMMODORE_ROLE_ID in role_ids:
+                                    handler = member
+                            except Exception:
+                                pass
                 except Exception as e:
                     print(f"ROE nudge thread read error ({thread.name}): {e}")
                     continue
