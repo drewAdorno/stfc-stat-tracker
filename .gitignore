@@ -35,6 +35,7 @@ deploy/upload_auth.sh
 data/.last_bot_report_date
 data/.bot_territory_sent
 data/.bot_alerts_sent
+data/.bot_roe_nudged
 roe_admin/node_modules/
 roe_uploads/
 data/roe_violations.json

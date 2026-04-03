@@ -695,6 +695,7 @@ async def on_ready():
     client.loop.create_task(alliance_alert_loop())
     client.loop.create_task(daily_report_loop())
     client.loop.create_task(kos_name_monitor_loop())
+    client.loop.create_task(roe_nudge_loop())
 
 
 @client.event
@@ -847,6 +848,94 @@ async def on_thread_update(before: discord.Thread, after: discord.Thread):
         await after.send(embed=embed)
     finally:
         conn.close()
+
+
+# --- ROE Ticket Nudge ---
+
+ROE_OPEN_TAG_ID = 1453418117609947340
+ADMIRAL_ROLE_ID = 1452763248955752641
+COMMODORE_ROLE_ID = 1452763363594735687
+
+
+async def roe_nudge_loop():
+    """Nudge the handler of stale ROE tickets (open > 24h with no activity)."""
+    await client.wait_until_ready()
+
+    while not client.is_closed():
+        try:
+            nudged_state = _load_state(".bot_roe_nudged", [])
+            nudged = set(nudged_state)
+            now_utc = datetime.now(timezone.utc)
+            cutoff = now_utc - timedelta(hours=24)
+
+            forum = client.get_channel(ROE_CHANNEL_ID)
+            if not forum:
+                await asyncio.sleep(3600)
+                continue
+
+            # Get active threads in the forum
+            threads = []
+            for thread in forum.threads:
+                if ROE_OPEN_TAG_ID in [t.id for t in (thread.applied_tags or [])]:
+                    threads.append(thread)
+
+            # Also check archived threads with OPEN tag
+            async for thread in forum.archived_threads(limit=50):
+                if ROE_OPEN_TAG_ID in [t.id for t in (thread.applied_tags or [])]:
+                    threads.append(thread)
+
+            for thread in threads:
+                if str(thread.id) in nudged:
+                    continue
+
+                # Find the last message time and the handler
+                handler = None
+                last_activity = thread.created_at
+                try:
+                    async for msg in thread.history(limit=20):
+                        # Track most recent activity
+                        if msg.created_at > last_activity:
+                            last_activity = msg.created_at
+                        # Find the handler: first admiral/commodore to reply (not the OP)
+                        if msg.author.bot:
+                            continue
+                        if msg.id == thread.id:
+                            continue  # skip opening post
+                        if handler is None and hasattr(msg.author, "roles"):
+                            role_ids = [r.id for r in msg.author.roles]
+                            if ADMIRAL_ROLE_ID in role_ids or COMMODORE_ROLE_ID in role_ids:
+                                handler = msg.author
+                except Exception as e:
+                    print(f"ROE nudge thread read error ({thread.name}): {e}")
+                    continue
+
+                if last_activity > cutoff:
+                    continue  # still active within 24h
+
+                # Send nudge
+                if handler:
+                    nudge_text = (
+                        f"Hey {handler.mention}, this ticket has been open for over 24 hours "
+                        f"with no recent activity. Just a friendly reminder to follow up when you get a chance!"
+                    )
+                else:
+                    admiral_mention = f"<@&{ADMIRAL_ROLE_ID}>"
+                    commodore_mention = f"<@&{COMMODORE_ROLE_ID}>"
+                    nudge_text = (
+                        f"{admiral_mention} {commodore_mention} — this ticket has been open "
+                        f"for over 24 hours with no one assigned. Could someone take a look?"
+                    )
+                try:
+                    await thread.send(nudge_text)
+                    nudged.add(str(thread.id))
+                    _save_state(".bot_roe_nudged", sorted(nudged))
+                except Exception as e:
+                    print(f"ROE nudge send error ({thread.name}): {e}")
+
+        except Exception as e:
+            print(f"ROE nudge loop error: {e}")
+
+        await asyncio.sleep(3600)
 
 
 # --- Territory Reminders ---
