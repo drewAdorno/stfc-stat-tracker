@@ -439,7 +439,7 @@ Valid violation types (use exactly one):
 {chr(10).join(f'- {t}' for t in _ROE_VALID_TYPES)}
 
 Respond with ONLY a JSON object (no markdown, no code fences):
-{{"is_violation": true, "offender_name": "player who violated ROE", "violation_type": "one of the types above", "victim_name": "player who was hit (if mentioned, otherwise empty string)", "system_name": "in-game system/location (if mentioned, otherwise empty string)", "notes": "any other relevant details (otherwise empty string)", "offense_date": "YYYY-MM-DD if a specific date is mentioned, otherwise empty string"}}
+{{"is_violation": true, "offender_name": "player who violated ROE (player name only, NOT the alliance tag)", "offender_alliance_tag": "alliance tag from thread title if present, otherwise empty string", "violation_type": "one of the types above", "victim_name": "player who was hit (if mentioned, otherwise empty string)", "system_name": "in-game system/location (if mentioned, otherwise empty string)", "notes": "any other relevant details (otherwise empty string)", "offense_date": "YYYY-MM-DD if a specific date is mentioned, otherwise empty string"}}
 
 Return is_violation: false ONLY if:
 - The post is an example/template
@@ -449,7 +449,7 @@ Return is_violation: false ONLY if:
 Every other post IS a violation — even if resolved or apologized, it still happened.
 
 Critical rules:
-- Thread titles are usually "[TAG] PlayerName" — the name in the title is the offender
+- Thread titles contain the offender's alliance tag and player name. Common formats: "[TAG] PlayerName", "TAG - PlayerName", "TAG PlayerName". The alliance tag is a short uppercase code (2-5 chars); the player name follows it. Extract both the alliance tag and the player name as offender_name
 - Posts with only screenshots and no text are still violations — use the thread title
 - If the violation type is unclear, default to "UPC hit"
 - Player names are in-game names, not Discord usernames"""
@@ -664,6 +664,12 @@ async def _process_roe_thread(message: discord.Message) -> dict | None:
         if existing:
             return None
 
+        # Pass parsed alliance tag as override so it's recorded even if
+        # player lookup is ambiguous or returns no match.
+        overrides = {}
+        if parsed.get("offender_alliance_tag"):
+            overrides["alliance_tag"] = parsed["offender_alliance_tag"]
+
         result = create_violation(
             conn,
             offender_query=parsed["offender_name"],
@@ -676,6 +682,7 @@ async def _process_roe_thread(message: discord.Message) -> dict | None:
             offense_date=parsed.get("offense_date", ""),
             source="discord",
             source_ref=jump_url,
+            offender_overrides=overrides or None,
         )
         result["parsed"] = parsed
         return result
@@ -797,8 +804,11 @@ async def on_thread_update(before: discord.Thread, after: discord.Thread):
     conn = get_db()
     try:
         from roe_service import detect_identity, merge_identity
+        overrides = {}
+        if parsed.get("offender_alliance_tag"):
+            overrides["alliance_tag"] = parsed["offender_alliance_tag"]
         identity = detect_identity(conn, parsed["offender_name"])
-        identity = merge_identity(identity, fallback_name=parsed["offender_name"])
+        identity = merge_identity(identity, fallback_name=parsed["offender_name"], overrides=overrides or None)
         player_id = identity.get("player_id", "")
         alliance_tag = identity.get("alliance_tag", "")
 
