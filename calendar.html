@@ -1693,7 +1693,7 @@ async function loadData() {
   opsLevelFilter = localStorage.getItem(OPS_FILTER_KEY) || '';
   document.getElementById('ops-filter').value = opsLevelFilter;
 
-  const anchorTs = (allEvents[0] && allEvents[0].start) || captureTs || Math.floor(Date.now() / 1000);
+  const anchorTs = Math.floor(Date.now() / 1000);
   currentWeekStart = startOfWeek(anchorTs);
   renderCurrentWeek();
 }
