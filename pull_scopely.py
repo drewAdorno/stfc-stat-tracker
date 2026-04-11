@@ -833,8 +833,12 @@ def main():
     alliances = fetch_alliances(alliance_ids, auth) if alliance_ids else {}
 
     # --- Fetch NCC alliance member ranks ---
-    safe_print("=== Fetching NCC member ranks ===")
-    ncc_members = fetch_alliance_members(NCC_ALLIANCE_ID, auth)
+    if NCC_ALLIANCE_ID:
+        safe_print("=== Fetching NCC member ranks ===")
+        ncc_members = fetch_alliance_members(NCC_ALLIANCE_ID, auth)
+    else:
+        safe_print("=== Skipping NCC member ranks (no alliance configured) ===")
+        ncc_members = {}
 
     # --- Fetch RSS/ISO contrib for all alliances ---
     safe_print(f"=== Fetching alliance contributions (RSS + ISO) for {len(alliance_ids)} alliances ===")
