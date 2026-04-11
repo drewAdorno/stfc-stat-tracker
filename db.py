@@ -22,9 +22,9 @@ BASE_DIR = Path(__file__).parent
 DATA_DIR = BASE_DIR / "data"
 DB_PATH = DATA_DIR / "stfc.db"
 
-NCC_ALLIANCE_ID = "2616095065411838478"
-NCC_ALLIANCE_NAME = "Discovery"
-SERVER = 716
+NCC_ALLIANCE_ID = ""
+NCC_ALLIANCE_NAME = ""
+SERVER = 724
 ROE_VIOLATION_TYPES = {
     "upc hit": "UPC hit",
     "upc": "UPC hit",
