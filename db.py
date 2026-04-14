@@ -22,8 +22,9 @@ BASE_DIR = Path(__file__).parent
 DATA_DIR = BASE_DIR / "data"
 DB_PATH = DATA_DIR / "stfc.db"
 
-NCC_ALLIANCE_ID = ""
-NCC_ALLIANCE_NAME = ""
+ALLIANCE_ID = "2656439294172226322"
+ALLIANCE_NAME = "No Win Scenario"
+ALLIANCE_TAG = "NWS"
 SERVER = 724
 ROE_VIOLATION_TYPES = {
     "upc hit": "UPC hit",
@@ -336,7 +337,7 @@ def _detect_daily_stat_changes(conn, mapped_players, date):
 def upsert_players(conn, mapped_players, date):
     """Bulk insert/update players and daily_snapshots for a given date.
 
-    mapped_players: list of dicts from pull_api.map_player() with integer values.
+    mapped_players: list of dicts with integer values.
     date: YYYY-MM-DD string.
     """
     # Detect daily stat refreshes before overwriting snapshots
@@ -586,7 +587,7 @@ def compute_activity_scores(players):
     return scores
 
 
-def export_latest_json(conn, alliance_id=NCC_ALLIANCE_ID, league=""):
+def export_latest_json(conn, alliance_id=ALLIANCE_ID, league=""):
     """Query the most recent snapshot for an alliance and write data/latest.json.
 
     Output format matches what dashboards expect:
@@ -650,7 +651,7 @@ def export_latest_json(conn, alliance_id=NCC_ALLIANCE_ID, league=""):
             "resources_mined": _format_abbr(rm),
             "resources_raided": _format_abbr(rr),
             "alliance_tag": atag or "",
-            "alliance_name": NCC_ALLIANCE_NAME if aid == NCC_ALLIANCE_ID else "",
+            "alliance_name": ALLIANCE_NAME if aid == ALLIANCE_ID else "",
             "alliance_id": aid or "",
         })
 
@@ -718,8 +719,8 @@ def export_latest_json(conn, alliance_id=NCC_ALLIANCE_ID, league=""):
     record = {
         "pulled_at": pulled_at,
         "alliance_url": "",
-        "alliance_name": NCC_ALLIANCE_NAME if alliance_id == NCC_ALLIANCE_ID else "",
-        "alliance_tag": "NCC" if alliance_id == NCC_ALLIANCE_ID else "",
+        "alliance_name": ALLIANCE_NAME if alliance_id == ALLIANCE_ID else "",
+        "alliance_tag": ALLIANCE_TAG if alliance_id == ALLIANCE_ID else "",
         "summary": {
             "total_power": _format_abbr(total_power),
             "member_count": str(len(members)),
@@ -737,7 +738,7 @@ def export_latest_json(conn, alliance_id=NCC_ALLIANCE_ID, league=""):
         json.dump(record, f, indent=2, ensure_ascii=False)
 
 
-def export_history_json(conn, alliance_id=NCC_ALLIANCE_ID):
+def export_history_json(conn, alliance_id=ALLIANCE_ID):
     """Query all daily snapshots and write data/history.json.
 
     Output format: list of {date, summary, members} where members is
@@ -881,7 +882,7 @@ def import_history_json(conn):
                     name = CASE WHEN excluded.last_seen > players.last_seen THEN excluded.name ELSE players.name END,
                     first_seen = MIN(players.first_seen, excluded.first_seen),
                     last_seen = MAX(players.last_seen, excluded.last_seen)
-            """, (player_id, name, SERVER, NCC_ALLIANCE_ID, "NCC", date, date))
+            """, (player_id, name, SERVER, ALLIANCE_ID, ALLIANCE_TAG, date, date))
 
             # Upsert snapshot
             cur.execute("""
@@ -902,7 +903,7 @@ def import_history_json(conn):
                     resources_mined = excluded.resources_mined,
                     resources_raided = excluded.resources_raided
             """, (player_id, date, name, level, power, helps, rss_c, iso_c, pk, hk, rm, rr,
-                  NCC_ALLIANCE_ID, "NCC"))
+                  ALLIANCE_ID, ALLIANCE_TAG))
 
     conn.commit()
     total = cur.execute("SELECT COUNT(*) FROM daily_snapshots").fetchone()[0]
@@ -1392,7 +1393,7 @@ def export_server_players_json(conn):
         json.dump(record, f, indent=2, ensure_ascii=False)
 
 
-def get_latest_two_dates(conn, alliance_id=NCC_ALLIANCE_ID):
+def get_latest_two_dates(conn, alliance_id=ALLIANCE_ID):
     """Return (prev_date, curr_date) for the two most recent snapshot dates,
     or (None, None) if fewer than 2 exist. Used by send_hourly_alerts."""
     rows = conn.execute("""
@@ -1405,7 +1406,7 @@ def get_latest_two_dates(conn, alliance_id=NCC_ALLIANCE_ID):
     return rows[1][0], rows[0][0]
 
 
-def get_members_for_date(conn, date, alliance_id=NCC_ALLIANCE_ID):
+def get_members_for_date(conn, date, alliance_id=ALLIANCE_ID):
     """Return a dict of {player_id_str: {name, level, power, ...}} for a date.
     Used by send_hourly_alerts for join/leave detection."""
     rows = conn.execute("""
@@ -1681,7 +1682,7 @@ def get_linked_player(conn, discord_user_id):
 
 def search_players(conn, query, limit=25):
     """Search players by name prefix. Returns list of (player_id, name, alliance_tag).
-    NCC members are listed first."""
+    Alliance members are listed first."""
     rows = conn.execute("""
         SELECT player_id, name, alliance_tag
         FROM players
@@ -1690,7 +1691,7 @@ def search_players(conn, query, limit=25):
             CASE WHEN alliance_id = ? THEN 0 ELSE 1 END,
             name COLLATE NOCASE
         LIMIT ?
-    """, (query + "%", NCC_ALLIANCE_ID, limit)).fetchall()
+    """, (query + "%", ALLIANCE_ID, limit)).fetchall()
     return rows
 
 

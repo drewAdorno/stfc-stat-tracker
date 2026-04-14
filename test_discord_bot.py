@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 import pytest
 
 from db import (
-    NCC_ALLIANCE_ID,
+    ALLIANCE_ID,
     SCHEMA,
     _format_abbr,
     get_earliest_snapshot_date,
@@ -35,8 +35,8 @@ def conn():
     # Insert players
     c.execute("""
         INSERT INTO players (player_id, name, server, alliance_id, alliance_tag, first_seen, last_seen)
-        VALUES (1, 'TestPlayer', 716, ?, 'NCC', ?, ?)
-    """, (NCC_ALLIANCE_ID, week_ago, today))
+        VALUES (1, 'TestPlayer', 716, ?, 'NWS', ?, ?)
+    """, (ALLIANCE_ID, week_ago, today))
 
     c.execute("""
         INSERT INTO players (player_id, name, server, alliance_id, alliance_tag, first_seen, last_seen)
@@ -49,16 +49,16 @@ def conn():
             (player_id, date, name, level, power, helps, rss_contrib, iso_contrib,
              players_killed, hostiles_killed, resources_mined, resources_raided,
              alliance_id, alliance_tag)
-        VALUES (1, ?, 'TestPlayer', 40, 100000000, 500, 1000, 200, 50, 10000, 50000000, 5000000, ?, 'NCC')
-    """, (week_ago, NCC_ALLIANCE_ID))
+        VALUES (1, ?, 'TestPlayer', 40, 100000000, 500, 1000, 200, 50, 10000, 50000000, 5000000, ?, 'NWS')
+    """, (week_ago, ALLIANCE_ID))
 
     c.execute("""
         INSERT INTO daily_snapshots
             (player_id, date, name, level, power, helps, rss_contrib, iso_contrib,
              players_killed, hostiles_killed, resources_mined, resources_raided,
              alliance_id, alliance_tag)
-        VALUES (1, ?, 'TestPlayer', 41, 150000000, 600, 1500, 300, 100, 15000, 80000000, 8000000, ?, 'NCC')
-    """, (today, NCC_ALLIANCE_ID))
+        VALUES (1, ?, 'TestPlayer', 41, 150000000, 600, 1500, 300, 100, 15000, 80000000, 8000000, ?, 'NWS')
+    """, (today, ALLIANCE_ID))
 
     # Snapshot for OtherPlayer
     c.execute("""
@@ -167,8 +167,8 @@ class TestNameHistory:
         conn.execute("""
             INSERT INTO daily_snapshots
                 (player_id, date, name, level, power, alliance_id, alliance_tag)
-            VALUES (1, ?, 'RenamedPlayer', 41, 150000000, ?, 'NCC')
-        """, (yesterday, NCC_ALLIANCE_ID))
+            VALUES (1, ?, 'RenamedPlayer', 41, 150000000, ?, 'NWS')
+        """, (yesterday, ALLIANCE_ID))
         conn.commit()
 
         history = get_player_name_history(conn, 1)

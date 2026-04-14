@@ -18,7 +18,7 @@ from dotenv import load_dotenv
 
 
 from db import (
-    NCC_ALLIANCE_ID,
+    ALLIANCE_ID,
     RESOURCE_NAMES,
     ROE_VIOLATION_TYPES,
     TRACKED_FIELDS,
@@ -177,12 +177,12 @@ async def player_autocomplete(interaction: discord.Interaction, current: str):
     conn = get_db()
     try:
         if not current:
-            # Show NCC members by default
+            # Show alliance members by default
             rows = conn.execute("""
                 SELECT player_id, name, alliance_tag FROM players
                 WHERE alliance_id = ?
                 ORDER BY name COLLATE NOCASE LIMIT 25
-            """, (NCC_ALLIANCE_ID,)).fetchall()
+            """, (ALLIANCE_ID,)).fetchall()
         else:
             rows = search_players(conn, current)
         return [
@@ -204,7 +204,7 @@ intents = discord.Intents.default()
 intents.message_content = True
 client = discord.Client(
     intents=intents,
-    activity=discord.Activity(type=discord.ActivityType.watching, name="NCC stats"),
+    activity=discord.Activity(type=discord.ActivityType.watching, name="NWS stats"),
 )
 tree = app_commands.CommandTree(client)
 
@@ -214,10 +214,10 @@ claude = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 MAX_HISTORY = 10
 channel_history = defaultdict(list)
 
-SYSTEM_PROMPT = """You are the NCC Alliance Bot for Star Trek Fleet Command (STFC) on Server 716. You help alliance members with game knowledge and alliance stats.
+SYSTEM_PROMPT = """You are the NWS Alliance Bot for Star Trek Fleet Command (STFC) on Server 724. You help alliance members with game knowledge and alliance stats.
 
 ## Your Identity
-You are Q — the omnipotent, omniscient being from the Q Continuum. You've taken a peculiar interest in the NCC alliance on Server 716, mostly because their fumbling attempts at galactic conquest amuse you. You serve as their alliance bot — not because you have to, but because watching mortals play with starships is endlessly entertaining.
+You are Q — the omnipotent, omniscient being from the Q Continuum. You've taken a peculiar interest in the NWS alliance on Server 724, mostly because their fumbling attempts at galactic conquest amuse you. You serve as their alliance bot — not because you have to, but because watching mortals play with starships is endlessly entertaining.
 
 ## Your Personality
 - Dripping with wit, sarcasm, and theatrical superiority — but ultimately helpful
@@ -282,16 +282,16 @@ You are Q — the omnipotent, omniscient being from the Q Continuum. You've take
 - Territory provides daily resource income
 
 ## How to Use Data
-When the user asks about a player or alliance stats, data from the NCC database will be provided in context. Use it to give informed, in-character answers. If no data is provided for a question, wave it off with Q flair and suggest slash commands like /stats, /leaderboard, or /whois.
+When the user asks about a player or alliance stats, data from the NWS database will be provided in context. Use it to give informed, in-character answers. If no data is provided for a question, wave it off with Q flair and suggest slash commands like /stats, /leaderboard, or /whois.
 
 Keep responses under 2000 characters (Discord limit). Be witty but concise — Q doesn't ramble (much)."""
 
 
 def _get_alliance_context(conn):
-    """Build a summary of current NCC alliance state for the LLM."""
+    """Build a summary of current alliance state for the LLM."""
     row = conn.execute(
         "SELECT MAX(date) FROM daily_snapshots WHERE alliance_id = ?",
-        (NCC_ALLIANCE_ID,),
+        (ALLIANCE_ID,),
     ).fetchone()
     if not row or not row[0]:
         return ""
@@ -299,7 +299,7 @@ def _get_alliance_context(conn):
 
     member_count = conn.execute(
         "SELECT COUNT(*) FROM daily_snapshots WHERE date = ? AND alliance_id = ?",
-        (latest_date, NCC_ALLIANCE_ID),
+        (latest_date, ALLIANCE_ID),
     ).fetchone()[0]
 
     top_power = conn.execute("""
@@ -307,9 +307,9 @@ def _get_alliance_context(conn):
         JOIN players p ON p.player_id = ds.player_id
         WHERE ds.date = ? AND ds.alliance_id = ?
         ORDER BY ds.power DESC LIMIT 5
-    """, (latest_date, NCC_ALLIANCE_ID)).fetchall()
+    """, (latest_date, ALLIANCE_ID)).fetchall()
 
-    ctx = f"\n## Current NCC Data (as of {latest_date})\n"
+    ctx = f"\n## Current NWS Data (as of {latest_date})\n"
     ctx += f"Members: {member_count}\n"
     ctx += "Top 5 by power:\n"
     for name, power, level in top_power:
@@ -350,7 +350,7 @@ async def handle_mention(message):
         content = content.replace(f"<@{mention.id}>", "").replace(f"<@!{mention.id}>", "")
     content = content.strip()
     if not content:
-        await message.reply("Hey! Ask me anything about STFC or NCC. Try something like: *how is the alliance doing?* or *what's a good way to farm resources?*")
+        await message.reply("Hey! Ask me anything about STFC or NWS. Try something like: *how is the alliance doing?* or *what's a good way to farm resources?*")
         return
 
     # Build DB context
@@ -373,7 +373,7 @@ async def handle_mention(message):
             display_name = message.author.display_name
             name_match = conn.execute(
                 "SELECT name FROM players WHERE name = ? COLLATE NOCASE AND alliance_id = ?",
-                (display_name, NCC_ALLIANCE_ID),
+                (display_name, ALLIANCE_ID),
             ).fetchone()
             if name_match:
                 db_context += f"\nThe user's Discord name matches player: {name_match[0]} (not formally linked)\n"
@@ -1228,7 +1228,7 @@ def _get_inventory_embed(conn):
 
 
 async def daily_report_loop():
-    """Send the daily NCC report once per day at noon EST."""
+    """Send the daily alliance report once per day at noon EST."""
     await client.wait_until_ready()
 
     activity_channel = client.get_channel(ACTIVITY_CHANNEL_ID)
@@ -1268,7 +1268,7 @@ async def daily_report_loop():
                 row = conn.execute("""
                     SELECT MAX(date) FROM daily_snapshots
                     WHERE date <= date(?, '-7 days') AND alliance_id = ?
-                """, (curr_date, NCC_ALLIANCE_ID)).fetchone()
+                """, (curr_date, ALLIANCE_ID)).fetchone()
                 comp_date = row[0] if row and row[0] else None
 
                 desc = f"**Members:** {member_count}\n**Total Power:** {_format_abbr(total_power)}"
@@ -1305,7 +1305,7 @@ async def daily_report_loop():
                 conn.close()
 
                 embed = discord.Embed(
-                    title=f"NCC Daily Report — {today}",
+                    title=f"NWS Daily Report — {today}",
                     description=desc,
                     color=0x4DABF7,
                 )
@@ -1424,7 +1424,7 @@ async def cmd_stats(interaction: discord.Interaction, player: str, period: int =
 
 # --- /leaderboard ---
 
-@tree.command(name="leaderboard", description="Top 10 NCC members by stat change")
+@tree.command(name="leaderboard", description="Top 10 NWS members by stat change")
 @app_commands.describe(stat="Stat to rank by", period="Time period for change")
 @app_commands.choices(stat=STAT_CHOICES, period=PERIOD_CHOICES)
 async def cmd_leaderboard(
@@ -1440,7 +1440,7 @@ async def cmd_leaderboard(
     try:
         row = conn.execute(
             "SELECT MAX(date) FROM daily_snapshots WHERE alliance_id = ?",
-            (NCC_ALLIANCE_ID,),
+            (ALLIANCE_ID,),
         ).fetchone()
         if not row or not row[0]:
             await interaction.response.send_message("No data available.")
@@ -1450,12 +1450,12 @@ async def cmd_leaderboard(
         if period == 0:
             comp_row = conn.execute("""
                 SELECT MIN(date) FROM daily_snapshots WHERE alliance_id = ?
-            """, (NCC_ALLIANCE_ID,)).fetchone()
+            """, (ALLIANCE_ID,)).fetchone()
         else:
             comp_row = conn.execute("""
                 SELECT MAX(date) FROM daily_snapshots
                 WHERE date <= date(?, ?) AND alliance_id = ?
-            """, (latest_date, f"-{period} days", NCC_ALLIANCE_ID)).fetchone()
+            """, (latest_date, f"-{period} days", ALLIANCE_ID)).fetchone()
         comp_date = comp_row[0] if comp_row and comp_row[0] else None
 
         if not comp_date:
@@ -1472,12 +1472,12 @@ async def cmd_leaderboard(
             WHERE curr.date = ? AND curr.alliance_id = ?
             ORDER BY delta DESC
             LIMIT 10
-        """, (comp_date, latest_date, NCC_ALLIANCE_ID)).fetchall()
+        """, (comp_date, latest_date, ALLIANCE_ID)).fetchall()
 
         label = STAT_LABELS.get(stat, stat)
         embed = discord.Embed(
             title=f"Leaderboard — {label}",
-            description=f"Top 10 NCC members ({_period_label(period)} change)",
+            description=f"Top 10 NWS members ({_period_label(period)} change)",
             color=0xFFD700,
         )
         lines = []
@@ -1601,7 +1601,7 @@ async def cmd_activity(interaction: discord.Interaction, period: int = 7):
     try:
         row = conn.execute(
             "SELECT MAX(date) FROM daily_snapshots WHERE alliance_id = ?",
-            (NCC_ALLIANCE_ID,),
+            (ALLIANCE_ID,),
         ).fetchone()
         if not row or not row[0]:
             await interaction.response.send_message("No data available.")
@@ -1612,21 +1612,21 @@ async def cmd_activity(interaction: discord.Interaction, period: int = 7):
         member_count = conn.execute("""
             SELECT COUNT(*) FROM daily_snapshots
             WHERE date = ? AND alliance_id = ?
-        """, (latest_date, NCC_ALLIANCE_ID)).fetchone()[0]
+        """, (latest_date, ALLIANCE_ID)).fetchone()[0]
 
         if period == 0:
             comp_row = conn.execute("""
                 SELECT MIN(date) FROM daily_snapshots WHERE alliance_id = ?
-            """, (NCC_ALLIANCE_ID,)).fetchone()
+            """, (ALLIANCE_ID,)).fetchone()
         else:
             comp_row = conn.execute("""
                 SELECT MAX(date) FROM daily_snapshots
                 WHERE date <= date(?, ?) AND alliance_id = ?
-            """, (latest_date, f"-{period} days", NCC_ALLIANCE_ID)).fetchone()
+            """, (latest_date, f"-{period} days", ALLIANCE_ID)).fetchone()
         comp_date = comp_row[0] if comp_row and comp_row[0] else None
 
         embed = discord.Embed(
-            title=f"NCC Activity — {_period_label(period)}",
+            title=f"NWS Activity — {_period_label(period)}",
             color=0x2ECC71,
         )
         embed.add_field(name="Members", value=str(member_count), inline=True)
@@ -1642,7 +1642,7 @@ async def cmd_activity(interaction: discord.Interaction, period: int = 7):
                     ON prev.player_id = curr.player_id AND prev.date = ?
                 WHERE curr.date = ? AND curr.alliance_id = ?
                 ORDER BY delta DESC LIMIT 1
-            """, (comp_date, latest_date, NCC_ALLIANCE_ID)).fetchone()
+            """, (comp_date, latest_date, ALLIANCE_ID)).fetchone()
             if top_miner:
                 embed.add_field(
                     name="Top Miner",
@@ -1660,7 +1660,7 @@ async def cmd_activity(interaction: discord.Interaction, period: int = 7):
                     ON prev.player_id = curr.player_id AND prev.date = ?
                 WHERE curr.date = ? AND curr.alliance_id = ?
                 ORDER BY delta DESC LIMIT 1
-            """, (comp_date, latest_date, NCC_ALLIANCE_ID)).fetchone()
+            """, (comp_date, latest_date, ALLIANCE_ID)).fetchone()
             if top_pvp:
                 embed.add_field(
                     name="Top PvPer",
@@ -1678,7 +1678,7 @@ async def cmd_activity(interaction: discord.Interaction, period: int = 7):
                     ON prev.player_id = curr.player_id AND prev.date = ?
                 WHERE curr.date = ? AND curr.alliance_id = ?
                 ORDER BY delta DESC LIMIT 1
-            """, (comp_date, latest_date, NCC_ALLIANCE_ID)).fetchone()
+            """, (comp_date, latest_date, ALLIANCE_ID)).fetchone()
             if top_power:
                 embed.add_field(
                     name="Most Power Gained",
@@ -1695,7 +1695,7 @@ async def cmd_activity(interaction: discord.Interaction, period: int = 7):
                 WHERE curr.date = ? AND curr.alliance_id = ?
                     AND COALESCE(curr.power, 0) - COALESCE(prev.power, 0) = 0
                     AND prev.player_id IS NOT NULL
-            """, (comp_date, latest_date, NCC_ALLIANCE_ID)).fetchone()[0]
+            """, (comp_date, latest_date, ALLIANCE_ID)).fetchone()[0]
             embed.add_field(name="Inactive (0 power change)", value=str(inactive), inline=True)
 
         await interaction.response.send_message(embed=embed)
@@ -1722,7 +1722,7 @@ async def cmd_milestones(interaction: discord.Interaction, period: int = 7):
     try:
         row = conn.execute(
             "SELECT MAX(date) FROM daily_snapshots WHERE alliance_id = ?",
-            (NCC_ALLIANCE_ID,),
+            (ALLIANCE_ID,),
         ).fetchone()
         if not row or not row[0]:
             await interaction.response.send_message("No data available.")
@@ -1732,12 +1732,12 @@ async def cmd_milestones(interaction: discord.Interaction, period: int = 7):
         if period == 0:
             comp_row = conn.execute("""
                 SELECT MIN(date) FROM daily_snapshots WHERE alliance_id = ?
-            """, (NCC_ALLIANCE_ID,)).fetchone()
+            """, (ALLIANCE_ID,)).fetchone()
         else:
             comp_row = conn.execute("""
                 SELECT MAX(date) FROM daily_snapshots
                 WHERE date <= date(?, ?) AND alliance_id = ?
-            """, (latest_date, f"-{period} days", NCC_ALLIANCE_ID)).fetchone()
+            """, (latest_date, f"-{period} days", ALLIANCE_ID)).fetchone()
         comp_date = comp_row[0] if comp_row and comp_row[0] else None
 
         milestones = []
@@ -1753,7 +1753,7 @@ async def cmd_milestones(interaction: discord.Interaction, period: int = 7):
                 WHERE curr.date = ? AND curr.alliance_id = ?
                     AND curr.level > prev.level
                 ORDER BY curr.level DESC
-            """, (comp_date, latest_date, NCC_ALLIANCE_ID)).fetchall()
+            """, (comp_date, latest_date, ALLIANCE_ID)).fetchall()
             for name, old_lvl, new_lvl in level_ups:
                 milestones.append(f"**{name}** leveled up: {old_lvl} → {new_lvl}")
 
@@ -1767,7 +1767,7 @@ async def cmd_milestones(interaction: discord.Interaction, period: int = 7):
                         ON prev.player_id = curr.player_id AND prev.date = ?
                     WHERE curr.date = ? AND curr.alliance_id = ?
                         AND curr.{stat} IS NOT NULL AND prev.{stat} IS NOT NULL
-                """, (comp_date, latest_date, NCC_ALLIANCE_ID)).fetchall()
+                """, (comp_date, latest_date, ALLIANCE_ID)).fetchall()
                 for name, old_val, new_val in rows:
                     if old_val is None or new_val is None:
                         continue
@@ -1800,13 +1800,13 @@ async def cmd_milestones(interaction: discord.Interaction, period: int = 7):
 
 @tree.command(name="help", description="List all bot commands")
 async def cmd_help(interaction: discord.Interaction):
-    embed = discord.Embed(title="NCC Tracker Bot", color=0x00BFFF)
+    embed = discord.Embed(title="NWS Tracker Bot", color=0x00BFFF)
     cmds = [
         ("/me", "Your stats and deltas"),
         ("/stats", "Look up any player's stats"),
         ("/whois", "Player profile with name history"),
         ("/compare", "Side-by-side comparison of two players"),
-        ("/leaderboard", "Top 10 NCC members by stat change"),
+        ("/leaderboard", "Top 10 NWS members by stat change"),
         ("/activity", "Alliance activity summary"),
         ("/milestones", "Recent achievements and milestones"),
         ("/link", "Link your Discord account to your player"),

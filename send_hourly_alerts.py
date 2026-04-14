@@ -1,5 +1,5 @@
 """
-Hourly Discord alerts for NCC Alliance: joins, leaves.
+Hourly Discord alerts for NWS Alliance: joins, leaves.
 Compares the 2 most recent daily snapshots from the SQLite DB and posts
 separate Discord embeds for each event type detected.
 """

@@ -178,17 +178,17 @@ class TestHasChanges:
 
 def _insert_snapshot(conn, date, members):
     """Helper to insert test snapshot data into the DB."""
-    alliance_id = db_mod.NCC_ALLIANCE_ID
+    alliance_id = db_mod.ALLIANCE_ID
     for mid, m in members.items():
         pid = int(mid)
         conn.execute("""
             INSERT OR REPLACE INTO players (player_id, name, server, alliance_id, alliance_tag, first_seen, last_seen)
-            VALUES (?, ?, 716, ?, 'NCC', ?, ?)
+            VALUES (?, ?, 716, ?, 'NWS', ?, ?)
         """, (pid, m["name"], alliance_id, date, date))
         conn.execute("""
             INSERT OR REPLACE INTO daily_snapshots
                 (player_id, date, level, power, alliance_id, alliance_tag)
-            VALUES (?, ?, ?, ?, ?, 'NCC')
+            VALUES (?, ?, ?, ?, ?, 'NWS')
         """, (pid, date, m.get("level", 0), m.get("power", 0), alliance_id))
     conn.commit()
 

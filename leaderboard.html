@@ -244,7 +244,6 @@
       <a href="calendar">Calendar</a>
       <a href="server" class="nav-admin">Server <span class="nav-lock">&#128274;</span></a>
       <a href="leaderboard" class="active nav-admin">Leaderboard <span class="nav-lock">&#128274;</span></a>
-      <a href="ncc_thc_war">War Tracker</a>
       <a href="/roe-admin/" class="nav-admin">ROE Violations <span class="nav-lock">&#128274;</span></a>
       <a href="admin" class="nav-admin">Admin <span class="nav-lock">&#128274;</span></a>
     </nav>
@@ -273,7 +272,7 @@
 <script>
 (function() {
   const $ = id => document.getElementById(id);
-  const NCC_ID = '2616095065411838478';
+  const NCC_ID = '2656439294172226322';
 
   // --- Auth gate ---
   const PASSWORD = 'salsa';
@@ -711,7 +710,7 @@
   function testHighLevel(p, minLevel) { return (p.level || 0) >= minLevel; }
 
   function renderRecruiting() {
-    // Base pool: everyone except NCC
+    // Base pool: everyone except NWS
     const basePlayers = playerData.players.filter(p => p.alliance_id !== NCC_ID);
 
     // Count how many match each filter (against the base pool) for button labels

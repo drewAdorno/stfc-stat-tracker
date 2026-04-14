@@ -31,7 +31,7 @@ from db import (get_db, upsert_players, clear_bad_rss_contrib_snapshots,
                 export_server_players_json, export_server_history_json,
                 ingest_alliance_inventory, export_alliance_inventory_json,
                 export_roe_violations_json,
-                NCC_ALLIANCE_ID, _migrate_alliance_ids)
+                ALLIANCE_ID, _migrate_alliance_ids)
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -714,8 +714,8 @@ def bridge_player_ids(conn, profiles):
 
 def save_data(all_mapped, total_count):
     """Store mapped players in SQLite and export JSON files for dashboards."""
-    ncc_members = [m for m in all_mapped if m["alliance_id"] == NCC_ALLIANCE_ID]
-    safe_print(f"NCC members found: {len(ncc_members)}")
+    ncc_members = [m for m in all_mapped if m["alliance_id"] == ALLIANCE_ID]
+    safe_print(f"Alliance members found: {len(ncc_members)}")
 
     today = now_est().strftime("%Y-%m-%d")
     conn = get_db()
@@ -748,10 +748,10 @@ def save_data(all_mapped, total_count):
 
     log_pull(conn, SERVER, total_count, source="scopely")
 
-    export_latest_json(conn, NCC_ALLIANCE_ID)
+    export_latest_json(conn, ALLIANCE_ID)
     safe_print(f"Exported {DATA_DIR / 'latest.json'}")
 
-    export_history_json(conn, NCC_ALLIANCE_ID)
+    export_history_json(conn, ALLIANCE_ID)
     safe_print(f"Exported {DATA_DIR / 'history.json'}")
 
     export_server_alliances_json(conn)
@@ -832,12 +832,12 @@ def main():
             alliance_ids.add(aid)  # keep as original type (int) for the API
     alliances = fetch_alliances(alliance_ids, auth) if alliance_ids else {}
 
-    # --- Fetch NCC alliance member ranks ---
-    if NCC_ALLIANCE_ID:
-        safe_print("=== Fetching NCC member ranks ===")
-        ncc_members = fetch_alliance_members(NCC_ALLIANCE_ID, auth)
+    # --- Fetch alliance member ranks ---
+    if ALLIANCE_ID:
+        safe_print("=== Fetching alliance member ranks ===")
+        ncc_members = fetch_alliance_members(ALLIANCE_ID, auth)
     else:
-        safe_print("=== Skipping NCC member ranks (no alliance configured) ===")
+        safe_print("=== Skipping alliance member ranks (no alliance configured) ===")
         ncc_members = {}
 
     # --- Fetch RSS/ISO contrib for all alliances ---

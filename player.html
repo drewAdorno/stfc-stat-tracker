@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Player Details — NCC Alliance Tracker</title>
+<title>Player Details — NWS Alliance Tracker</title>
 <link rel="stylesheet" href="lcars.css">
 <style>
   /* Player header layout */
@@ -210,7 +210,6 @@
       <a href="calendar">Calendar</a>
       <a href="server" class="nav-admin">Server <span class="nav-lock">&#128274;</span></a>
       <a href="leaderboard" class="nav-admin">Leaderboard <span class="nav-lock">&#128274;</span></a>
-      <a href="ncc_thc_war">War Tracker</a>
       <a href="/roe-admin/" class="nav-admin">ROE Violations <span class="nav-lock">&#128274;</span></a>
       <a href="admin" class="nav-admin">Admin <span class="nav-lock">&#128274;</span></a>
     </nav>
@@ -469,11 +468,11 @@
       </div>
       <div class="player-meta">${metaHtml}</div>
     `;
-    document.title = player.name + (isNccPlayer ? ' — NCC Alliance Tracker' : ' — Server 716 Player');
+    document.title = player.name + (isNccPlayer ? ' — NWS Alliance Tracker' : ' — Server 724 Player');
 
     // Update LCARS subtitle
     const sub = $('lcars-subtitle');
-    if (sub) sub.textContent = player.name + (isNccPlayer ? ' // NCC Alliance' : ' // Server 716');
+    if (sub) sub.textContent = player.name + (isNccPlayer ? ' // NWS Alliance' : ' // Server 724');
 
     // Get 1-day-ago snapshot for deltas
     let pastSnap = null;
@@ -618,7 +617,7 @@
     }
   }
 
-  // Load data — try NCC data first, fall back to server-wide data for non-NCC players
+  // Load data — try alliance data first, fall back to server-wide data for non-members
   const cacheBust = Date.now();
 
   const latestP = fetch('data/latest.json?t=' + cacheBust)
@@ -638,7 +637,7 @@
       const nccPlayer = nccMembers.find(m => m.id === playerId);
 
       if (nccPlayer) {
-        // NCC member — merge server history (pre-NCC) with NCC history
+        // Alliance member — merge server history with alliance history
         isNccPlayer = true;
         const allPlayers = serverPlayersData ? serverPlayersData.players : [];
         // Attach past_alliances from server_players data
@@ -650,12 +649,12 @@
           .then(r => { if (!r.ok) return []; return r.json(); })
           .catch(() => [])
           .then(serverHistory => {
-            // Build set of dates where this player appears in NCC history
+            // Build set of dates where this player appears in alliance history
             const nccPlayerDates = new Set(
               nccHistory.filter(e => e.members[playerId]).map(e => e.date)
             );
-            // Merge: use NCC entries as-is, add server history for dates
-            // where the player wasn't yet in NCC data
+            // Merge: use alliance entries as-is, add server history for dates
+            // where the player wasn't yet in alliance data
             const merged = [...nccHistory];
             for (const entry of serverHistory) {
               if (!nccPlayerDates.has(entry.date) && entry.members[playerId]) {
@@ -666,7 +665,7 @@
             render(nccPlayer, history, nccMembers, allPlayers);
           });
       } else if (serverPlayersData) {
-        // Non-NCC player — use server-wide data
+        // Non-alliance player — use server-wide data
         isNccPlayer = false;
 
         // Find player in server_players.json
@@ -714,7 +713,7 @@
             resources_raided: formatAbbr(p.resources_raided),
           }));
 
-        // Load server_history.json for chart and name history (lazy, only for non-NCC)
+        // Load server_history.json for chart and name history (lazy, only for non-alliance)
         fetch('data/server_history.json?t=' + cacheBust)
           .then(r => { if (!r.ok) return []; return r.json(); })
           .catch(() => [])

@@ -1,5 +1,5 @@
 """
-Discord Webhook Notification for NCC Alliance Daily Report.
+Discord Webhook Notification for NWS Alliance Daily Report.
 Reads data/latest.json and data/history.json, computes analytics,
 and POSTs a rich embed to a Discord webhook URL from .env file.
 Stdlib only — no pip installs needed.
@@ -287,7 +287,7 @@ def build_embed(latest, history):
     today = now_est().strftime("%Y-%m-%d")
 
     embed = {
-        "title": f"NCC Daily Report \u2014 {today}",
+        "title": f"NWS Daily Report \u2014 {today}",
         "description": compute_description(latest, history),
         "color": EMBED_COLOR,
         "footer": {"text": "ncctracker.top"},
@@ -393,7 +393,7 @@ def post_webhook(url, embed):
         data=payload,
         headers={
             "Content-Type": "application/json",
-            "User-Agent": "NCC-Alliance-Tracker/1.0",
+            "User-Agent": "NWS-Alliance-Tracker/1.0",
         },
         method="POST",
     )

@@ -38,7 +38,7 @@ class TestRoeViolations:
         conn, tmp_path = test_db
         _insert_player(conn, "p1", "BadGuy", "a1", "FOE", "Foe Alliance")
         _insert_player(conn, "p2", "WorseGuy", "a1", "FOE", "Foe Alliance")
-        _insert_player(conn, "n1", "Victim", db_mod.NCC_ALLIANCE_ID, "NCC", "Discovery")
+        _insert_player(conn, "n1", "Victim", db_mod.ALLIANCE_ID, "NWS", "No Win Scenario")
 
         db_mod.record_roe_violation(
             conn,
