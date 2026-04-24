@@ -242,28 +242,17 @@
     <nav>
       <a href="index">Tracker</a>
       <a href="calendar">Calendar</a>
-      <a href="server" class="nav-admin">Server <span class="nav-lock">&#128274;</span></a>
-      <a href="leaderboard" class="active nav-admin">Leaderboard <span class="nav-lock">&#128274;</span></a>
-      <a href="/roe-admin/" class="nav-admin">ROE Violations <span class="nav-lock">&#128274;</span></a>
-      <a href="admin" class="nav-admin">Admin <span class="nav-lock">&#128274;</span></a>
+      <a href="server">Server</a>
+      <a href="leaderboard" class="active">Leaderboard</a>
     </nav>
 
     <div class="updated" id="updated"></div>
 
-    <div id="login-gate">
-      <div class="login-box">
-        <h2>Player Leaderboard</h2>
-        <input type="password" id="pw-input" placeholder="Enter password" autocomplete="off">
-        <button id="pw-btn">Enter</button>
-        <div class="login-error" id="pw-error"></div>
-      </div>
-    </div>
-
-    <div id="content" style="display:none">
+    <div id="content">
       <div class="loading">Loading player data...</div>
     </div>
 
-    <footer style="display:none" id="footer-el">
+    <footer id="footer-el">
       Data sourced from Scopely game APIs
     </footer>
   </div>
@@ -272,40 +261,9 @@
 <script>
 (function() {
   const $ = id => document.getElementById(id);
-  const NCC_ID = '2656439294172226322';
+  const NCC_ID = '2696744443654333349';
 
-  // --- Auth gate ---
-  const PASSWORD = 'salsa';
-
-  function checkAuth() {
-    return sessionStorage.getItem('ncc_admin_auth') === 'ok';
-  }
-
-  function showDashboard() {
-    $('login-gate').style.display = 'none';
-    $('content').style.display = '';
-    $('footer-el').style.display = '';
-    loadData();
-  }
-
-  if (checkAuth()) {
-    showDashboard();
-  } else {
-    $('pw-btn').addEventListener('click', tryLogin);
-    $('pw-input').addEventListener('keydown', e => { if (e.key === 'Enter') tryLogin(); });
-  }
-
-  function tryLogin() {
-    const val = $('pw-input').value;
-    if (val === PASSWORD) {
-      sessionStorage.setItem('ncc_admin_auth', 'ok');
-      showDashboard();
-    } else {
-      $('pw-error').textContent = 'Incorrect password';
-      $('pw-input').value = '';
-      $('pw-input').focus();
-    }
-  }
+  loadData();
 
   // --- Utilities ---
   function esc(s) {
