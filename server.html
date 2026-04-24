@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Server 716 Analytics</title>
+<title>Server 724 Tracker</title>
 <style>
   /* === Page-specific styles (login, tabs, search, compare, movements) === */
 
@@ -99,6 +99,83 @@
     color: var(--bg-deep);
     border-color: var(--lcars-orange);
     font-weight: 700;
+  }
+
+  /* Recruiting filter controls */
+  .filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+    justify-content: center;
+    align-items: center;
+  }
+  .filter-toggle {
+    background: rgba(255,153,51,0.06);
+    border: 1px solid rgba(255,153,51,0.12);
+    color: var(--lcars-gold);
+    padding: 6px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    transition: all 0.15s;
+  }
+  .filter-toggle:hover {
+    border-color: var(--lcars-orange);
+    color: var(--lcars-orange);
+  }
+  .filter-toggle.active {
+    background: var(--lcars-orange);
+    color: var(--bg-deep);
+    border-color: var(--lcars-orange);
+    font-weight: 700;
+  }
+  .filter-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.82rem;
+    color: var(--text-mid);
+    font-family: 'Rajdhani', sans-serif;
+  }
+  .filter-input-wrap input {
+    width: 80px;
+    padding: 5px 10px;
+    background: var(--bg-input);
+    border: 1px solid rgba(255,153,51,0.12);
+    border-radius: 4px;
+    color: var(--text-bright);
+    font-size: 0.85rem;
+    font-family: 'Share Tech Mono', monospace;
+  }
+  .filter-input-wrap input:focus {
+    outline: none;
+    border-color: var(--lcars-orange);
+  }
+
+  /* Recruit score badges */
+  .badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    font-family: 'Share Tech Mono', monospace;
+  }
+  .badge-hot  { background: rgba(255,85,85,0.15); color: var(--lcars-red); border: 1px solid rgba(255,85,85,0.3); }
+  .badge-warm { background: rgba(255,153,51,0.15); color: var(--lcars-orange); border: 1px solid rgba(255,153,51,0.3); }
+  .badge-cool { background: rgba(85,204,85,0.15); color: var(--lcars-green); border: 1px solid rgba(85,204,85,0.3); }
+  .badge-cold { background: rgba(153,153,255,0.15); color: var(--lcars-blue); border: 1px solid rgba(153,153,255,0.3); }
+
+  .result-count {
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    font-family: 'Share Tech Mono', monospace;
+    margin-bottom: 8px;
   }
 
   /* Search input */
@@ -288,8 +365,8 @@
   }
   .section-header:first-child { margin-top: 0; }
 
-  /* NCC row highlight */
-  tr.ncc-row td { background: rgba(255,153,51,0.06); }
+  /* Home alliance row highlight */
+  tr.home-row td { background: rgba(255,153,51,0.06); }
 
   /* Clickable rows */
   tr.clickable { cursor: pointer; }
@@ -314,7 +391,7 @@
 <div class="lcars-bar">
   <div class="lcars-cap"></div>
   <div class="lcars-title-block">
-    <h1>Server 716</h1>
+    <h1>Server 724</h1>
     <span class="subtitle">ALLIANCE ANALYTICS</span>
   </div>
   <div class="lcars-end"></div>
@@ -331,10 +408,9 @@
   </div>
   <div class="lcars-main">
     <nav>
-      <a href="index">Tracker</a>
+      <a href="index">NWS</a>
       <a href="calendar">Calendar</a>
-      <a href="server" class="active">Server</a>
-      <a href="leaderboard">Leaderboard</a>
+      <a href="server" class="active">Server 724 Tracker</a>
     </nav>
 
     <div class="updated" id="updated"></div>
@@ -352,7 +428,7 @@
 <script>
 (function() {
   const $ = id => document.getElementById(id);
-  const NCC_ID = '2696744443654333349';
+  const HOME_ALLIANCE_ID = '2696744443654333349';
 
   loadData();
 
@@ -419,6 +495,32 @@
   let detailSortAsc = false;
   let detailPeriod = null; // null = all time, 1/7/30 = days
 
+  // Player Leaderboard state
+  let plbSortCol = 'power';
+  let plbSortAsc = false;
+  let plbPeriod = 7;
+  let plbSearch = '';
+
+  // Recruiting state
+  let recSortCol = 'recruit_score';
+  let recSortAsc = false;
+  let recPeriod = 7;
+  let recSearch = '';
+  let recFilters = {
+    noAlliance: false,
+    smallAlliance: false,
+    recentlyMoved: false,
+    highActivity: false,
+    highLevel: false,
+  };
+  let recMinPower = 0;
+  let recMinLevel = 25;
+
+  // Precomputed (populated after loadData)
+  let allianceMemberCounts = {};
+  let allianceAvgActivity = {};
+  let avgActivityScore = 0;
+
   const DELTA_FIELDS = [
     'level', 'power', 'helps', 'iso_contrib',
     'players_killed', 'hostiles_killed', 'resources_mined', 'resources_raided',
@@ -450,11 +552,18 @@
           year: 'numeric', month: 'short', day: 'numeric',
           hour: '2-digit', minute: '2-digit'
         });
+        precompute();
         // Deep-link: ?alliance=<id> opens alliance detail tab
-        const urlAllianceId = new URLSearchParams(window.location.search).get('alliance');
+        const params = new URLSearchParams(window.location.search);
+        const urlAllianceId = params.get('alliance');
         if (urlAllianceId && a.alliances.some(al => al.alliance_id === urlAllianceId)) {
           detailAllianceId = urlAllianceId;
           currentTab = 'detail';
+        }
+        const urlTab = params.get('tab');
+        const validTabs = ['leaderboard','players','detail','search','compare','recruiting','movements'];
+        if (urlTab && validTabs.includes(urlTab)) {
+          currentTab = urlTab;
         }
         renderPage();
       })
@@ -469,9 +578,11 @@
     // Tab bar
     const tabs = [
       ['leaderboard', 'Alliance Leaderboard'],
+      ['players', 'Player Leaderboard'],
       ['detail', 'Alliance Detail'],
       ['search', 'Player Search'],
       ['compare', 'Alliance Comparison'],
+      ['recruiting', 'Recruiting Board'],
       ['movements', 'Player Movements'],
     ];
     html += '<div class="tab-bar">';
@@ -500,12 +611,39 @@
     if (!el) return;
 
     switch (currentTab) {
-      case 'leaderboard': el.innerHTML = renderLeaderboard(); attachLeaderboardHandlers(); break;
-      case 'detail':      el.innerHTML = renderDetail();      attachDetailHandlers(); break;
-      case 'search':      el.innerHTML = renderSearch();      attachSearchHandlers(); break;
-      case 'compare':     el.innerHTML = renderCompare();     attachCompareHandlers(); break;
-      case 'movements':   el.innerHTML = renderMovements();   break;
+      case 'leaderboard': el.innerHTML = renderLeaderboard();       attachLeaderboardHandlers(); break;
+      case 'players':     el.innerHTML = renderPlayerLeaderboard(); attachPlayerLeaderboardHandlers(); break;
+      case 'detail':      el.innerHTML = renderDetail();            attachDetailHandlers(); break;
+      case 'search':      el.innerHTML = renderSearch();            attachSearchHandlers(); break;
+      case 'compare':     el.innerHTML = renderCompare();           attachCompareHandlers(); break;
+      case 'recruiting':  el.innerHTML = renderRecruiting();        attachRecruitingHandlers(); break;
+      case 'movements':   el.innerHTML = renderMovements();         break;
     }
+  }
+
+  function precompute() {
+    allianceMemberCounts = {};
+    for (const p of playerData.players) {
+      if (p.alliance_tag) {
+        allianceMemberCounts[p.alliance_tag] = (allianceMemberCounts[p.alliance_tag] || 0) + 1;
+      }
+    }
+    allianceAvgActivity = {};
+    const sums = {}, counts = {};
+    for (const p of playerData.players) {
+      if (p.alliance_tag) {
+        const a = p.activity_score || 0;
+        sums[p.alliance_tag] = (sums[p.alliance_tag] || 0) + a;
+        counts[p.alliance_tag] = (counts[p.alliance_tag] || 0) + 1;
+      }
+    }
+    for (const tag in sums) allianceAvgActivity[tag] = sums[tag] / counts[tag];
+    let total = 0, n = 0;
+    for (const p of playerData.players) {
+      const a = p.activity_score || 0;
+      if (a > 0) { total += a; n++; }
+    }
+    avgActivityScore = n > 0 ? total / n : 0;
   }
 
   // ===== TAB 1: Alliance Leaderboard =====
@@ -571,8 +709,8 @@
     html += '</tr></thead><tbody>';
 
     for (const a of alliances) {
-      const isNcc = a.alliance_id === NCC_ID;
-      const rowCls = (isNcc ? ' ncc-row' : '') + ' clickable';
+      const isHome = a.alliance_id === HOME_ALLIANCE_ID;
+      const rowCls = (isHome ? ' home-row' : '') + ' clickable';
       html += `<tr class="${rowCls.trim()}" data-aid="${a.alliance_id}">`;
       html += `<td>${a.rank}</td>`;
       html += `<td><strong>${esc(a.alliance_tag)}</strong></td>`;
@@ -642,7 +780,7 @@
     html += '<div id="alliance-search-dropdown" class="alliance-search-results"></div>';
     html += '</div>';
     if (!detailAllianceId) {
-      html += `<div class="alliance-search-hint">Search across ${alliances.length} alliances on Server 716</div>`;
+      html += `<div class="alliance-search-hint">Search across ${alliances.length} alliances on Server 724</div>`;
     }
 
     if (!detailAllianceId) {
@@ -1063,12 +1201,12 @@
       return '<div class="empty">No player movements detected in the last 7 days</div>';
     }
 
-    // Split into NCC-related and other
-    const nccMoves = moved.filter(p =>
-      p.alliance_id === NCC_ID || (p.prev_alliance_tag && p.prev_alliance_tag === 'NWS')
+    // Split into home-alliance-related and other
+    const homeMoves = moved.filter(p =>
+      p.alliance_id === HOME_ALLIANCE_ID || (p.prev_alliance_tag && p.prev_alliance_tag === 'NWS')
     );
     const otherMoves = moved.filter(p =>
-      p.alliance_id !== NCC_ID && (p.prev_alliance_tag !== 'NWS')
+      p.alliance_id !== HOME_ALLIANCE_ID && (p.prev_alliance_tag !== 'NWS')
     );
 
     let html = '';
@@ -1094,14 +1232,424 @@
       return s;
     }
 
-    if (nccMoves.length > 0) {
-      html += movementTable(nccMoves, 'NWS-Related Movements');
+    if (homeMoves.length > 0) {
+      html += movementTable(homeMoves, 'NWS-Related Movements');
     }
     if (otherMoves.length > 0) {
       html += movementTable(otherMoves, 'Other Alliance Movements');
     }
 
     return html;
+  }
+
+  // ===== TAB: Player Leaderboard =====
+  function renderPlayerLeaderboard() {
+    const players = [...playerData.players];
+
+    let filtered = players;
+    if (plbSearch.length >= 2) {
+      const q = plbSearch.toLowerCase();
+      filtered = players.filter(p =>
+        p.name.toLowerCase().includes(q) ||
+        (p.alliance_tag && p.alliance_tag.toLowerCase().includes(q))
+      );
+    }
+
+    const cols = [
+      { key: 'rank',             label: '#',              sortable: false },
+      { key: 'name',             label: 'Player',         type: 'name' },
+      { key: 'alliance_tag',     label: 'Alliance',       type: 'text' },
+      { key: 'level',            label: 'Level',          type: 'num' },
+      { key: 'activity_score',   label: 'Activity',       type: 'num' },
+      { key: 'power',            label: 'Power',          delta: true },
+      { key: 'players_killed',   label: 'PVP Kills',      delta: true },
+      { key: 'hostiles_killed',  label: 'Hostile Kills',  delta: true },
+      { key: 'resources_mined',  label: 'RSS Mined',      delta: true },
+      { key: 'resources_raided', label: 'RSS Raided',     delta: true },
+    ];
+
+    const sortDef = cols.find(c => c.key === plbSortCol);
+    if (sortDef) {
+      if (sortDef.type === 'name' || sortDef.type === 'text') {
+        filtered.sort((a, b) => {
+          const va = (a[plbSortCol] || '').toLowerCase();
+          const vb = (b[plbSortCol] || '').toLowerCase();
+          const v = va.localeCompare(vb);
+          return plbSortAsc ? v : -v;
+        });
+      } else {
+        const useDelta = sortDef.delta && plbPeriod;
+        const sortKey = useDelta ? getDeltaKey(plbSortCol, plbPeriod) : plbSortCol;
+        filtered.sort((a, b) => {
+          const v = (a[sortKey] || 0) - (b[sortKey] || 0);
+          return plbSortAsc ? v : -v;
+        });
+      }
+    }
+
+    function findLeader(field) {
+      if (filtered.length === 0) return null;
+      const dk = getDeltaKey(field, plbPeriod);
+      return filtered.reduce((best, p) => (p[dk] || 0) > (best[dk] || 0) ? p : best);
+    }
+    function leaderCard(label, field) {
+      const leader = findLeader(field);
+      if (!leader) return '';
+      const dk = getDeltaKey(field, plbPeriod);
+      const val = leader[dk] || 0;
+      if (val <= 0) return '';
+      return `<div class="card"><div class="label">${label} (${plbPeriod}d)</div><div class="value">${formatAbbr(val)}</div><div class="sub">${esc(leader.name)}</div></div>`;
+    }
+    const topPower = filtered.length > 0 ? filtered.reduce((best, p) => (p.power || 0) > (best.power || 0) ? p : best) : null;
+
+    const cardParts = [];
+    if (filtered.length > 0) cardParts.push(`<div class="card"><div class="label">Total Players</div><div class="value">${filtered.length.toLocaleString()}</div></div>`);
+    if (topPower && topPower.power > 0) cardParts.push(`<div class="card"><div class="label">Most Powerful</div><div class="value">${formatAbbr(topPower.power)}</div><div class="sub">${esc(topPower.name)}</div></div>`);
+    for (const [label, field] of [['Power Gained','power'],['PVP Kills','players_killed'],['Hostile Kills','hostiles_killed'],['RSS Mined','resources_mined'],['RSS Raided','resources_raided'],['Helps','helps'],['ISO Contributed','iso_contrib']]) {
+      const c = leaderCard(label, field);
+      if (c) cardParts.push(c);
+    }
+    let html = '';
+    if (cardParts.length > 0) {
+      html += '<div class="cards">' + cardParts.join('') + '</div>';
+    }
+
+    html += '<div class="search-wrap">';
+    html += `<input type="text" class="search-input" id="plb-search" placeholder="Search by player name or alliance tag..." value="${esc(plbSearch)}">`;
+    html += '</div>';
+
+    html += '<div class="period-bar">';
+    for (const [p, label] of [[1, 'Yesterday'], [7, 'This Week'], [30, 'This Month']]) {
+      const active = plbPeriod === p ? ' active' : '';
+      html += `<button class="period-btn${active}" data-period="${p}">${label}</button>`;
+    }
+    html += '</div>';
+
+    if (playerData.delta_dates) {
+      const baseDate = playerData.delta_dates[`${plbPeriod}d`];
+      if (baseDate) {
+        html += `<div style="text-align:center;font-size:0.78rem;color:var(--text-dim);margin-bottom:16px;">Comparing against ${baseDate}</div>`;
+      }
+    }
+
+    const shown = filtered.slice(0, 500);
+
+    html += '<div class="table-wrap"><table><thead><tr>';
+    for (const col of cols) {
+      if (col.sortable === false) {
+        html += `<th>${col.label}</th>`;
+      } else {
+        const arrow = plbSortCol === col.key ? (plbSortAsc ? '&#9650;' : '&#9660;') : '';
+        html += `<th data-col="${col.key}">${col.label}<span class="arrow">${arrow}</span></th>`;
+      }
+    }
+    html += '</tr></thead><tbody>';
+
+    for (let i = 0; i < shown.length; i++) {
+      const p = shown[i];
+      const isHome = p.alliance_id === HOME_ALLIANCE_ID;
+      const rowCls = isHome ? 'home-row' : '';
+      html += `<tr class="${rowCls}">`;
+      html += `<td>${i + 1}</td>`;
+      html += `<td>${playerLink(p)}</td>`;
+      html += `<td>${esc(p.alliance_tag || '—')}</td>`;
+
+      const levelDelta = p[getDeltaKey('level', plbPeriod)] || 0;
+      if (levelDelta > 0) {
+        html += `<td>${p.level} <span class="delta-pos" style="font-size:0.75rem">+${levelDelta}</span></td>`;
+      } else {
+        html += `<td>${p.level}</td>`;
+      }
+
+      html += `<td>${activityBadge(p.activity_score)}</td>`;
+
+      for (const col of cols.filter(c => c.delta)) {
+        const val = p[col.key] || 0;
+        const delta = p[getDeltaKey(col.key, plbPeriod)] || 0;
+        html += `<td>${gainCellHtml(val, delta)}</td>`;
+      }
+
+      html += '</tr>';
+    }
+    html += '</tbody></table></div>';
+
+    if (filtered.length > 500) {
+      html += `<div class="empty">Showing top 500 of ${filtered.length.toLocaleString()} players. Use search to find specific players.</div>`;
+    }
+
+    return html;
+  }
+
+  function attachPlayerLeaderboardHandlers() {
+    document.querySelectorAll('#tab-content th[data-col]').forEach(th => {
+      th.addEventListener('click', () => {
+        const col = th.dataset.col;
+        if (plbSortCol === col) plbSortAsc = !plbSortAsc;
+        else { plbSortCol = col; plbSortAsc = (col === 'name' || col === 'alliance_tag'); }
+        rerenderPlayerLeaderboard();
+      });
+    });
+    document.querySelectorAll('#tab-content .period-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        plbPeriod = parseInt(btn.dataset.period);
+        rerenderPlayerLeaderboard();
+      });
+    });
+    const searchInput = document.getElementById('plb-search');
+    if (searchInput) {
+      searchInput.addEventListener('input', () => {
+        plbSearch = searchInput.value;
+        rerenderPlayerLeaderboard();
+        const newInput = document.getElementById('plb-search');
+        if (newInput) {
+          newInput.focus();
+          newInput.setSelectionRange(newInput.value.length, newInput.value.length);
+        }
+      });
+    }
+  }
+
+  function rerenderPlayerLeaderboard() {
+    document.getElementById('tab-content').innerHTML = renderPlayerLeaderboard();
+    attachPlayerLeaderboardHandlers();
+  }
+
+  // ===== TAB: Recruiting Board =====
+  function computeRecruitScore(p) {
+    const activityPct = Math.min((p.activity_score || 0) / 100, 1);
+    let availability = 0;
+    if (!p.alliance_tag || p.alliance_tag === '') {
+      availability = 1;
+    } else {
+      const memberCount = allianceMemberCounts[p.alliance_tag] || 0;
+      const allyAvg = allianceAvgActivity[p.alliance_tag] || 0;
+      const smallPct = Math.max(0, 1 - (memberCount / 20));
+      const inactivePct = allyAvg < avgActivityScore ? 1 - Math.max(0, allyAvg / avgActivityScore) : 0;
+      availability = Math.max(smallPct, inactivePct);
+    }
+    return (activityPct * 0.6) + (availability * 0.4);
+  }
+
+  function scoreBadge(score) {
+    if (score >= 0.6) return '<span class="badge badge-hot">HOT</span>';
+    if (score >= 0.45) return '<span class="badge badge-warm">WARM</span>';
+    if (score >= 0.3) return '<span class="badge badge-cool">COOL</span>';
+    return '<span class="badge badge-cold">COLD</span>';
+  }
+
+  function testNoAlliance(p) { return !p.alliance_tag || p.alliance_tag === ''; }
+  function testSmallAlliance(p) { return p.alliance_tag && (allianceMemberCounts[p.alliance_tag] || 0) < 10; }
+  function testRecentlyMoved(p) { return p.moved === true; }
+  function testHighActivity(p) { return (p.activity_score || 0) > avgActivityScore; }
+  function testHighLevel(p, minLevel) { return (p.level || 0) >= minLevel; }
+
+  function renderRecruiting() {
+    const basePlayers = playerData.players.filter(p => p.alliance_id !== HOME_ALLIANCE_ID);
+
+    const filterCounts = {
+      noAlliance:    basePlayers.filter(testNoAlliance).length,
+      smallAlliance: basePlayers.filter(testSmallAlliance).length,
+      recentlyMoved: basePlayers.filter(testRecentlyMoved).length,
+      highActivity:  basePlayers.filter(testHighActivity).length,
+      highLevel:     basePlayers.filter(p => testHighLevel(p, recMinLevel)).length,
+    };
+
+    let players = [...basePlayers];
+    if (recFilters.noAlliance) players = players.filter(testNoAlliance);
+    if (recFilters.smallAlliance) players = players.filter(testSmallAlliance);
+    if (recFilters.recentlyMoved) players = players.filter(testRecentlyMoved);
+    if (recFilters.highActivity) players = players.filter(testHighActivity);
+    if (recFilters.highLevel) players = players.filter(p => testHighLevel(p, recMinLevel));
+    if (recMinPower > 0) players = players.filter(p => (p.power || 0) >= recMinPower);
+
+    if (recSearch.length >= 2) {
+      const q = recSearch.toLowerCase();
+      players = players.filter(p =>
+        p.name.toLowerCase().includes(q) ||
+        (p.alliance_tag && p.alliance_tag.toLowerCase().includes(q))
+      );
+    }
+
+    for (const p of players) p._score = computeRecruitScore(p);
+
+    const cols = [
+      { key: 'rank',             label: '#',              sortable: false },
+      { key: 'recruit_score',    label: 'Score',          type: 'score' },
+      { key: 'name',             label: 'Player',         type: 'name' },
+      { key: 'alliance_tag',     label: 'Alliance',       type: 'text' },
+      { key: 'level',            label: 'Level',          type: 'num' },
+      { key: 'activity_score',   label: 'Activity',       type: 'num' },
+      { key: 'power',            label: 'Power',          delta: true },
+      { key: 'players_killed',   label: 'PVP Kills',      delta: true },
+      { key: 'hostiles_killed',  label: 'Hostile Kills',  delta: true },
+      { key: 'resources_mined',  label: 'RSS Mined',      delta: true },
+      { key: 'resources_raided', label: 'RSS Raided',     delta: true },
+    ];
+
+    const sortDef = cols.find(c => c.key === recSortCol);
+    if (sortDef) {
+      if (sortDef.type === 'score') {
+        players.sort((a, b) => {
+          const v = (a._score || 0) - (b._score || 0);
+          return recSortAsc ? v : -v;
+        });
+      } else if (sortDef.type === 'name' || sortDef.type === 'text') {
+        players.sort((a, b) => {
+          const va = (a[recSortCol] || '').toLowerCase();
+          const vb = (b[recSortCol] || '').toLowerCase();
+          return recSortAsc ? va.localeCompare(vb) : -va.localeCompare(vb);
+        });
+      } else {
+        const useDelta = sortDef.delta && recPeriod;
+        const sortKey = useDelta ? getDeltaKey(recSortCol, recPeriod) : recSortCol;
+        players.sort((a, b) => {
+          const v = (a[sortKey] || 0) - (b[sortKey] || 0);
+          return recSortAsc ? v : -v;
+        });
+      }
+    }
+
+    let html = '';
+
+    html += '<div class="filter-bar">';
+    const toggleDefs = [
+      ['noAlliance',    'No Alliance'],
+      ['smallAlliance', 'Small Alliance (<10)'],
+      ['recentlyMoved', 'Recently Moved'],
+      ['highActivity',  'High Activity'],
+      ['highLevel',     'High Level'],
+    ];
+    for (const [key, label] of toggleDefs) {
+      const active = recFilters[key] ? ' active' : '';
+      html += `<button class="filter-toggle${active}" data-filter="${key}">${label} (${filterCounts[key]})</button>`;
+    }
+    html += '<div class="filter-input-wrap">';
+    html += `<label>Min Level:</label><input type="number" id="rec-min-level" value="${recMinLevel}" min="1" max="99">`;
+    html += '</div>';
+    html += '<div class="filter-input-wrap">';
+    html += `<label>Min Power:</label><input type="number" id="rec-min-power" value="${recMinPower}" min="0" step="1000000">`;
+    html += '</div>';
+    html += '</div>';
+
+    html += '<div class="search-wrap">';
+    html += `<input type="text" class="search-input" id="rec-search" placeholder="Search by player name or alliance tag..." value="${esc(recSearch)}">`;
+    html += '</div>';
+
+    html += '<div class="period-bar">';
+    for (const [p, label] of [[1, 'Yesterday'], [7, 'This Week'], [30, 'This Month']]) {
+      const active = recPeriod === p ? ' active' : '';
+      html += `<button class="period-btn${active}" data-period="${p}">${label}</button>`;
+    }
+    html += '</div>';
+
+    html += `<div class="result-count">${players.length.toLocaleString()} players</div>`;
+
+    const shown = players.slice(0, 500);
+
+    html += '<div class="table-wrap"><table><thead><tr>';
+    for (const col of cols) {
+      if (col.sortable === false) {
+        html += `<th>${col.label}</th>`;
+      } else {
+        const arrow = recSortCol === col.key ? (recSortAsc ? '&#9650;' : '&#9660;') : '';
+        html += `<th data-col="${col.key}">${col.label}<span class="arrow">${arrow}</span></th>`;
+      }
+    }
+    html += '</tr></thead><tbody>';
+
+    for (let i = 0; i < shown.length; i++) {
+      const p = shown[i];
+      html += '<tr>';
+      html += `<td>${i + 1}</td>`;
+      html += `<td>${scoreBadge(p._score)}</td>`;
+      html += `<td>${playerLink(p)}</td>`;
+
+      if (p.alliance_tag) {
+        const mc = allianceMemberCounts[p.alliance_tag] || 0;
+        html += `<td>${esc(p.alliance_tag)} <span style="font-size:0.7rem;color:var(--text-dim)">(${mc})</span></td>`;
+      } else {
+        html += '<td><span style="color:var(--text-dim)">None</span></td>';
+      }
+
+      const levelDelta = p[getDeltaKey('level', recPeriod)] || 0;
+      if (levelDelta > 0) {
+        html += `<td>${p.level} <span class="delta-pos" style="font-size:0.75rem">+${levelDelta}</span></td>`;
+      } else {
+        html += `<td>${p.level}</td>`;
+      }
+
+      html += `<td>${activityBadge(p.activity_score)}</td>`;
+
+      for (const col of cols.filter(c => c.delta)) {
+        const val = p[col.key] || 0;
+        const delta = p[getDeltaKey(col.key, recPeriod)] || 0;
+        html += `<td>${gainCellHtml(val, delta)}</td>`;
+      }
+
+      html += '</tr>';
+    }
+    html += '</tbody></table></div>';
+
+    if (players.length > 500) {
+      html += `<div class="empty">Showing top 500 of ${players.length.toLocaleString()} matches. Use search or filters to narrow down.</div>`;
+    }
+
+    return html;
+  }
+
+  function attachRecruitingHandlers() {
+    document.querySelectorAll('#tab-content .filter-toggle').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const key = btn.dataset.filter;
+        recFilters[key] = !recFilters[key];
+        rerenderRecruiting();
+      });
+    });
+    const minLevelInput = document.getElementById('rec-min-level');
+    if (minLevelInput) {
+      minLevelInput.addEventListener('change', () => {
+        recMinLevel = parseInt(minLevelInput.value) || 25;
+        rerenderRecruiting();
+      });
+    }
+    const minPowerInput = document.getElementById('rec-min-power');
+    if (minPowerInput) {
+      minPowerInput.addEventListener('change', () => {
+        recMinPower = parseInt(minPowerInput.value) || 0;
+        rerenderRecruiting();
+      });
+    }
+    document.querySelectorAll('#tab-content th[data-col]').forEach(th => {
+      th.addEventListener('click', () => {
+        const col = th.dataset.col;
+        if (recSortCol === col) recSortAsc = !recSortAsc;
+        else { recSortCol = col; recSortAsc = (col === 'name' || col === 'alliance_tag'); }
+        rerenderRecruiting();
+      });
+    });
+    document.querySelectorAll('#tab-content .period-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        recPeriod = parseInt(btn.dataset.period);
+        rerenderRecruiting();
+      });
+    });
+    const searchInput = document.getElementById('rec-search');
+    if (searchInput) {
+      searchInput.addEventListener('input', () => {
+        recSearch = searchInput.value;
+        rerenderRecruiting();
+        const newInput = document.getElementById('rec-search');
+        if (newInput) {
+          newInput.focus();
+          newInput.setSelectionRange(newInput.value.length, newInput.value.length);
+        }
+      });
+    }
+  }
+
+  function rerenderRecruiting() {
+    document.getElementById('tab-content').innerHTML = renderRecruiting();
+    attachRecruitingHandlers();
   }
 
 })();
