@@ -350,7 +350,7 @@ class TestBuildEmbed:
     def test_footer_text(self, members, history):
         latest = {"members": members, "summary": {}}
         embed = sdn.build_embed(latest, history)
-        assert embed["footer"]["text"] == "ncctracker.top"
+        assert embed["footer"]["text"] == "nws.stfcdrew.lol"
 
     def test_color(self, members, history):
         latest = {"members": members, "summary": {}}

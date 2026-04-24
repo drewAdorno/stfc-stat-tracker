@@ -9,7 +9,7 @@ set -euo pipefail
 APP_USER="stfc"
 APP_DIR="/opt/stfc"
 REPO_URL="https://github.com/drewAdorno/stfc-stat-tracker.git"
-DOMAIN="ncctracker.top"
+DOMAIN="nws.stfcdrew.lol"
 
 echo "=== 1. System packages ==="
 apt-get update

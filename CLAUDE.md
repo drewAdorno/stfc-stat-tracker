@@ -1,7 +1,7 @@
 # STFC Stat Tracker
 
 ## Project Overview
-Star Trek Fleet Command alliance tracker for NWS / No Win Scenario (alliance ID `2656439294172226322`) on Server 724. Hourly data pulls from Scopely game APIs (public CDN + authenticated game server), stored in SQLite, served as static HTML dashboards on ncctracker.top.
+Star Trek Fleet Command alliance tracker for NWS / No Win Scenario (alliance ID `2656439294172226322`) on Server 724. Hourly data pulls from Scopely game APIs (public CDN + authenticated game server), stored in SQLite, served as static HTML dashboards on nws.stfcdrew.lol.
 
 ## Tech Stack
 - **Python 3.11** (Windows) / **3.12** (CI/EC2)
@@ -58,7 +58,7 @@ Star Trek Fleet Command alliance tracker for NWS / No Win Scenario (alliance ID 
 - **IP**: 3.16.255.133
 - **SSH**: `ssh -i ~/Downloads/STFC_pem.pem ubuntu@3.16.255.133`
 - **App dir**: `/opt/stfc` (venv at `/opt/stfc/venv`)
-- **Domain**: ncctracker.top (SSL via certbot)
+- **Domain**: nws.stfcdrew.lol (SSL via certbot)
 - **Scraping**: systemd timer runs `deploy/run_pull.sh` hourly
 
 ### CI/CD Pipeline

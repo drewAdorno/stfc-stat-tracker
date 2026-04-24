@@ -728,7 +728,7 @@ async def on_message(message):
             if alliance_tag:
                 offender_val += f" [{alliance_tag}]"
             if player_id:
-                offender_val += f"\n[View on tracker](https://ncctracker.top/player?id={player_id})"
+                offender_val += f"\n[View on tracker](https://nws.stfcdrew.lol/player?id={player_id})"
 
             # Warnings for missing data
             warnings = []
@@ -751,7 +751,7 @@ async def on_message(message):
                 )
                 embed.add_field(name="Offender", value=offender_val, inline=True)
                 embed.add_field(name="Type", value=parsed.get("violation_type", "?"), inline=True)
-                embed.set_footer(text=f"Violation #{vid} (KOS) • ncctracker.top")
+                embed.set_footer(text=f"Violation #{vid} (KOS) • nws.stfcdrew.lol")
             else:
                 desc = None
                 if warnings:
@@ -770,7 +770,7 @@ async def on_message(message):
                 if system:
                     embed.add_field(name="System", value=system, inline=True)
                 embed.add_field(name="Reported by", value=message.author.display_name, inline=True)
-                embed.set_footer(text=f"Violation #{vid} • ncctracker.top")
+                embed.set_footer(text=f"Violation #{vid} • nws.stfcdrew.lol")
             await message.reply(embed=embed)
 
 
@@ -843,7 +843,7 @@ async def on_thread_update(before: discord.Thread, after: discord.Thread):
         if alliance_tag:
             offender_val += f" [{alliance_tag}]"
         if player_id:
-            offender_val += f"\n[View on tracker](https://ncctracker.top/player?id={player_id})"
+            offender_val += f"\n[View on tracker](https://nws.stfcdrew.lol/player?id={player_id})"
 
         embed = discord.Embed(
             title="ROE Violation Updated",
@@ -1223,7 +1223,7 @@ def _get_inventory_embed(conn):
         description="\n".join(lines) or "No items",
         color=0xE67E22,
     )
-    embed.set_footer(text="ncctracker.top")
+    embed.set_footer(text="nws.stfcdrew.lol")
     return embed
 
 
@@ -1309,7 +1309,7 @@ async def daily_report_loop():
                     description=desc,
                     color=0x4DABF7,
                 )
-                embed.set_footer(text="ncctracker.top")
+                embed.set_footer(text="nws.stfcdrew.lol")
                 for f in fields:
                     embed.add_field(name=f["name"], value=f["value"], inline=False)
 
@@ -1582,7 +1582,7 @@ async def cmd_whois(interaction: discord.Interaction, player: str):
 
         embed.add_field(
             name="Profile",
-            value=f"[ncctracker.top/player?id={player_id}](https://ncctracker.top/player?id={player_id})",
+            value=f"[nws.stfcdrew.lol/player?id={player_id}](https://nws.stfcdrew.lol/player?id={player_id})",
             inline=False,
         )
 

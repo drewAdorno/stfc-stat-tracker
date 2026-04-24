@@ -96,7 +96,7 @@ class TestBuildAlertEmbeds:
         changes = sha.detect_changes(prev_members, curr_members)
         embeds = sha.build_alert_embeds(changes)
         for embed in embeds:
-            assert embed["footer"]["text"] == "ncctracker.top"
+            assert embed["footer"]["text"] == "nws.stfcdrew.lol"
 
     def test_joined_embed_is_green(self):
         changes = {

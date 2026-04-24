@@ -60,7 +60,7 @@ def build_alert_embeds(changes):
             "title": "✅ Member Joined",
             "description": truncate_field("\n".join(lines)),
             "color": 0x51CF66,  # green
-            "footer": {"text": "ncctracker.top"},
+            "footer": {"text": "nws.stfcdrew.lol"},
         })
 
     if changes["left"]:
@@ -72,7 +72,7 @@ def build_alert_embeds(changes):
             "title": "🚪 Member Left",
             "description": truncate_field("\n".join(lines)),
             "color": 0xFF6B6B,  # red
-            "footer": {"text": "ncctracker.top"},
+            "footer": {"text": "nws.stfcdrew.lol"},
         })
 
     return embeds

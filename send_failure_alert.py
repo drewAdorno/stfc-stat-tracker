@@ -43,7 +43,7 @@ def main():
             "```"
         ),
         "color": 0xFF0000,  # red
-        "footer": {"text": "ncctracker.top"},
+        "footer": {"text": "nws.stfcdrew.lol"},
     }
 
     if post_webhook(webhook_url, embed):

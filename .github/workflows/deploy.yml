@@ -72,6 +72,6 @@ jobs:
             if ! diff -q deploy/stfc-nginx.conf /etc/nginx/sites-available/stfc.base > /dev/null 2>&1; then
               sudo cp deploy/stfc-nginx.conf /etc/nginx/sites-available/stfc.base
               sudo cp deploy/stfc-nginx.conf /etc/nginx/sites-available/stfc
-              sudo certbot --nginx -d ncctracker.top -d www.ncctracker.top --non-interactive --redirect
+              sudo certbot --nginx -d nws.stfcdrew.lol --non-interactive --redirect
             fi
             sudo nginx -t && sudo systemctl reload nginx

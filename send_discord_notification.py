@@ -290,7 +290,7 @@ def build_embed(latest, history):
         "title": f"NWS Daily Report \u2014 {today}",
         "description": compute_description(latest, history),
         "color": EMBED_COLOR,
-        "footer": {"text": "ncctracker.top"},
+        "footer": {"text": "nws.stfcdrew.lol"},
     }
 
     fields = []
