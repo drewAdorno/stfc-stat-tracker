@@ -11,8 +11,14 @@ echo ============================================ >> "%LOG_FILE%"
 
 cd /d "%PROJECT_DIR%"
 
-echo Running API puller... >> "%LOG_FILE%"
-"%PYTHON_EXE%" pull_api.py >> "%LOG_FILE%" 2>&1
+echo Fetching alliance inventory... >> "%LOG_FILE%"
+"%PYTHON_EXE%" fetch_alliance_inventory.py >> "%LOG_FILE%" 2>&1
+if !ERRORLEVEL! neq 0 (
+    echo WARNING: alliance inventory fetch failed with exit code !ERRORLEVEL! - continuing >> "%LOG_FILE%"
+)
+
+echo Running Scopely puller... >> "%LOG_FILE%"
+"%PYTHON_EXE%" pull_scopely.py >> "%LOG_FILE%" 2>&1
 if !ERRORLEVEL! neq 0 (
     echo ERROR: Scraper failed with exit code !ERRORLEVEL! >> "%LOG_FILE%"
     goto :end
