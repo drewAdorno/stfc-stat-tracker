@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NWS Alliance Inventory</title>
+<link rel="stylesheet" href="lcars.css">
+<style>
+  .inv-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .inv-card {
+    padding: 14px 16px;
+    border: 1px solid var(--border-glow);
+    background: var(--bg-panel);
+    border-radius: var(--radius);
+  }
+  .inv-card .label {
+    color: var(--text-dim);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+  .inv-card .value {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.45rem;
+    color: var(--lcars-orange);
+    margin-top: 4px;
+  }
+  .inv-card .detail {
+    color: var(--text-mid);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.78rem;
+    margin-top: 2px;
+  }
+  .inv-controls {
+    display: grid;
+    grid-template-columns: 1fr auto auto auto;
+    gap: 12px;
+    align-items: end;
+    padding: 14px 16px;
+    border: 1px solid var(--border-glow);
+    background: var(--bg-panel);
+    border-radius: var(--radius);
+    margin-bottom: 12px;
+  }
+  .inv-controls .ctl-group {
+    display: grid;
+    gap: 4px;
+  }
+  .inv-controls label {
+    color: var(--text-dim);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.62rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+  .inv-controls select,
+  .inv-controls input {
+    background: rgba(255,153,51,0.06);
+    color: var(--lcars-gold);
+    border: 1px solid rgba(255,153,51,0.12);
+    border-radius: 4px;
+    padding: 8px 10px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.9rem;
+    min-width: 140px;
+  }
+  .inv-controls select:focus,
+  .inv-controls input:focus {
+    outline: none;
+    border-color: var(--lcars-orange);
+  }
+  .inv-table-wrap {
+    border: 1px solid var(--border-glow);
+    background: var(--bg-panel);
+    border-radius: var(--radius);
+    overflow: auto;
+  }
+  table.inv {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.92rem;
+  }
+  table.inv thead th {
+    background: rgba(255,153,51,0.08);
+    color: var(--text-dim);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.66rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    text-align: left;
+    padding: 12px 14px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border-glow);
+    user-select: none;
+    white-space: nowrap;
+  }
+  table.inv thead th:hover {
+    color: var(--lcars-orange);
+  }
+  table.inv thead th.sort-asc::after { content: ' ▲'; color: var(--lcars-orange); }
+  table.inv thead th.sort-desc::after { content: ' ▼'; color: var(--lcars-orange); }
+  table.inv tbody td {
+    padding: 9px 14px;
+    border-bottom: 1px solid rgba(255,153,51,0.05);
+    color: var(--text-bright);
+    white-space: nowrap;
+  }
+  table.inv tbody tr:hover td {
+    background: rgba(255,153,51,0.04);
+  }
+  td.num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  .delta-pos { color: #6cf07d; }
+  .delta-neg { color: #ff6c6c; }
+  .delta-zero { color: var(--text-dim); }
+  .name-unknown {
+    color: var(--text-dim);
+    font-style: italic;
+  }
+  .empty-state {
+    padding: 40px;
+    text-align: center;
+    color: var(--text-dim);
+    font-family: 'Share Tech Mono', monospace;
+  }
+  .footer-note {
+    margin-top: 8px;
+    color: var(--text-dim);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.78rem;
+    text-align: right;
+  }
+</style>
+</head>
+<body>
+
+<div class="lcars-bar">
+  <div class="lcars-cap"></div>
+  <div class="lcars-title-block">
+    <h1>Alliance Inventory</h1>
+    <span class="subtitle" id="updated">LOADING...</span>
+  </div>
+  <div class="lcars-end"></div>
+</div>
+
+<div class="lcars-layout">
+  <div class="lcars-sidebar">
+    <div class="seg seg-orange" style="height:80px"></div>
+    <div class="seg seg-amber" style="height:40px"></div>
+    <div class="seg seg-blue" style="height:60px"></div>
+    <div class="seg seg-purple" style="height:30px"></div>
+    <div class="seg seg-teal" style="height:50px"></div>
+    <div class="seg seg-amber"></div>
+  </div>
+  <div class="lcars-main">
+    <nav>
+      <a href="index">NWS</a>
+      <a href="calendar">Calendar</a>
+      <a href="inventory" class="active">Inventory</a>
+      <a href="server">Server 724</a>
+    </nav>
+
+    <section class="inv-summary" id="summary"></section>
+
+    <section class="inv-controls">
+      <div class="ctl-group">
+        <label for="filter">Filter</label>
+        <input id="filter" type="text" placeholder="resource name…" autocomplete="off">
+      </div>
+      <div class="ctl-group">
+        <label for="from-date">Compare From</label>
+        <select id="from-date"></select>
+      </div>
+      <div class="ctl-group">
+        <label for="to-date">Compare To</label>
+        <select id="to-date"></select>
+      </div>
+      <div class="ctl-group">
+        <label>&nbsp;</label>
+        <button id="reset-cmp" type="button" style="
+          padding:8px 14px;border-radius:4px;border:1px solid rgba(255,153,51,0.12);
+          background:rgba(255,153,51,0.06);color:var(--lcars-gold);
+          font-family:'Rajdhani',sans-serif;font-weight:600;cursor:pointer;">
+          Today vs Yesterday
+        </button>
+      </div>
+    </section>
+
+    <section class="inv-table-wrap">
+      <table class="inv" id="inv-table">
+        <thead>
+          <tr>
+            <th data-sort="name">Resource</th>
+            <th data-sort="from" class="num">From</th>
+            <th data-sort="to" class="num">To</th>
+            <th data-sort="delta" class="num sort-desc">Δ</th>
+            <th data-sort="pct" class="num">Δ %</th>
+          </tr>
+        </thead>
+        <tbody id="inv-body"></tbody>
+      </table>
+      <div id="empty" class="empty-state" style="display:none">No inventory snapshots yet.</div>
+    </section>
+    <div class="footer-note" id="snapshot-info"></div>
+
+    <footer>Data sourced from in-game alliance bank API</footer>
+  </div>
+</div>
+
+<script>
+(function() {
+  const $ = id => document.getElementById(id);
+
+  function fmt(n) {
+    if (n === 0 || n === null || n === undefined) return '0';
+    const sign = n < 0 ? '-' : '';
+    return sign + Math.abs(n).toLocaleString('en-US');
+  }
+  function fmtPct(p) {
+    if (!isFinite(p)) return '—';
+    const sign = p > 0 ? '+' : '';
+    return sign + p.toFixed(1) + '%';
+  }
+  function deltaClass(n) {
+    if (n > 0) return 'delta-pos';
+    if (n < 0) return 'delta-neg';
+    return 'delta-zero';
+  }
+
+  let snapshots = [];     // [{date, items:{name:count}}, ...]
+  let dates = [];         // ['YYYY-MM-DD', ...]
+  let fromDate = null;
+  let toDate = null;
+  let sortKey = 'delta';
+  let sortDir = 'desc';
+  let filterText = '';
+
+  function buildRows() {
+    const fromItems = (snapshots.find(s => s.date === fromDate) || {}).items || {};
+    const toItems = (snapshots.find(s => s.date === toDate) || {}).items || {};
+    const allNames = new Set([...Object.keys(fromItems), ...Object.keys(toItems)]);
+    const rows = [];
+    for (const name of allNames) {
+      const from = fromItems[name] || 0;
+      const to = toItems[name] || 0;
+      const delta = to - from;
+      const pct = from === 0 ? (to === 0 ? 0 : Infinity) : (delta / from) * 100;
+      rows.push({ name, from, to, delta, pct });
+    }
+    return rows;
+  }
+
+  function renderSummary() {
+    const latestDate = dates.length ? dates[dates.length - 1] : '—';
+    const latestSnap = snapshots.find(s => s.date === latestDate) || { items: {} };
+    const itemCount = Object.keys(latestSnap.items).length;
+    const totalUnits = Object.values(latestSnap.items).reduce((a, b) => a + b, 0);
+
+    let topGain = null, topLoss = null;
+    if (dates.length >= 2) {
+      const rows = buildRows();
+      for (const r of rows) {
+        if (r.delta > 0 && (!topGain || r.delta > topGain.delta)) topGain = r;
+        if (r.delta < 0 && (!topLoss || r.delta < topLoss.delta)) topLoss = r;
+      }
+    }
+
+    $('summary').innerHTML = `
+      <div class="inv-card">
+        <div class="label">Latest Snapshot</div>
+        <div class="value">${latestDate}</div>
+        <div class="detail">${dates.length} total snapshots on file</div>
+      </div>
+      <div class="inv-card">
+        <div class="label">Distinct Items</div>
+        <div class="value">${itemCount}</div>
+        <div class="detail">across all resource types</div>
+      </div>
+      <div class="inv-card">
+        <div class="label">Total Units Stored</div>
+        <div class="value">${totalUnits.toLocaleString('en-US')}</div>
+        <div class="detail">sum of all item counts</div>
+      </div>
+      <div class="inv-card">
+        <div class="label">Top Gainer (Today)</div>
+        <div class="value" style="font-size:1.05rem">${topGain ? topGain.name : '—'}</div>
+        <div class="detail ${topGain ? deltaClass(topGain.delta) : ''}">
+          ${topGain ? '+' + topGain.delta.toLocaleString('en-US') : 'no day-over-day data'}
+        </div>
+      </div>
+      <div class="inv-card">
+        <div class="label">Top Loser (Today)</div>
+        <div class="value" style="font-size:1.05rem">${topLoss ? topLoss.name : '—'}</div>
+        <div class="detail ${topLoss ? deltaClass(topLoss.delta) : ''}">
+          ${topLoss ? topLoss.delta.toLocaleString('en-US') : 'no day-over-day data'}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderTable() {
+    const tbody = $('inv-body');
+    let rows = buildRows();
+    if (filterText) {
+      const f = filterText.toLowerCase();
+      rows = rows.filter(r => r.name.toLowerCase().includes(f));
+    }
+    rows.sort((a, b) => {
+      const av = a[sortKey], bv = b[sortKey];
+      if (typeof av === 'string') {
+        return sortDir === 'asc' ? av.localeCompare(bv) : bv.localeCompare(av);
+      }
+      return sortDir === 'asc' ? av - bv : bv - av;
+    });
+
+    if (rows.length === 0) {
+      tbody.innerHTML = '';
+      $('empty').style.display = 'block';
+    } else {
+      $('empty').style.display = 'none';
+      tbody.innerHTML = rows.map(r => {
+        const looksUnknown = /^\d+$/.test(r.name);
+        const nameClass = looksUnknown ? 'name-unknown' : '';
+        const dCls = deltaClass(r.delta);
+        return `<tr>
+          <td class="${nameClass}">${r.name}</td>
+          <td class="num">${fmt(r.from)}</td>
+          <td class="num">${fmt(r.to)}</td>
+          <td class="num ${dCls}">${r.delta > 0 ? '+' : ''}${fmt(r.delta)}</td>
+          <td class="num ${dCls}">${fmtPct(r.pct)}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    $('snapshot-info').textContent =
+      `Comparing ${fromDate || '—'} → ${toDate || '—'} · ${rows.length} resource${rows.length === 1 ? '' : 's'}`;
+  }
+
+  function setSort(key) {
+    if (sortKey === key) {
+      sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+    } else {
+      sortKey = key;
+      sortDir = (key === 'name') ? 'asc' : 'desc';
+    }
+    document.querySelectorAll('table.inv thead th').forEach(th => {
+      th.classList.remove('sort-asc', 'sort-desc');
+      if (th.dataset.sort === sortKey) {
+        th.classList.add(sortDir === 'asc' ? 'sort-asc' : 'sort-desc');
+      }
+    });
+    renderTable();
+  }
+
+  function populateDateSelectors() {
+    const opts = dates.map(d => `<option value="${d}">${d}</option>`).join('');
+    $('from-date').innerHTML = opts;
+    $('to-date').innerHTML = opts;
+    $('from-date').value = fromDate;
+    $('to-date').value = toDate;
+  }
+
+  function defaultDates() {
+    if (dates.length >= 2) {
+      toDate = dates[dates.length - 1];
+      fromDate = dates[dates.length - 2];
+    } else if (dates.length === 1) {
+      toDate = dates[0];
+      fromDate = dates[0];
+    }
+  }
+
+  function wireControls() {
+    $('filter').addEventListener('input', e => {
+      filterText = e.target.value;
+      renderTable();
+    });
+    $('from-date').addEventListener('change', e => {
+      fromDate = e.target.value;
+      renderSummary();
+      renderTable();
+    });
+    $('to-date').addEventListener('change', e => {
+      toDate = e.target.value;
+      renderSummary();
+      renderTable();
+    });
+    $('reset-cmp').addEventListener('click', () => {
+      defaultDates();
+      $('from-date').value = fromDate;
+      $('to-date').value = toDate;
+      renderSummary();
+      renderTable();
+    });
+    document.querySelectorAll('table.inv thead th').forEach(th => {
+      th.addEventListener('click', () => setSort(th.dataset.sort));
+    });
+  }
+
+  fetch('data/alliance_inventory.json?t=' + Date.now())
+    .then(r => {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    })
+    .then(data => {
+      snapshots = (data.snapshots || []).slice().sort((a, b) => a.date.localeCompare(b.date));
+      dates = snapshots.map(s => s.date);
+      if (dates.length === 0) {
+        $('updated').textContent = 'NO DATA';
+        $('empty').style.display = 'block';
+        $('summary').innerHTML = '<div class="inv-card"><div class="label">Status</div><div class="value">No snapshots yet</div><div class="detail">Run fetch_alliance_inventory.py</div></div>';
+        return;
+      }
+      defaultDates();
+      populateDateSelectors();
+      $('updated').textContent = 'LATEST ' + dates[dates.length - 1];
+      wireControls();
+      renderSummary();
+      renderTable();
+    })
+    .catch(err => {
+      $('updated').textContent = 'LOAD FAILED';
+      $('empty').textContent = 'Failed to load inventory data: ' + err.message;
+      $('empty').style.display = 'block';
+    });
+})();
+</script>
+</body>
+</html>
