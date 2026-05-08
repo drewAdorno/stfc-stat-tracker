@@ -39,3 +39,5 @@ data/.bot_roe_nudged
 roe_admin/node_modules/
 roe_uploads/
 data/roe_violations.json
+*.pem
+*.key

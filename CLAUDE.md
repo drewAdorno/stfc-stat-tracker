@@ -56,7 +56,7 @@ Star Trek Fleet Command alliance tracker for NWS / No Win Scenario (alliance ID 
 ### EC2 (Production)
 - **Instance**: Ubuntu 24.04, t2.micro, us-east-2
 - **IP**: 3.16.255.133
-- **SSH**: `ssh -i ~/Downloads/STFC_pem.pem ubuntu@3.16.255.133`
+- **SSH**: `ssh -i ~/.ssh/my-key.pem ubuntu@3.16.255.133`
 - **App dir**: `/opt/stfc` (venv at `/opt/stfc/venv`)
 - **Domain**: nws.stfcdrew.lol (SSL via certbot)
 - **Scraping**: systemd timer runs `deploy/run_pull.sh` hourly
